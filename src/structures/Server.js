@@ -24,6 +24,7 @@ const RoutingManager = require('./managers/RoutingManager');
 const { Signale } = require('signale');
 const { version } = require('../util/Constants');
 const express = require('express');
+const cors = require('cors');
 
 /**
  * Represents the bare-minimum API server, which handles everything
@@ -77,6 +78,9 @@ module.exports = class Server {
       res.setHeader('X-Powered-By', `auguwu tehc (v${version}, https://github.com/auguwu/API)`);
       next();
     });
+
+    // Add CORS functionality
+    this.app.use(cors());
   }
 
   /**

@@ -14,6 +14,7 @@
     "@augu/dotenv": "1.1.0",
     "@augu/immutable": "0.4.0",
     "@augu/orchid": "1.4.0",
+    "cors": "^2.8.5",
     "express": "4.17.1",
     "signale": "1.4.0"
   },
