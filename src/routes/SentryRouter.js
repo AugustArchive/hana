@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-const { Signale, config } = require('signale');
+const { Signale } = require('signale');
 const crypto = require('crypto');
 const e = require('express');
 
@@ -38,7 +38,8 @@ const verify = (req) => {
 
 router.get('/', (_, res) => res.status(200).json({ apple: 'dot com' }));
 router.post('/', (req, res) => {
-  if (!config.sentryAccessToken) return res.status(503).json({ message: 'Sentry webhooks aren\'t enabled.' });
+  console.log('a');
+  if (!config.sentryAccessToken || !config.sentrySignature) return res.status(503).json({ message: 'Sentry webhooks aren\'t enabled.' });
   //if (!verify(req)) return res.status(204).send();
 
   logger.debug(req.headers);
