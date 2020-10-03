@@ -28,6 +28,8 @@ const logger = new Signale({ scope: 'Webhooks' });
 const router = e.Router();
 
 const verify = (req, signature = '') => {
+  console.log(req.body);
+  
   const hmac = crypto.createHmac('sha256', signature);
   hmac.update(JSON.stringify(req.body), 'utf8');
 
