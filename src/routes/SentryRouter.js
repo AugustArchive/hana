@@ -38,11 +38,10 @@ const verify = (req) => {
 
 router.get('/', (_, res) => res.status(200).json({ apple: 'dot com' }));
 router.post('/', (req, res) => {
-  console.log('a');
   if (!config.sentryAccessToken || !config.sentrySignature) return res.status(503).json({ message: 'Sentry webhooks aren\'t enabled.' });
   //if (!verify(req)) return res.status(204).send();
 
-  logger.debug(req.headers);
+  logger.debug(req.headers, req.body);
   logger.info(`Received event "${req.headers['Sentry-Hook-Resource']}"`);
 });
 
