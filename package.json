@@ -1,7 +1,7 @@
 {
   "name": "@polarboi/api",
   "description": "🖤 API service for all of my services",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "build/app.js",
   "license": "MIT",
   "author": "Chris \"August\" Hernandez <august@augu.dev>",
