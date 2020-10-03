@@ -41,6 +41,8 @@ router.post('/', (req, res) => {
   if (!config.sentryAccessToken || !config.sentrySignature) return res.status(503).json({ message: 'Sentry webhooks aren\'t enabled.' });
   //if (!verify(req)) return res.status(204).send();
 
+  if (req.headers['sentry-trace']) return res.status(200).json({ message: 'fuck you sentry, document ur fucking webhooks api' });
+
   logger.debug(req.headers, req.body);
   logger.info(`Received event "${req.headers['Sentry-Hook-Resource']}"`);
 });
