@@ -1,25 +1,25 @@
 {
   "name": "@polarboi/api",
   "description": "🖤 API service for all of my services",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "build/app.js",
   "license": "MIT",
   "author": "Chris \"August\" Hernandez <august@augu.dev>",
   "repository": "https://github.com/auguwu/API",
   "scripts": {
     "build": "yarn lint && rm -fr build && yarn tsc",
-    "lint": "eslint src --ext .ts --fix"
+    "lint": "eslint src --ext .js --fix"
   },
   "dependencies": {
-    "@augu/dotenv": "1.1.0",
-    "@augu/immutable": "0.4.0",
-    "@augu/orchid": "1.4.0",
-    "cors": "^2.8.5",
+    "@augu/dotenv": "1.2.0",
+    "@augu/immutable": "0.5.0",
+    "@augu/orchid": "1.6.5",
+    "cors": "2.8.5",
     "express": "4.17.1",
     "signale": "1.4.0"
   },
   "devDependencies": {
-    "@augu/eslint-config": "1.6.1",
-    "eslint": "7.7.0"
+    "@augu/eslint-config": "1.8.2",
+    "eslint": "7.10.0"
   }
 }

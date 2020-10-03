@@ -46,6 +46,7 @@ module.exports = {
               sponsorEntity {
                 ... on User {
                   avatarUrl(size: 1024)
+                  login
                   name
                   bio
                   url

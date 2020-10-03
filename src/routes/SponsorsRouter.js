@@ -25,15 +25,17 @@ const { HttpClient } = require('@augu/orchid');
 
 const e = require('express');
 const router = e.Router();
-const http = new HttpClient({
-  defaults: {
-    headers: {
-      'User-Agent': `api.augu.dev (v${version}, https://github.com/auguwu/API)`
-    }
-  }
-});
 
 router.get('/', async(req, res) => {
+  const http = new HttpClient({
+    defaults: {
+      headers: {
+        'User-Agent': `api.augu.dev (v${version}, https://github.com/auguwu/API)`,
+        'Authorization': `Bearer ${config.accessToken}`
+      }
+    }
+  });
+
   if (!req.query.hasOwnProperty('login')) return res.status(406).json({
     statusCode: 406,
     message: 'Missing "?login" query'
@@ -51,9 +53,6 @@ router.get('/', async(req, res) => {
   try {
     const resp = await http.request({
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${config.accessToken}`
-      },
       url: 'https://api.github.com/graphql',
       data: {
         query
@@ -70,6 +69,7 @@ router.get('/', async(req, res) => {
         sponsor: {
           profile: sponsor.sponsorEntity.url,
           avatar: sponsor.sponsorEntity.avatarUrl,
+          login: sponsor.sponsorEntity.login,
           name: sponsor.sponsorEntity.name,
           bio: sponsor.sponsorEntity.bio === '' ? 'User is a mystery...' : sponsor.sponsorEntity.bio
         },

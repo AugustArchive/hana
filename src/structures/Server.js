@@ -43,9 +43,9 @@ module.exports = class Server {
      * @type {Config}
      */
     this.config = {
-      environment: config.node_env,
-      accessToken: config.gh_access_token,
-      port: config.port
+      environment: config.NODE_ENV,
+      accessToken: config.GH_ACCESS_TOKEN,
+      port: config.PORT
     };
 
     /**
