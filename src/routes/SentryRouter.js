@@ -26,6 +26,7 @@ const e = require('express');
 
 const logger = new Signale({ scope: 'Webhooks' });
 const router = e.Router();
+logger.config({ displayBadge: true, displayTimestamp: true });
 
 const verify = (req, signature = '') => {
   console.log(req.body);
@@ -41,6 +42,7 @@ router.get('/', (_, res) => res.status(200).json({ apple: 'dot com' }));
 router.post('/', (req, res) => {
   //if (!verify(req)) return res.status(204).send();
 
+  logger.debug(req.headers);
   logger.info(`Received event "${req.headers['sentry-hook-resource']}" at ${new Date(req.headers['sentry-hook-timestamp']).toUTCString()}`);
   logger.debug(req.body);
 });
