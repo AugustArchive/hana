@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-const { Signale } = require('signale');
+const { Signale, config } = require('signale');
 const crypto = require('crypto');
 const e = require('express');
 
@@ -28,23 +28,21 @@ const logger = new Signale({ scope: 'Webhooks' });
 const router = e.Router();
 logger.config({ displayBadge: true, displayTimestamp: true });
 
-const verify = (req, signature = '') => {
-  console.log(req.body);
-
-  const hmac = crypto.createHmac('sha256', signature);
+const verify = (req) => {
+  const hmac = crypto.createHmac('sha256', config.sentrySignature);
   hmac.update(JSON.stringify(req.body), 'utf8');
 
   const digest = hmac.digest('hex');
-  return digest === req.headers['sentry-hook-signature'];
+  return digest === req.headers['Sentry-Hook-Signature'];
 };
 
 router.get('/', (_, res) => res.status(200).json({ apple: 'dot com' }));
 router.post('/', (req, res) => {
+  if (!config.sentryAccessToken) return res.status(503).json({ message: 'Sentry webhooks aren\'t enabled.' });
   //if (!verify(req)) return res.status(204).send();
 
   logger.debug(req.headers);
-  logger.info(`Received event "${req.headers['sentry-hook-resource']}" at ${new Date(req.headers['sentry-hook-timestamp']).toUTCString()}`);
-  logger.debug(req.body);
+  logger.info(`Received event "${req.headers['Sentry-Hook-Resource']}"`);
 });
 
 module.exports = { path: '/sentry', core: router };

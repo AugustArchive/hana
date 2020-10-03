@@ -43,6 +43,7 @@ module.exports = class Server {
      * @type {Config}
      */
     this.config = {
+      sentrySignature: config.SENTRY_SIGNATURE,
       sentryAccessToken: config.SENTRY_ACCESS_TOKEN,
       environment: config.NODE_ENV,
       accessToken: config.GH_ACCESS_TOKEN,

@@ -43,6 +43,14 @@ const config = parse({
   populate: false,
   file: join(__dirname, '..', '.env'),
   schema: {
+    SENTRY_ACCESS_TOKEN: {
+      type: 'string',
+      default: undefined
+    },
+    SENTRY_SIGNATURE: {
+      type: 'string',
+      default: undefined
+    },
     GH_ACCESS_TOKEN: {
       type: 'string',
       default: undefined
