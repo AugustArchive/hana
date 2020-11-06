@@ -21,6 +21,7 @@
  */
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.diffplug.gradle.spotless.SpotlessApply
 import org.apache.tools.ant.filters.ReplaceTokens
 
@@ -85,12 +86,17 @@ spotless {
 }
 
 application {
-    mainClassName = "dev.floofy.monori.Bootstrap"
+    mainClassName = "dev.floofy.api.Bootstrap"
+}
+
+kotlin {
+    explicitApi()
 }
 
 tasks {
     compileKotlin {
         kotlinOptions {
+            freeCompilerArgs = listOf("-Xuse-experimental=kotlin.RequiresOptIn")
             jvmTarget = JavaVersion.VERSION_11.toString()
         }
     }
