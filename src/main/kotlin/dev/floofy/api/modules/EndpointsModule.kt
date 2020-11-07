@@ -23,10 +23,9 @@ package dev.floofy.api.modules
 
 import dev.floofy.api.endpoints.v1.SponsorsEndpoint as SponsorsV1Endpoint
 import dev.floofy.api.endpoints.v1.MainEndpoint as MainV1Endpoint
-import dev.floofy.api.endpoints.KadiEndpoint
 import dev.floofy.api.endpoints.v2.*
+import dev.floofy.api.endpoints.KadiEndpoint
 import dev.floofy.api.core.Endpoint
-import dev.floofy.api.endpoints.TestEndpoint
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -47,6 +46,5 @@ val endpointsModule = module {
 
     // Other that don't require an version number
     // i.e: API (data) didn't change
-    //single { KadiEndpoint() } bind Endpoint::class
-    single { TestEndpoint() } bind Endpoint::class
+    single { KadiEndpoint() } bind Endpoint::class
 }

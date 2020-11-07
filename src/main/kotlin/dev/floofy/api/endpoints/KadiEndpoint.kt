@@ -22,11 +22,26 @@
 package dev.floofy.api.endpoints
 
 import dev.floofy.api.core.Endpoint
+import dev.floofy.api.end
 import io.vertx.core.http.HttpMethod
+import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 
-class KadiEndpoint: Endpoint(HttpMethod.GET, "/kadi", 2) {
-    override fun run(ctx: RoutingContext) {
+import java.io.File
 
+class KadiEndpoint: Endpoint(HttpMethod.GET, "/kadi", 0) {
+    override fun run(ctx: RoutingContext) {
+        val res = ctx.response()
+        val kadi = File("/var/www/cdn/kadi")
+        val files = mutableListOf<File>()
+        val listed = kadi.listFiles { path -> path?.isDirectory ?: false } ?: emptyArray()
+
+        for (l in listed) files.add(l)
+
+        val file = files.random()
+        return res.setStatusCode(200).end(JsonObject().apply {
+            put("files", files.size)
+            put("url", "https://cdn.floofy.dev/kadi/${file.name}")
+        })
     }
 }
