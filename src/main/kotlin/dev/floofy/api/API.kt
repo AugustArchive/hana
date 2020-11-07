@@ -68,17 +68,22 @@ class API: KoinComponent {
         val routes = getKoin().getAll<Endpoint>()
         val v1 = routes.filter { it.version == 1 }
         val v2 = routes.filter { it.version == 2 }
-        val wentOver = routes.filter { it.version > 2 }
-        val wentUnder = routes.filter { it.version < 1 }
+        val global = routes.filter { it.version == 0 }
 
-        if (wentOver.isNotEmpty()) throw Exception("${wentOver.size} endpoints went over the current version (v2)")
-        if (wentUnder.isNotEmpty()) throw Exception("${wentUnder.size} endpoints went over the oldest version (v1)")
-
-        logger.info("Found ${v1.size} v1 endpoints and ${v2.size} v2 endpoints")
-        logger.info("Global API Version: v${config.defaultAPIVersion}")
+        logger.info("v1 Endpoints:\n${v1.joinToString("\n") { "${it.method} /v1${it.path}" }}\n")
+        logger.info("v2 Endpoints:\n${v2.joinToString("\n") { "${it.method} /v2${it.path}" }}\n")
+        logger.info("Global Endpoints:\n${global.joinToString("\n") { "${it.method} ${it.path}" }}\n")
 
         val v1Router = Router.router(vertx)
         val v2Router = Router.router(vertx)
+
+        for (g in global) {
+            logger.info("Found route \"${g.method} ${g.path}\" under global scope")
+            router
+                .route(g.method, g.path)
+                .failureHandler { this.onFailure(g, it) }
+                .blockingHandler({ g.run(it) }, false)
+        }
 
         for (r in v1) {
             logger.info("Found route \"${r.method} ${r.path}\" under v1 scope")
