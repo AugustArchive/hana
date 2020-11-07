@@ -30,8 +30,14 @@ data class Config(
     @SerialName("github_access_token")
     val githubAccessToken: String,
 
+    @SerialName("default_api_version")
+    val defaultAPIVersion: Int = 2,
+
     @SerialName("webhook_url")
     val webhookUrl: String,
+
+    @SerialName("threads")
+    val threads: Int = 40,
 
     @SerialName("port")
     val port: Int

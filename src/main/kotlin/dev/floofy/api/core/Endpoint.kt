@@ -25,6 +25,10 @@ package dev.floofy.api.core
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
 
-abstract class Endpoint(val method: HttpMethod, val path: String) {
+abstract class Endpoint(
+    val method: HttpMethod,
+    val path: String,
+    val version: Int = 2
+) {
     abstract fun run(ctx: RoutingContext)
 }

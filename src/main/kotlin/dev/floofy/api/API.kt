@@ -21,3 +21,110 @@
  */
 
 package dev.floofy.api
+
+import dev.floofy.api.core.Endpoint
+import dev.floofy.api.data.Config
+import io.vertx.core.Vertx
+import io.vertx.core.json.JsonObject
+import io.vertx.ext.healthchecks.HealthCheckHandler
+import io.vertx.ext.web.Router
+import io.vertx.ext.web.RoutingContext
+import org.koin.core.KoinComponent
+import org.koin.core.inject
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+class API: KoinComponent {
+    private val health: HealthCheckHandler by inject()
+    private val config: Config by inject()
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
+    private val vertx: Vertx by inject()
+
+    private fun onFailure(r: Endpoint, ctx: RoutingContext) {
+        val throwable = ctx.failure()
+        val res = ctx.response()
+
+        logger.error("Unable to run route \"${r.method} ${r.path}\"")
+        logger.error(throwable.toString())
+
+        val obj = JsonObject().apply {
+            put("message", "If this error keeps occuring, please report it August#5820 on Discord or at https://t.me/auguwu if you prefer Telegram")
+            put("error", throwable.localizedMessage)
+        }
+
+        res.setStatusCode(ctx.statusCode()).end(obj)
+    }
+
+    fun start() {
+        // Set the current thread name
+        Thread.currentThread().name = "API-MainThread"
+        logger.info("Now loading up API...")
+
+        // Create a global router to use
+        val router = Router.router(vertx)
+        router
+                .route("/health")
+                .handler(health)
+
+        val routes = getKoin().getAll<Endpoint>()
+        val v1 = routes.filter { it.version == 1 }
+        val v2 = routes.filter { it.version == 2 }
+        val wentOver = routes.filter { it.version > 2 }
+        val wentUnder = routes.filter { it.version < 1 }
+
+        if (wentOver.isNotEmpty()) throw Exception("${wentOver.size} endpoints went over the current version (v2)")
+        if (wentUnder.isNotEmpty()) throw Exception("${wentUnder.size} endpoints went over the oldest version (v1)")
+
+        logger.info("Found ${v1.size} v1 endpoints and ${v2.size} v2 endpoints")
+        logger.info("Global API Version: v${config.defaultAPIVersion}")
+
+        val v1Router = Router.router(vertx)
+        val v2Router = Router.router(vertx)
+
+        for (r in v1) {
+            logger.info("Found route \"${r.method} ${r.path}\" under v1 scope")
+            if (config.defaultAPIVersion == 1) {
+                router
+                        .route(r.method, r.path)
+                        .failureHandler { ctx -> this.onFailure(r, ctx) }
+                        .blockingHandler({ ctx -> r.run(ctx) }, false)
+            }
+
+            v1Router
+                    .route(r.method, r.path)
+                    .failureHandler { ctx -> this.onFailure(r, ctx) }
+                    .blockingHandler({ ctx -> r.run(ctx) }, false)
+        }
+
+        for (r in v2) {
+            logger.info("Found route \"${r.method} ${r.path}\" under v2 scope")
+            if (config.defaultAPIVersion == 2) {
+                router
+                        .route(r.method, r.path)
+                        .failureHandler { ctx -> this.onFailure(r, ctx) }
+                        .blockingHandler({ ctx -> r.run(ctx) }, false)
+            }
+
+            v2Router
+                    .route(r.method, r.path)
+                    .failureHandler { ctx -> this.onFailure(r, ctx) }
+                    .blockingHandler({ ctx -> r.run(ctx) }, false)
+        }
+
+        // Mount sub-routers for api.augu.dev/v2 for an example
+        router
+                .mountSubRouter("/v2", v2Router)
+                .mountSubRouter("/v1", v1Router)
+
+        val http = vertx.createHttpServer()
+        http.requestHandler(router)
+        http.listen(config.port)
+
+        logger.info("API is now listening at http://localhost:${config.port}, default API version: v${config.defaultAPIVersion}")
+    }
+
+    fun destroy() {
+        logger.info("Destroyed service.")
+        vertx.close()
+    }
+}

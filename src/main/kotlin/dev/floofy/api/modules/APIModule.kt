@@ -22,4 +22,26 @@
 
 package dev.floofy.api.modules
 
+import dev.floofy.api.data.Config
+import io.vertx.ext.healthchecks.HealthCheckHandler
+import io.vertx.ext.healthchecks.Status
 import io.vertx.core.Vertx
+import io.vertx.core.VertxOptions
+import org.koin.dsl.module
+
+val apiModule = module {
+    single {
+        val config: Config = get()
+        val options = VertxOptions().setWorkerPoolSize(config.threads)
+
+        Vertx.vertx(options)
+    }
+
+    single {
+        val vertx: Vertx = get()
+        val health = HealthCheckHandler.create(vertx)
+        health.register("api", 5000) { it.complete(Status.OK()) }
+
+        health
+    }
+}

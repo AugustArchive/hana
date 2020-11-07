@@ -21,3 +21,30 @@
  */
 
 package dev.floofy.api
+
+import io.vertx.core.http.HttpServerResponse
+import io.vertx.core.json.JsonObject
+
+import java.util.Properties
+import java.io.InputStream
+
+/**
+ * Inline function to load a properties file using an [InputStream]
+ * @param stream The stream to use
+ */
+fun loadProperties(stream: InputStream): Properties = Properties().apply { load(stream) }
+
+/**
+ * Inline function to create a [java.lang.Thread] thread.
+ * @param name The name of the thread
+ * @param block The chunk of code to run when it's executed
+ */
+fun createThread(name: String, block: () -> Unit): Thread = (object: Thread(name) {
+    override fun run() { block() }
+})
+
+/**
+ * Extension to pass in [JsonObject] as a parameter and converted
+ * to a string from [HttpServerResponse].
+ */
+fun HttpServerResponse.end(json: JsonObject): Unit = this.end(json.toString())

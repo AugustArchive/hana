@@ -21,3 +21,23 @@
  */
 
 package dev.floofy.api
+
+import dev.floofy.api.modules.*
+import org.koin.core.context.startKoin
+
+object Bootstrap {
+    @JvmStatic
+    fun main(args: Array<String>) {
+        startKoin {
+            environmentProperties()
+            modules(apiModule, endpointsModule, configModule)
+        }
+
+        val api = API()
+        api.start()
+
+        Runtime.getRuntime().addShutdownHook(createThread("API-ShutdownThread") {
+            api.destroy()
+        })
+    }
+}

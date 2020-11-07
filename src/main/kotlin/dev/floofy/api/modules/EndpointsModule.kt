@@ -22,19 +22,32 @@
 
 package dev.floofy.api.modules
 
-import dev.floofy.api.endpoints.*
+import dev.floofy.api.endpoints.v1.SponsorsEndpoint as SponsorsV1Endpoint
+import dev.floofy.api.endpoints.v1.MainEndpoint as MainV1Endpoint
+import dev.floofy.api.endpoints.KadiEndpoint
+import dev.floofy.api.endpoints.v2.*
 import dev.floofy.api.core.Endpoint
+import dev.floofy.api.endpoints.TestEndpoint
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val endpointsModule = module {
-    single { SponsorsWebhookEndpoint() } bind Endpoint::class
-    single { GitHubWebhooksEndpoint() } bind Endpoint::class
-    single { SentryWebhookEndpoint() } bind Endpoint::class
-    single { ListSponsorsEndpoint() } bind Endpoint::class
-    single { SponsorsEndpoint() } bind Endpoint::class
-    single { WebhooksEndpoint() } bind Endpoint::class
-    single { MainEndpoint() } bind Endpoint::class
-    single { KadiEndpoint() } bind Endpoint::class
-    single { YiffEndpoint() } bind Endpoint::class
+    // v2 endpoints
+    //single { SponsorsWebhookEndpoint() } bind Endpoint::class
+    //single { GitHubWebhooksEndpoint() } bind Endpoint::class
+    //single { SentryWebhookEndpoint() } bind Endpoint::class
+    //single { ListSponsorsEndpoint() } bind Endpoint::class
+    //single { SponsorsEndpoint() } bind Endpoint::class
+    //single { WebhooksEndpoint() } bind Endpoint::class
+    //single { MainEndpoint() } bind Endpoint::class
+    //single { YiffEndpoint() } bind Endpoint::class
+
+    // v1 endpoints
+    //single { SponsorsV1Endpoint() } bind Endpoint::class
+    //single { MainV1Endpoint() } bind Endpoint::class
+
+    // Other that don't require an version number
+    // i.e: API (data) didn't change
+    //single { KadiEndpoint() } bind Endpoint::class
+    single { TestEndpoint() } bind Endpoint::class
 }

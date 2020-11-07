@@ -25,8 +25,8 @@ package dev.floofy.api.modules
 import dev.floofy.api.data.Application
 import dev.floofy.api.data.Config
 import com.charleskorn.kaml.Yaml
+import dev.floofy.api.loadProperties
 import org.koin.dsl.module
-import org.koin.dsl.bind
 
 import java.io.File
 
@@ -37,6 +37,12 @@ val configModule = module {
     }
 
     single {
+        val stream = this::class.java.getResourceAsStream("/app.properties")
+        val props = loadProperties(stream)
 
+        Application(
+                version=props.getProperty("app.version", "v0.0.0"),
+                commit=props.getProperty("app.commit", "unknown")
+        )
     }
 }
