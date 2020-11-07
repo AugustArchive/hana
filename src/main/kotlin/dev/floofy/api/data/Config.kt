@@ -40,5 +40,5 @@ data class Config(
     val threads: Int = 40,
 
     @SerialName("port")
-    val port: Int
+    val port: Int = 3621
 )

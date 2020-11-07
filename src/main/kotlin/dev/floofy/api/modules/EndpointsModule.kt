@@ -49,5 +49,5 @@ val endpointsModule = module {
     // Other that don't require an version number
     // i.e: API (data) didn't change
     //single { KadiEndpoint() } bind Endpoint::class
-    single { TestEndpoint() } bind Endpoint::class
+    single { TestEndpoint(get()) } bind Endpoint::class
 }
