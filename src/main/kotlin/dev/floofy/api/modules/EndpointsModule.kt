@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package dev.floofy.api.modules
 
 import dev.floofy.api.endpoints.v1.SponsorsEndpoint as SponsorsV1Endpoint
@@ -49,5 +48,5 @@ val endpointsModule = module {
     // Other that don't require an version number
     // i.e: API (data) didn't change
     //single { KadiEndpoint() } bind Endpoint::class
-    single { TestEndpoint(get()) } bind Endpoint::class
+    single { TestEndpoint() } bind Endpoint::class
 }

@@ -19,13 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package dev.floofy.api.modules
 
-import dev.floofy.api.data.Application
 import dev.floofy.api.data.Config
 import com.charleskorn.kaml.Yaml
-import dev.floofy.api.loadProperties
 import org.koin.dsl.module
 
 import java.io.File
@@ -34,15 +31,5 @@ val configModule = module {
     single {
         val file = File("config.yml")
         Yaml.default.decodeFromString(Config.serializer(), file.readText())
-    }
-
-    single {
-        val stream = this::class.java.getResourceAsStream("/app.properties")
-        val props = loadProperties(stream)
-
-        Application(
-                version=props.getProperty("app.version", "v0.0.0"),
-                commit=props.getProperty("app.commit", "unknown")
-        )
     }
 }

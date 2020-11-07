@@ -19,15 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 package dev.floofy.api
 
 import dev.floofy.api.modules.*
 import org.koin.core.context.startKoin
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 object Bootstrap {
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
+
     @JvmStatic
     fun main(args: Array<String>) {
+        logger.info("Bootstrapping...")
         startKoin {
             environmentProperties()
             modules(apiModule, endpointsModule, configModule)

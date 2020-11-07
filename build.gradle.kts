@@ -89,14 +89,9 @@ application {
     mainClassName = "dev.floofy.api.Bootstrap"
 }
 
-kotlin {
-    explicitApi()
-}
-
 tasks {
     compileKotlin {
         kotlinOptions {
-            freeCompilerArgs = listOf("-Xuse-experimental=kotlin.RequiresOptIn")
             jvmTarget = JavaVersion.VERSION_11.toString()
         }
     }
