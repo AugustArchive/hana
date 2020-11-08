@@ -37,7 +37,11 @@ class KadiEndpoint: Endpoint(HttpMethod.GET, "/kadi", 0) {
         val listed = kadi.listFiles() ?: emptyArray()
         println(if (listed.isEmpty()) "empty" else "not empty")
 
-        for (l in listed) files.add(l)
+        for (l in listed) {
+            if (l.isDirectory) continue
+
+            files.add(l)
+        }
 
         val file = files.random()
         return res.setStatusCode(200).end(JsonObject().apply {
