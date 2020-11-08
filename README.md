@@ -1,5 +1,5 @@
 # api.augu.dev
-[![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/)
+[![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/) ![Workflow Staatus](https://github.com/auguwu/API/workflows/ktlint/badge.svg)
 
 > :black_heart: **| API service to do certain things, mainly for webhooks and proxying.**
 
