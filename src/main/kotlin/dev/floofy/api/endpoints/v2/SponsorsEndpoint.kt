@@ -301,7 +301,7 @@ class ListSponsorsEndpoint(
         }
 
         return JsonObject().apply {
-            put("createdAt", sponsor["createdAt"])
+            put("created_at", sponsor["createdAt"])
             put("tier", sponsor["tier"])
             put("user", JsonObject().apply {
                 val user = sponsor[key] as LinkedHashMap<String, Any>
