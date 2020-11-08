@@ -79,7 +79,7 @@ class ListSponsorsEndpoint(
         val showPrivate = java.lang.Boolean.parseBoolean(params.get("show_private") ?: "false")
         val monthlyIn = when (pricing) {
             "dollars" -> "monthlyPriceInDollars"
-            "cents" -> "montlyPriceInCents"
+            "cents" -> "monthlyPriceInCents"
             else -> "monthlyPriceInDollars" // we are required to add this unless it fails?
         }
 
