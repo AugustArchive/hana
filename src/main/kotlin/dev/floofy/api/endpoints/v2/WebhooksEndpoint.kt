@@ -22,25 +22,43 @@
 package dev.floofy.api.endpoints.v2
 
 import dev.floofy.api.core.Endpoint
+import dev.floofy.api.end
 import io.vertx.core.http.HttpMethod
+import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 
 class WebhooksEndpoint: Endpoint(HttpMethod.GET, "/webhooks") {
     override fun run(ctx: RoutingContext) {
+        val res = ctx.response()
+        return res.setStatusCode(200).end(JsonObject().apply {
+            put("message", "Webhooks endpoint, mainly for showing embeds on Discord from GitHub and Sentry. This is an internal endpoint, how did you get here?")
+        })
     }
 }
 
 class GitHubWebhooksEndpoint: Endpoint(HttpMethod.POST, "/webhooks/github") {
     override fun run(ctx: RoutingContext) {
+        val req = ctx.request()
+        val res = ctx.response()
+
+        return res.setStatusCode(201).end()
     }
 }
 
 class SponsorsWebhookEndpoint: Endpoint(HttpMethod.POST, "/webhooks/github/sponsors") {
     override fun run(ctx: RoutingContext) {
+        val req = ctx.request()
+        val res = ctx.response()
+
+        return res.setStatusCode(201).end()
     }
 }
 
 class SentryWebhookEndpoint: Endpoint(HttpMethod.POST, "/webhooks/sentry") {
     override fun run(ctx: RoutingContext) {
+        val req = ctx.request()
+        val res = ctx.response()
+
+        return res.setStatusCode(201).end()
     }
 }
