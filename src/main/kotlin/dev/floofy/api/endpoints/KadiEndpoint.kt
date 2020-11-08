@@ -34,8 +34,8 @@ class KadiEndpoint: Endpoint(HttpMethod.GET, "/kadi", 0) {
         val res = ctx.response()
         val kadi = File("/var/www/cdn/kadi")
         val files = mutableListOf<File>()
-        val listed = kadi.listFiles { path -> path?.isDirectory ?: false } ?: emptyArray()
-        println(listed)
+        val listed = kadi.listFiles() ?: emptyArray()
+        println(if (listed.isEmpty()) "empty" else "not empty")
 
         for (l in listed) files.add(l)
 
