@@ -129,6 +129,9 @@ tasks {
 
 docker {
     name = "auguwu/api:$version"
+
+    noCache(true)
+    pull(true)
     tag("latest", "auguwu:api/$version")
     buildArgs(mapOf(
             "version" to ver.string()
