@@ -22,10 +22,10 @@
 ### Process (Docker)
 > This process is the most recommended, so you don't have to install any dependencies under your machine.
 >
-> If you're on Windows or macOS, you must have Docker Desktop installed, else install Docker under Linux.
+> :warning: If you're on Windows or macOS, you must have Docker Desktop installed.
 >
-> You can skip this process by using the official image under the Docker registry, just use `docker.floofy.dev`
-> when retrieving the image and run `docker pull auguwu/api:latest` then run `docker run -d -p 3621:3621 auguwu/api:latest`
+> We have official releases under the `docker.floofy.dev` registry, just do `docker pull auguwu/api:latest` from
+> the registry and run `docker run -d -p 3621:3621 auguwu/api:latest` to run the image.
 
 - Run `docker build . -t api:latest`, which will create the `api` image using the `latest` tag
 - Run `docker run -d -p 3621:3621 api:latest` to run the image under detached mode, which will run under the background.

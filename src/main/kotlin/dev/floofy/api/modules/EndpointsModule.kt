@@ -23,6 +23,7 @@ package dev.floofy.api.modules
 
 import dev.floofy.api.core.Endpoint
 import dev.floofy.api.endpoints.KadiEndpoint
+import dev.floofy.api.endpoints.NotFoundEndpoint
 import dev.floofy.api.endpoints.v1.MainEndpoint as MainV1Endpoint
 import dev.floofy.api.endpoints.v1.SponsorsEndpoint as SponsorsV1Endpoint
 import dev.floofy.api.endpoints.v2.*
@@ -37,7 +38,7 @@ val endpointsModule = module {
     // single { ListSponsorsEndpoint() } bind Endpoint::class
     // single { SponsorsEndpoint() } bind Endpoint::class
     // single { WebhooksEndpoint() } bind Endpoint::class
-    // single { MainEndpoint() } bind Endpoint::class
+    single { MainEndpoint() } bind Endpoint::class
     // single { YiffEndpoint() } bind Endpoint::class
 
     // v1 endpoints
@@ -46,5 +47,6 @@ val endpointsModule = module {
 
     // Other that don't require an version number
     // i.e: API (data) didn't change
+    single { NotFoundEndpoint() } bind Endpoint::class
     single { KadiEndpoint() } bind Endpoint::class
 }

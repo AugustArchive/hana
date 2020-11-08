@@ -23,6 +23,7 @@ package dev.floofy.api
 
 import dev.floofy.api.core.Endpoint
 import dev.floofy.api.data.Config
+import dev.floofy.api.endpoints.NotFoundEndpoint
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.healthchecks.HealthCheckHandler
@@ -61,11 +62,15 @@ class API: KoinComponent {
 
         // Create a global router to use
         val router = Router.router(vertx)
+        val notFound = getKoin().get<NotFoundEndpoint>()
+
+        // Set 404 handler to the not found endpoint
+        router.errorHandler(404) { ctx -> notFound.run(ctx) }
         router
                 .route("/health")
                 .handler(health)
 
-        val routes = getKoin().getAll<Endpoint>()
+        val routes = getKoin().getAll<Endpoint>().filter { it !is NotFoundEndpoint }
         val v1 = routes.filter { it.version == 1 }
         val v2 = routes.filter { it.version == 2 }
         val global = routes.filter { it.version == 0 }

@@ -19,31 +19,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package dev.floofy.api.endpoints.v2
+package dev.floofy.api.endpoints
 
 import dev.floofy.api.core.Endpoint
-import dev.floofy.api.data.Application
 import dev.floofy.api.end
-import dev.floofy.api.loadProperties
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 
-class MainEndpoint: Endpoint(HttpMethod.GET, "/") {
+class NotFoundEndpoint: Endpoint(HttpMethod.GET, "", 0) {
     override fun run(ctx: RoutingContext) {
         val res = ctx.response()
-        val stream = this::class.java.getResourceAsStream("/app.properties")
-        val props = loadProperties(stream)
+        val req = ctx.request()
 
-        val app = Application(
-            version = props.getProperty("app.version", "v2.0.0"),
-            commit = props.getProperty("app.commit", "unknown")
-        )
-
-        return res.setStatusCode(200).end(JsonObject().apply {
-            put("hello", "world")
-            put("commit", app.commit.slice(0..8))
-            put("version", app.version)
+        return res.setStatusCode(404).end(JsonObject().apply {
+            put("message", "Path \"${req.rawMethod()} ${req.path()}\" was not found, are you lost?")
         })
     }
 }
