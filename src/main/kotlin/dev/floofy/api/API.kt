@@ -45,7 +45,7 @@ class API: KoinComponent {
         val res = ctx.response()
 
         logger.error("Unable to run route \"${r.method} ${r.path}\"")
-        logger.error(throwable.toString())
+        println(throwable)
 
         val obj = JsonObject().apply {
             put("message", "If this error keeps occuring, please report it August#5820 on Discord or at https://t.me/auguwu if you prefer Telegram")
