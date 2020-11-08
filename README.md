@@ -13,7 +13,7 @@
 ### Process (locally)
 - [Fork](https://github.com/auguwu/API/fork) the repository under your username.
 - Clone the repository (``git clone https://github.com/USERNAME/API``); omit `USERNAME` with your actual username.
-- Change the directory to the newly cloned repository (``cd API`)
+- Change the directory to the newly cloned repository (``cd API``)
 - Run `./gradlew build` if you're using Unix; run `gradlew build` if you're using Windows
 - Copy the configuration under `config.example.yml` and copy it to make a new file called `config.yml`
   - This has to be placed where you build the JAR file, so `build/libs` is where it'll be at!
