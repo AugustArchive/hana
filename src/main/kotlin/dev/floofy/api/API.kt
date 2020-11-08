@@ -70,10 +70,6 @@ class API: KoinComponent {
         val v2 = routes.filter { it.version == 2 }
         val global = routes.filter { it.version == 0 }
 
-        logger.info("v1 Endpoints:\n${v1.joinToString("\n") { "${it.method} /v1${it.path}" }}\n")
-        logger.info("v2 Endpoints:\n${v2.joinToString("\n") { "${it.method} /v2${it.path}" }}\n")
-        logger.info("Global Endpoints:\n${global.joinToString("\n") { "${it.method} ${it.path}" }}\n")
-
         val v1Router = Router.router(vertx)
         val v2Router = Router.router(vertx)
 

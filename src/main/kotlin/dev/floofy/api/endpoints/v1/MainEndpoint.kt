@@ -22,11 +22,19 @@
 package dev.floofy.api.endpoints.v1
 
 import dev.floofy.api.core.Endpoint
+import dev.floofy.api.end
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
+import io.vertx.core.json.JsonObject
 
 class MainEndpoint: Endpoint(HttpMethod.GET, "/", 1) {
     override fun run(ctx: RoutingContext) {
-
+        val res = ctx.response()
+        return res.setStatusCode(200).end(JsonObject().apply {
+            put("statusCode", 200)
+            put("message", "Welcome! Read the docs here: https://docs.augu.dev/API")
+            put("notice", "Version v1 is deprecated, view the changelog here: https://cdn.floofy.dev/changelog")
+            put("version", "v1.0.2")
+        })
     }
 }

@@ -41,8 +41,8 @@ val endpointsModule = module {
     //single { YiffEndpoint() } bind Endpoint::class
 
     // v1 endpoints
-    //single { SponsorsV1Endpoint() } bind Endpoint::class
-    //single { MainV1Endpoint() } bind Endpoint::class
+    single { SponsorsV1Endpoint(get(), get(), get()) } bind Endpoint::class
+    single { MainV1Endpoint() } bind Endpoint::class
 
     // Other that don't require an version number
     // i.e: API (data) didn't change

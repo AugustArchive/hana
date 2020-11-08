@@ -27,7 +27,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Config(
     @SerialName("github_access_token")
-    val githubAccessToken: String,
+    val githubAccessToken: String? = null,
 
     @SerialName("default_api_version")
     val defaultAPIVersion: Int = 2,

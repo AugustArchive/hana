@@ -26,6 +26,8 @@ import io.vertx.ext.healthchecks.HealthCheckHandler
 import io.vertx.ext.healthchecks.Status
 import io.vertx.core.Vertx
 import io.vertx.core.VertxOptions
+import io.vertx.ext.web.client.WebClient
+import io.vertx.ext.web.client.WebClientOptions
 import org.koin.dsl.module
 
 val apiModule = module {
@@ -42,5 +44,10 @@ val apiModule = module {
         health.register("api", 5000) { it.complete(Status.OK()) }
 
         health
+    }
+
+    single {
+        val vertx: Vertx = get()
+        WebClient.create(vertx, WebClientOptions().setUserAgent("api.augu.dev"))
     }
 }
