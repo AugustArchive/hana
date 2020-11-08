@@ -35,14 +35,14 @@ val endpointsModule = module {
     // single { SponsorsWebhookEndpoint() } bind Endpoint::class
     // single { GitHubWebhooksEndpoint() } bind Endpoint::class
     // single { SentryWebhookEndpoint() } bind Endpoint::class
-    // single { ListSponsorsEndpoint() } bind Endpoint::class
-    // single { SponsorsEndpoint() } bind Endpoint::class
+    single { ListSponsorsEndpoint(get(), get()) } bind Endpoint::class
+    single { SponsorsEndpoint() } bind Endpoint::class
     // single { WebhooksEndpoint() } bind Endpoint::class
     single { MainEndpoint() } bind Endpoint::class
     // single { YiffEndpoint() } bind Endpoint::class
 
     // v1 endpoints
-    single { SponsorsV1Endpoint(get(), get(), get()) } bind Endpoint::class
+    single { SponsorsV1Endpoint(get(), get()) } bind Endpoint::class
     single { MainV1Endpoint() } bind Endpoint::class
 
     // Other that don't require an version number

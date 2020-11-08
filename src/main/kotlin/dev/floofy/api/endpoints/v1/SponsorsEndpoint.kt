@@ -24,7 +24,6 @@ package dev.floofy.api.endpoints.v1
 import dev.floofy.api.core.Endpoint
 import dev.floofy.api.data.Config
 import dev.floofy.api.end
-import io.vertx.core.Vertx
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
@@ -33,9 +32,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class SponsorsEndpoint(
-    val vertx: Vertx,
-    val config: Config,
-    val http: WebClient
+    private val config: Config,
+    private val http: WebClient
 ): Endpoint(HttpMethod.GET, "/sponsors", 1) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
