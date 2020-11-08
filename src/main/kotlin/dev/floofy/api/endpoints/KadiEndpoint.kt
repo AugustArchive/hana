@@ -45,7 +45,7 @@ class KadiEndpoint: Endpoint(HttpMethod.GET, "/kadi", 0) {
 
         val file = files.random()
         return res.setStatusCode(200).end(JsonObject().apply {
-            put("files", file.totalSpace)
+            put("size", file.totalSpace / 1024L / 1024L)
             put("url", "https://cdn.floofy.dev/kadi/${file.name}")
         })
     }
