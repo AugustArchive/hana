@@ -26,18 +26,17 @@ import dev.floofy.api.data.Config
 import dev.floofy.api.end
 import io.vertx.core.Vertx
 import io.vertx.core.http.HttpMethod
-import io.vertx.ext.web.RoutingContext
 import io.vertx.core.json.JsonObject
+import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.client.WebClient
-import kotlinx.serialization.json.Json
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class SponsorsEndpoint(
-        val vertx: Vertx,
-        val config: Config,
-        val http: WebClient
-): Endpoint(HttpMethod.GET, "/sponsors", 1) {
+    val vertx: Vertx,
+    val config: Config,
+    val http: WebClient
+) : Endpoint(HttpMethod.GET, "/sponsors", 1) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     override fun run(ctx: RoutingContext) {
@@ -57,7 +56,7 @@ class SponsorsEndpoint(
 
         val first = (try {
             Integer.parseInt(params.get("first") ?: "5")
-        } catch(ex: Exception) {
+        } catch (ex: Exception) {
             null
         }) ?: return res.setStatusCode(406).end(JsonObject().apply {
             put("statusCode", 406)
@@ -67,7 +66,7 @@ class SponsorsEndpoint(
         val query = """
             query {
                 user(login: "$login") {
-                    sponsorshipsAsMaintainer(first: ${first}) {
+                    sponsorshipsAsMaintainer(first: $first) {
                         nodes {
                             privacyLevel
                             createdAt

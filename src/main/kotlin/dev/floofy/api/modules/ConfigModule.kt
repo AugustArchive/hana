@@ -21,11 +21,10 @@
  */
 package dev.floofy.api.modules
 
-import dev.floofy.api.data.Config
 import com.charleskorn.kaml.Yaml
-import org.koin.dsl.module
-
+import dev.floofy.api.data.Config
 import java.io.File
+import org.koin.dsl.module
 
 val configModule = module {
     single {

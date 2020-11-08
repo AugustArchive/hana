@@ -83,6 +83,14 @@ spotless {
         trimTrailingWhitespace()
         licenseHeaderFile("${rootProject.projectDir}/.cache/HEADER")
         endWithNewline()
+
+        // We can't use the .editorconfig file, so we'll have to specify it
+        // read: https://github.com/diffplug/spotless/issues/142
+        ktlint()
+                .userData(mapOf(
+                        "disabled_rules" to "no-wildcard-imports",
+                        "indent_size" to "4"
+                ))
     }
 }
 

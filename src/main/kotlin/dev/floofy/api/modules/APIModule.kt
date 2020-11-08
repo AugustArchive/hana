@@ -22,10 +22,10 @@
 package dev.floofy.api.modules
 
 import dev.floofy.api.data.Config
-import io.vertx.ext.healthchecks.HealthCheckHandler
-import io.vertx.ext.healthchecks.Status
 import io.vertx.core.Vertx
 import io.vertx.core.VertxOptions
+import io.vertx.ext.healthchecks.HealthCheckHandler
+import io.vertx.ext.healthchecks.Status
 import io.vertx.ext.web.client.WebClient
 import io.vertx.ext.web.client.WebClientOptions
 import org.koin.dsl.module

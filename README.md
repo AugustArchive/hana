@@ -1,4 +1,6 @@
-# August API
+# api.augu.dev
+[![ktlint](https://img.shields.io/badge/code%20style-%E2%9D%A4-FF4081.svg)](https://ktlint.github.io/)
+
 > :black_heart: **| API service to do certain things, mainly for webhooks and proxying.**
 
 ## Installation Guide
