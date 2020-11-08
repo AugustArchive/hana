@@ -275,7 +275,7 @@ class ListSponsorsEndpoint(
                         }
                     }.filterNotNull()
 
-                return@sendJsonObject res.setStatusCode(500).end(JsonObject().apply {
+                return@sendJsonObject res.setStatusCode(200).end(JsonObject().apply {
                     put("sponsors", JsonObject().apply {
                         put("total_count", total)
                         put("data", allSponsors)
@@ -308,14 +308,14 @@ class ListSponsorsEndpoint(
                 val followers = user["followers"] as LinkedHashMap<String, Any>
                 val following = user["following"] as LinkedHashMap<String, Any>
 
+                put("website_url", user["websiteUrl"])
+                put("avatar_url", user["avatarUrl"])
                 put("following", following["totalCount"])
                 put("followers", followers["totalCount"])
-                put("websiteUrl", user["websiteUrl"])
-                put("avatarUrl", user["avatarUrl"])
                 put("company", user["company"])
                 put("login", user["login"])
                 put("name", user["name"])
-                put("bio", if (user["bio"] == "") "User is a mystery..." else (user["bio"] as String).trim())
+                put("bio", user["bio"])
                 put("url", user["url"])
             })
         }

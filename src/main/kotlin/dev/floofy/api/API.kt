@@ -48,7 +48,7 @@ class API: KoinComponent {
         println(throwable)
 
         val obj = JsonObject().apply {
-            put("message", "If this error keeps occuring, please report it August#5820 on Discord or at https://t.me/auguwu if you prefer Telegram")
+            put("note", "If this error keeps occuring, please report it August#5820 on Discord or at https://t.me/auguwu if you prefer Telegram")
             put("error", throwable.localizedMessage)
         }
 
@@ -83,7 +83,14 @@ class API: KoinComponent {
             router
                 .route(g.method, g.path)
                 .failureHandler { this.onFailure(g, it) }
-                .blockingHandler({ g.run(it) }, false)
+                .blockingHandler({
+                    it
+                        .response()
+                        .putHeader("Access-Control-Allow-Origin", "*")
+                        .putHeader("Access-Control-Allow-Methods", "GET,POST")
+
+                    g.run(it)
+                }, false)
         }
 
         for (r in v1) {
@@ -92,13 +99,27 @@ class API: KoinComponent {
                 router
                         .route(r.method, r.path)
                         .failureHandler { ctx -> this.onFailure(r, ctx) }
-                        .blockingHandler({ ctx -> r.run(ctx) }, false)
+                        .blockingHandler({
+                            it
+                                .response()
+                                .putHeader("Access-Control-Allow-Origin", "*")
+                                .putHeader("Access-Control-Allow-Methods", "GET,POST")
+
+                            r.run(it)
+                        }, false)
             }
 
             v1Router
                     .route(r.method, r.path)
                     .failureHandler { ctx -> this.onFailure(r, ctx) }
-                    .blockingHandler({ ctx -> r.run(ctx) }, false)
+                    .blockingHandler({
+                        it
+                            .response()
+                            .putHeader("Access-Control-Allow-Origin", "*")
+                            .putHeader("Access-Control-Allow-Methods", "GET,POST")
+
+                        r.run(it)
+                    }, false)
         }
 
         for (r in v2) {
@@ -107,13 +128,27 @@ class API: KoinComponent {
                 router
                         .route(r.method, r.path)
                         .failureHandler { ctx -> this.onFailure(r, ctx) }
-                        .blockingHandler({ ctx -> r.run(ctx) }, false)
+                        .blockingHandler({
+                            it
+                                .response()
+                                .putHeader("Access-Control-Allow-Origin", "*")
+                                .putHeader("Access-Control-Allow-Methods", "GET,POST")
+
+                            r.run(it)
+                        }, false)
             }
 
             v2Router
                     .route(r.method, r.path)
                     .failureHandler { ctx -> this.onFailure(r, ctx) }
-                    .blockingHandler({ ctx -> r.run(ctx) }, false)
+                    .blockingHandler({
+                        it
+                            .response()
+                            .putHeader("Access-Control-Allow-Origin", "*")
+                            .putHeader("Access-Control-Allow-Methods", "GET,POST")
+
+                        r.run(it)
+                    }, false)
         }
 
         // Mount sub-routers for api.augu.dev/v2 for an example

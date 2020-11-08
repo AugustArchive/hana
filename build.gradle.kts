@@ -32,7 +32,7 @@ plugins {
     application
 }
 
-val ver = Version(2, 0, 2)
+val ver = Version(2, 0, 3, VersionCandidate.RC)
 
 group = "dev.floofy"
 version = ver.string()
@@ -126,12 +126,20 @@ tasks {
     }
 }
 
+enum class VersionCandidate(val value: String) {
+    RELEASED(""),
+    INDEV("-indev."),
+    BETA("-beta."),
+    RC("-rc.")
+}
+
 class Version(
         private val major: Int,
         private val minor: Int,
-        private val revision: Int
+        private val revision: Int,
+        private val candidate: VersionCandidate
 ) {
-    fun string(): String = "$major.$minor.$revision"
+    fun string(): String = "$major.$minor.${candidate.value}$revision"
     fun commit(): String = exec("git rev-parse HEAD")
 }
 
