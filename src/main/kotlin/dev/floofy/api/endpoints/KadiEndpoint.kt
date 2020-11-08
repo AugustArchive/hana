@@ -28,7 +28,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 import java.io.File
 
-class KadiEndpoint : Endpoint(HttpMethod.GET, "/kadi", 0) {
+class KadiEndpoint: Endpoint(HttpMethod.GET, "/kadi", 0) {
     override fun run(ctx: RoutingContext) {
         val res = ctx.response()
         val kadi = File("/var/www/cdn/kadi")

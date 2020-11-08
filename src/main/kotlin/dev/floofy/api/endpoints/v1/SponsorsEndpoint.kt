@@ -36,7 +36,7 @@ class SponsorsEndpoint(
     val vertx: Vertx,
     val config: Config,
     val http: WebClient
-) : Endpoint(HttpMethod.GET, "/sponsors", 1) {
+): Endpoint(HttpMethod.GET, "/sponsors", 1) {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     override fun run(ctx: RoutingContext) {
