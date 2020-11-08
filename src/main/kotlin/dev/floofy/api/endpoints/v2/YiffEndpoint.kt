@@ -26,7 +26,6 @@ import dev.floofy.api.end
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
-
 import java.io.File
 
 class YiffEndpoint: Endpoint(HttpMethod.GET, "/yiff") {

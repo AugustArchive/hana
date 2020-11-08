@@ -108,8 +108,9 @@ tasks {
 
     named<ShadowJar>("shadowJar") {
         mergeServiceFiles()
-        archiveClassifier.set(null as String?)
+        archiveClassifier.set("")
         archiveBaseName.set("API")
+        archiveVersion.set("")
 
         manifest {
             attributes(mapOf(
