@@ -24,6 +24,7 @@ package dev.floofy.api.modules
 import dev.floofy.api.core.Endpoint
 import dev.floofy.api.endpoints.KadiEndpoint
 import dev.floofy.api.endpoints.NotFoundEndpoint
+import dev.floofy.api.endpoints.RandomKadiEndpoint
 import dev.floofy.api.endpoints.v1.MainEndpoint as MainV1Endpoint
 import dev.floofy.api.endpoints.v1.SponsorsEndpoint as SponsorsV1Endpoint
 import dev.floofy.api.endpoints.v2.*
@@ -32,10 +33,11 @@ import org.koin.dsl.module
 
 val endpointsModule = module {
     // v2 endpoints
+    single { ListSponsorsEndpoint(get(), get()) } bind Endpoint::class
     single { SponsorsWebhookEndpoint() } bind Endpoint::class
     single { GitHubWebhooksEndpoint() } bind Endpoint::class
     single { SentryWebhookEndpoint() } bind Endpoint::class
-    single { ListSponsorsEndpoint(get(), get()) } bind Endpoint::class
+    single { RandomYiffEndpoint() } bind Endpoint::class
     single { SponsorsEndpoint() } bind Endpoint::class
     single { WebhooksEndpoint() } bind Endpoint::class
     single { MainEndpoint() } bind Endpoint::class
@@ -47,6 +49,7 @@ val endpointsModule = module {
 
     // Other that don't require an version number
     // i.e: API (data) didn't change
+    single { RandomKadiEndpoint() } bind Endpoint::class
     single { NotFoundEndpoint() } bind Endpoint::class
     single { KadiEndpoint() } bind Endpoint::class
 }

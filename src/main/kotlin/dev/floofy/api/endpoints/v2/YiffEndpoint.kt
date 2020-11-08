@@ -42,8 +42,27 @@ class YiffEndpoint: Endpoint(HttpMethod.GET, "/yiff") {
         }
 
         val file = files.random()
+        res.setStatusCode(200).sendFile(file.canonicalPath)
+
+        return
+    }
+}
+
+class RandomYiffEndpoint: Endpoint(HttpMethod.GET, "/yiff/random") {
+    override fun run(ctx: RoutingContext) {
+        val res = ctx.response()
+        val yiff = File("/var/www/cdn/yiff")
+        val files = mutableListOf<File>()
+        val listed = yiff.listFiles() ?: emptyArray()
+
+        for (l in listed) {
+            if (l.isDirectory) continue
+
+            files.add(l)
+        }
+
+        val file = files.random()
         return res.setStatusCode(200).end(JsonObject().apply {
-            put("size", file.totalSpace / 1024L / 1024L)
             put("url", "https://cdn.floofy.dev/yiff/${file.name}")
         })
     }

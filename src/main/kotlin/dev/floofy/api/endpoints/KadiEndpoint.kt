@@ -34,7 +34,26 @@ class KadiEndpoint: Endpoint(HttpMethod.GET, "/kadi", 0) {
         val kadi = File("/var/www/cdn/kadi")
         val files = mutableListOf<File>()
         val listed = kadi.listFiles() ?: emptyArray()
-        println(if (listed.isEmpty()) "empty" else "not empty")
+
+        for (l in listed) {
+            if (l.isDirectory) continue
+
+            files.add(l)
+        }
+
+        val file = files.random()
+        res.setStatusCode(200).sendFile(file.canonicalPath)
+
+        return
+    }
+}
+
+class RandomKadiEndpoint: Endpoint(HttpMethod.GET, "/kadi/random", 0) {
+    override fun run(ctx: RoutingContext) {
+        val res = ctx.response()
+        val kadi = File("/var/www/cdn/kadi")
+        val files = mutableListOf<File>()
+        val listed = kadi.listFiles() ?: emptyArray()
 
         for (l in listed) {
             if (l.isDirectory) continue
