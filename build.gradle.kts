@@ -29,7 +29,6 @@ plugins {
     id("com.github.johnrengelman.shadow") version "6.1.0"
     kotlin("plugin.serialization") version "1.4.10"
     id("com.diffplug.spotless") version "5.7.0"
-    id("com.palantir.docker") version "0.25.0"
     kotlin("jvm") version "1.4.10"
     application
 }
@@ -125,17 +124,6 @@ tasks {
         dependsOn(shadowJar)
         dependsOn(metadata)
     }
-}
-
-docker {
-    name = "auguwu/api:$version"
-
-    noCache(true)
-    pull(true)
-    tag("latest", "auguwu:api/$version")
-    buildArgs(mapOf(
-            "version" to ver.string()
-    ))
 }
 
 class Version(
