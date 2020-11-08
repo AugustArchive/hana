@@ -33,7 +33,7 @@ plugins {
     application
 }
 
-val ver = Version(2, 0, 0)
+val ver = Version(2, 0, 1)
 
 group = "dev.floofy"
 version = ver.string()
