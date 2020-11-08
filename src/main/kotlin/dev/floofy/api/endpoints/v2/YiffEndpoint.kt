@@ -22,10 +22,26 @@
 package dev.floofy.api.endpoints.v2
 
 import dev.floofy.api.core.Endpoint
+import dev.floofy.api.end
 import io.vertx.core.http.HttpMethod
+import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
+
+import java.io.File
 
 class YiffEndpoint: Endpoint(HttpMethod.GET, "/yiff") {
     override fun run(ctx: RoutingContext) {
+        val res = ctx.response()
+        val yiff = File("/var/www/cdn/yiff")
+        val files = mutableListOf<File>()
+        val listed = yiff.listFiles { path -> path?.isDirectory ?: false } ?: emptyArray()
+
+        for (l in listed) files.add(l)
+
+        val file = files.random()
+        return res.setStatusCode(200).end(JsonObject().apply {
+            put("size", file.totalSpace)
+            put("url", "https://cdn.floofy.dev/yiff/${file.name}")
+        })
     }
 }

@@ -39,7 +39,7 @@ val endpointsModule = module {
     single { SponsorsEndpoint() } bind Endpoint::class
     single { WebhooksEndpoint() } bind Endpoint::class
     single { MainEndpoint() } bind Endpoint::class
-    // single { YiffEndpoint() } bind Endpoint::class
+    single { YiffEndpoint() } bind Endpoint::class
 
     // v1 endpoints
     single { SponsorsV1Endpoint(get(), get()) } bind Endpoint::class

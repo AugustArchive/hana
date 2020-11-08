@@ -26,6 +26,7 @@ import dev.floofy.api.end
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
+
 import java.io.File
 
 class KadiEndpoint: Endpoint(HttpMethod.GET, "/kadi", 0) {
@@ -39,7 +40,7 @@ class KadiEndpoint: Endpoint(HttpMethod.GET, "/kadi", 0) {
 
         val file = files.random()
         return res.setStatusCode(200).end(JsonObject().apply {
-            put("files", files.size)
+            put("files", file.totalSpace)
             put("url", "https://cdn.floofy.dev/kadi/${file.name}")
         })
     }
