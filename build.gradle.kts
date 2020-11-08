@@ -21,7 +21,6 @@
  */
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.diffplug.gradle.spotless.SpotlessApply
 import org.apache.tools.ant.filters.ReplaceTokens
 
@@ -33,7 +32,7 @@ plugins {
     application
 }
 
-val ver = Version(2, 0, 1)
+val ver = Version(2, 0, 2)
 
 group = "dev.floofy"
 version = ver.string()
