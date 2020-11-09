@@ -22,6 +22,8 @@
 package dev.floofy.api.endpoints.v2
 
 import dev.floofy.api.core.Endpoint
+import dev.floofy.api.core.Hash
+import dev.floofy.api.data.Config
 import dev.floofy.api.end
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonObject
@@ -36,10 +38,21 @@ class WebhooksEndpoint: Endpoint(HttpMethod.GET, "/webhooks") {
     }
 }
 
-class GitHubWebhooksEndpoint: Endpoint(HttpMethod.POST, "/webhooks/github") {
+class GitHubWebhooksEndpoint(
+    private val config: Config
+): Endpoint(HttpMethod.POST, "/webhooks/github") {
     override fun run(ctx: RoutingContext) {
         val req = ctx.request()
         val res = ctx.response()
+        val body = ctx.bodyAsJson
+        println(body)
+
+        if (config.githubSecret == null) return res.setStatusCode(500).end(JsonObject().apply {
+            put("message", "Missing `github_secret` key, did the runner add it?")
+        })
+
+        val validated = Hash.validateGitHubSignature(config.githubSecret, req.getHeader("x-github-signature"))
+        println("Validated?: $validated")
 
         return res.setStatusCode(201).end()
     }
@@ -47,7 +60,6 @@ class GitHubWebhooksEndpoint: Endpoint(HttpMethod.POST, "/webhooks/github") {
 
 class SponsorsWebhookEndpoint: Endpoint(HttpMethod.POST, "/webhooks/github/sponsors") {
     override fun run(ctx: RoutingContext) {
-        val req = ctx.request()
         val res = ctx.response()
 
         return res.setStatusCode(201).end()
@@ -56,7 +68,6 @@ class SponsorsWebhookEndpoint: Endpoint(HttpMethod.POST, "/webhooks/github/spons
 
 class SentryWebhookEndpoint: Endpoint(HttpMethod.POST, "/webhooks/sentry") {
     override fun run(ctx: RoutingContext) {
-        val req = ctx.request()
         val res = ctx.response()
 
         return res.setStatusCode(201).end()

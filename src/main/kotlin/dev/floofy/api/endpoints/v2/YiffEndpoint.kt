@@ -28,7 +28,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 import java.io.File
 
-class YiffEndpoint: Endpoint(HttpMethod.GET, "/yiff") {
+class YiffEndpoint: Endpoint(HttpMethod.GET, "/yiff/random") {
     override fun run(ctx: RoutingContext) {
         val res = ctx.response()
         val yiff = File("/var/www/cdn/yiff")
@@ -48,7 +48,7 @@ class YiffEndpoint: Endpoint(HttpMethod.GET, "/yiff") {
     }
 }
 
-class RandomYiffEndpoint: Endpoint(HttpMethod.GET, "/yiff/random") {
+class RandomYiffEndpoint: Endpoint(HttpMethod.GET, "/yiff") {
     override fun run(ctx: RoutingContext) {
         val res = ctx.response()
         val yiff = File("/var/www/cdn/yiff")

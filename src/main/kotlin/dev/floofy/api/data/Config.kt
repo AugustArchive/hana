@@ -32,6 +32,9 @@ data class Config(
     @SerialName("default_api_version")
     val defaultAPIVersion: Int = 2,
 
+    @SerialName("github_secret")
+    val githubSecret: String? = null,
+
     @SerialName("webhook_url")
     val webhookUrl: String,
 
