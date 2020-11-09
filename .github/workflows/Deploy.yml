@@ -37,8 +37,12 @@ jobs:
           port: 22
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
+
+          # don't ask why i have to stash changes
+          # git is being dumb with this sooo
           script: |
             cd ~/api-v2
+            git stash
             git pull
             rm -fr build
             ./gradlew build

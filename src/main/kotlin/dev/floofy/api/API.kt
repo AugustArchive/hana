@@ -65,7 +65,16 @@ class API: KoinComponent {
         val notFound = getKoin().get<NotFoundEndpoint>()
 
         // Set 404 handler to the not found endpoint
-        router.errorHandler(404) { ctx -> notFound.run(ctx) }
+        router.errorHandler(404, notFound::run)
+        router.errorHandler(405) { ctx ->
+            val res = ctx.response()
+            val req = ctx.request()
+
+            return@errorHandler res.setStatusCode(405).end(JsonObject().apply {
+                put("message", "Endpoint \"${req.rawMethod()} ${req.path()}\" didn't use a valid method.")
+            })
+        }
+
         router
                 .route("/health")
                 .handler(health)
