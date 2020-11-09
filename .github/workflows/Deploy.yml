@@ -45,5 +45,6 @@ jobs:
             git stash
             git pull
             rm -fr build
+            chmod +x gradlew
             ./gradlew build
             pm2 restart api-v2

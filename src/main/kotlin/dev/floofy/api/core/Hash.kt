@@ -35,7 +35,7 @@ object Hash {
                 .toString()
 
         println("Compiled Value: $value")
-        println("Signature: ${signature.slice(0..7)}")
+        println("Signature: $signature")
         return "sha256=$value" == signature
     }
 }
