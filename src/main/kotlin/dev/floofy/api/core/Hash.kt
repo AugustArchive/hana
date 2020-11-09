@@ -13,6 +13,8 @@ object Hash {
                 .hash()
                 .toString()
 
+        println("Compiled Value: $value")
+        println("Signature: ${signature.slice(0..7)}")
         return "sha256=$value" == signature
     }
 }

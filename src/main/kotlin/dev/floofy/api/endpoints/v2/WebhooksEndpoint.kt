@@ -52,7 +52,7 @@ class GitHubWebhooksEndpoint(
         })
 
         println(req.headers())
-        val validated = Hash.validateGitHubSignature(config.githubSecret, req.getHeader("x-hub-signature"))
+        val validated = Hash.validateGitHubSignature(config.githubSecret, req.getHeader("X-Hub-Signature-256"))
         println("Validated?: $validated")
 
         return res.setStatusCode(201).end()

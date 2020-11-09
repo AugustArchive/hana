@@ -121,7 +121,6 @@ tasks {
     }
 
     build {
-        dependsOn(spotlessApply)
         dependsOn(shadowJar)
         dependsOn(metadata)
     }
