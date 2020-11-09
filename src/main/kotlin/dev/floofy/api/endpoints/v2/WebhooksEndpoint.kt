@@ -51,7 +51,8 @@ class GitHubWebhooksEndpoint(
             put("message", "Missing `github_secret` key, did the runner add it?")
         })
 
-        val validated = Hash.validateGitHubSignature(config.githubSecret, req.getHeader("x-github-signature"))
+        println(req.headers())
+        val validated = Hash.validateGitHubSignature(config.githubSecret, req.getHeader("x-hub-signature"))
         println("Validated?: $validated")
 
         return res.setStatusCode(201).end()

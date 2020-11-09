@@ -3,7 +3,9 @@ package dev.floofy.api.core
 import com.google.common.hash.Hashing
 
 object Hash {
-    fun validateGitHubSignature(key: String, signature: String): Boolean {
+    fun validateGitHubSignature(key: String, signature: String?): Boolean {
+        if (signature == null) return false
+
         val value = Hashing
                 .hmacSha256(key.toByteArray())
                 .newHasher()
@@ -11,6 +13,6 @@ object Hash {
                 .hash()
                 .toString()
 
-        return signature == value
+        return "sha256=$value" == signature
     }
 }
