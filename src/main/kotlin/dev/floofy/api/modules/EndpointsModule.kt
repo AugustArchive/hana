@@ -34,12 +34,8 @@ import org.koin.dsl.module
 val endpointsModule = module {
     // v2 endpoints
     single { ListSponsorsEndpoint(get(), get()) } bind Endpoint::class
-    single { SponsorsWebhookEndpoint() } bind Endpoint::class
-    single { GitHubWebhooksEndpoint(get()) } bind Endpoint::class
-    single { SentryWebhookEndpoint() } bind Endpoint::class
     single { RandomYiffEndpoint() } bind Endpoint::class
     single { SponsorsEndpoint() } bind Endpoint::class
-    single { WebhooksEndpoint() } bind Endpoint::class
     single { MainEndpoint() } bind Endpoint::class
     single { YiffEndpoint() } bind Endpoint::class
 
