@@ -32,7 +32,7 @@ plugins {
     application
 }
 
-val ver = Version(2, 1, 0, VersionCandidate.RELEASED)
+val ver = Version(2, 1, 1, VersionCandidate.RELEASED)
 
 group = "dev.floofy"
 version = ver.string()

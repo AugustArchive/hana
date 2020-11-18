@@ -141,11 +141,18 @@ class API: KoinComponent {
                         .route(r.method, r.path)
                         .failureHandler { ctx -> this.onFailure(r, ctx) }
                         .blockingHandler({
-                            it
-                                .response()
-                                .putHeader("Content-Type", "application/json")
-                                .putHeader("Access-Control-Allow-Origin", "*")
-                                .putHeader("Access-Control-Allow-Methods", "GET,POST")
+                            if (r.path.contains("random")) {
+                                it
+                                    .response()
+                                    .putHeader("Access-Control-Allow-Origin", "*")
+                                    .putHeader("Access-Control-Allow-Methods", "GET,POST")
+                            } else {
+                                it
+                                    .response()
+                                    .putHeader("Content-Type", "application/json")
+                                    .putHeader("Access-Control-Allow-Origin", "*")
+                                    .putHeader("Access-Control-Allow-Methods", "GET,POST")
+                            }
 
                             r.run(it)
                         }, false)
