@@ -30,10 +30,11 @@ import io.vertx.ext.web.RoutingContext
 class MainEndpoint: Endpoint(HttpMethod.GET, "/", 1) {
     override fun run(ctx: RoutingContext) {
         val res = ctx.response()
+
         return res.setStatusCode(200).end(JsonObject().apply {
             put("statusCode", 200)
             put("message", "Welcome! Read the docs here: https://docs.augu.dev/API")
-            put("notice", "Version v1 is deprecated, view the changelog here: https://cdn.floofy.dev/changelog")
+            put("notice", "Version v1 is deprecated! Switch over to v2 for a robust and updated API.")
             put("version", "v1.0.2")
         })
     }

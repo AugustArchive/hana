@@ -95,6 +95,7 @@ class API: KoinComponent {
                 .blockingHandler({
                     it
                         .response()
+                        .putHeader("Content-Type", "application/json")
                         .putHeader("Access-Control-Allow-Origin", "*")
                         .putHeader("Access-Control-Allow-Methods", "GET,POST")
 
@@ -111,6 +112,7 @@ class API: KoinComponent {
                         .blockingHandler({
                             it
                                 .response()
+                                .putHeader("Content-Type", "application/json")
                                 .putHeader("Access-Control-Allow-Origin", "*")
                                 .putHeader("Access-Control-Allow-Methods", "GET,POST")
 
@@ -124,6 +126,7 @@ class API: KoinComponent {
                     .blockingHandler({
                         it
                             .response()
+                            .putHeader("Content-Type", "application/json")
                             .putHeader("Access-Control-Allow-Origin", "*")
                             .putHeader("Access-Control-Allow-Methods", "GET,POST")
 
@@ -140,6 +143,7 @@ class API: KoinComponent {
                         .blockingHandler({
                             it
                                 .response()
+                                .putHeader("Content-Type", "application/json")
                                 .putHeader("Access-Control-Allow-Origin", "*")
                                 .putHeader("Access-Control-Allow-Methods", "GET,POST")
 
@@ -153,6 +157,7 @@ class API: KoinComponent {
                     .blockingHandler({
                         it
                             .response()
+                            .putHeader("Content-Type", "application/json")
                             .putHeader("Access-Control-Allow-Origin", "*")
                             .putHeader("Access-Control-Allow-Methods", "GET,POST")
 
