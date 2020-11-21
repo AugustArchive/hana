@@ -70,11 +70,11 @@ Returns an image of Kadi, my red panda plush. This endpoint returns as an image 
 
 ### Request
 ```sh
-$ curl -X GET https://api.floofy.dev/kadi
+$ curl -X GET https://api.floofy.dev/kadi/random
 ```
 
 ### Response
-![kadi example](https://cdn.floofy.dev/kadi/kadi.png)
+![cute wah](https://cdn.floofy.dev/kadi/kadi.png)
 
 # Types
 List of types from the different request(s) above.
