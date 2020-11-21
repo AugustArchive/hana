@@ -26,7 +26,7 @@ on:
       - 'LICENSE'
       - 'docs/**'
       - '**.md'
-      - - 'config.example.yml'
+      - 'config.example.yml'
       - 'renovate.json'
 jobs:
   ktlint:
