@@ -33,6 +33,9 @@ data class Config(
     @SerialName("default_api_version")
     val defaultAPIVersion: Int = 2,
 
+    @SerialName("sentry_dsn")
+    val sentryDSN: String? = null,
+
     @SerialName("threads")
     val threads: Int = 40,
 

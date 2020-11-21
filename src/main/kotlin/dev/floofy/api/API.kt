@@ -23,6 +23,7 @@
 package dev.floofy.api
 
 import dev.floofy.api.core.Endpoint
+import dev.floofy.api.core.Sentry
 import dev.floofy.api.data.Config
 import dev.floofy.api.endpoints.NotFoundEndpoint
 import io.vertx.core.Vertx
@@ -39,6 +40,7 @@ class API: KoinComponent {
     private val health: HealthCheckHandler by inject()
     private val config: Config by inject()
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
+    private val sentry: Sentry by inject()
     private val vertx: Vertx by inject()
 
     private fun onFailure(r: Endpoint, ctx: RoutingContext) {
@@ -46,6 +48,7 @@ class API: KoinComponent {
         val res = ctx.response()
 
         logger.error("Unable to run route \"${r.method} ${r.path}\"")
+        sentry.report(throwable)
         println(throwable)
 
         val obj = JsonObject().apply {
@@ -182,6 +185,7 @@ class API: KoinComponent {
         http.requestHandler(router)
         http.listen(config.port)
 
+        sentry.install()
         logger.info("API is now listening at http://localhost:${config.port}, default API version: v${config.defaultAPIVersion}")
     }
 

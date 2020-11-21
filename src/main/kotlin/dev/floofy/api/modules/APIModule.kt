@@ -22,6 +22,7 @@
 
 package dev.floofy.api.modules
 
+import dev.floofy.api.core.Sentry
 import dev.floofy.api.data.Config
 import io.vertx.core.Vertx
 import io.vertx.core.VertxOptions
@@ -51,4 +52,6 @@ val apiModule = module {
         val vertx: Vertx = get()
         WebClient.create(vertx, WebClientOptions().setUserAgent("api.augu.dev"))
     }
+
+    single { Sentry(get()) }
 }

@@ -38,12 +38,10 @@ fun loadProperties(stream: InputStream): Properties = Properties().apply { load(
  * @param name The name of the thread
  * @param block The chunk of code to run when it's executed
  */
-fun createThread(name: String, block: () -> Unit): Thread = (object : Thread(name) {
-    override fun run() { block() }
-})
+fun createThread(name: String, block: () -> Unit): Thread = Thread(block, name)
 
 /**
  * Extension to pass in [JsonObject] as a parameter and converted
  * to a string from [HttpServerResponse].
  */
-fun HttpServerResponse.end(json: JsonObject): Unit = this.end(json.toString())
+fun HttpServerResponse.end(json: JsonObject) = this.end(json.toString())
