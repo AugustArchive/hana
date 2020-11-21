@@ -5,6 +5,7 @@ on:
       - 'master'
     paths-ignore:
       - '.github/**'
+      - 'docs/**'
       - 'gradle.properties'
       - 'LICENSE'
       - '**.md'

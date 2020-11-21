@@ -11,7 +11,8 @@ on:
       - 'gradle.properties'
       - 'LICENSE'
       - '**.md'
-      - - 'config.example.yml'
+      - 'docs/**'
+      - 'config.example.yml'
       - 'renovate.json'
   pull_request:
     branches:
@@ -23,6 +24,7 @@ on:
       - '.github/**'
       - 'gradle.properties'
       - 'LICENSE'
+      - 'docs/**'
       - '**.md'
       - - 'config.example.yml'
       - 'renovate.json'
