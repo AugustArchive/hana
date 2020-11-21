@@ -19,6 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package dev.floofy.api.endpoints.v1
 
 import dev.floofy.api.core.Endpoint

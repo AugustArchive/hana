@@ -1,0 +1,24 @@
+########################################
+######## Example Configuration #########
+####### Fill this to your needs #######
+#######################################
+
+# GitHub Access Token for /sponsors endpoint
+# Required: no
+# Default: undefined
+github_access_token: ""
+
+# The default API version to key on, so /v1 -> / for an example
+# Required: no
+# Default: current version number
+default_api_version: 2
+
+# List of threads to give Vert.x to use for handling concurrent requests
+# Required: No
+# Default: 40 threads
+threads: 40
+
+# The port to listen to when using the API
+# Required: No
+# Default: localhost:3621
+port: 3621

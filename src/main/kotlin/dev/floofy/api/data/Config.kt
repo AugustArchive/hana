@@ -19,6 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package dev.floofy.api.data
 
 import kotlinx.serialization.SerialName
@@ -31,12 +32,6 @@ data class Config(
 
     @SerialName("default_api_version")
     val defaultAPIVersion: Int = 2,
-
-    @SerialName("github_secret")
-    val githubSecret: String? = null,
-
-    @SerialName("webhook_url")
-    val webhookUrl: String,
 
     @SerialName("threads")
     val threads: Int = 40,
