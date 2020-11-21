@@ -11,6 +11,7 @@ on:
       - 'gradle.properties'
       - 'LICENSE'
       - '**.md'
+      - - 'config.example.yml'
       - 'renovate.json'
   pull_request:
     branches:
@@ -23,6 +24,7 @@ on:
       - 'gradle.properties'
       - 'LICENSE'
       - '**.md'
+      - - 'config.example.yml'
       - 'renovate.json'
 jobs:
   ktlint:
