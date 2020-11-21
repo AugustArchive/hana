@@ -9,9 +9,14 @@
 github_access_token: ""
 
 # The default API version to key on, so /v1 -> / for an example
-# Required: no
+# Required: No
 # Default: current version number
 default_api_version: 2
+
+# The DSN url for Sentry
+# Required: No
+# Default: undefined
+sentry_dsn: ""
 
 # List of threads to give Vert.x to use for handling concurrent requests
 # Required: No
