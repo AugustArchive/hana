@@ -1,3 +1,14 @@
 {
-  "$schema": "https://cdn.floofy.dev/schematics/documentation"
+  "$schema": "https://cdn.floofy.dev/schematics/docs",
+  "pages": {
+    "/endpoints": "~/endpoints.md",
+    "/": "~/index.md"
+  },
+  "sidebar": {
+    "short_name": "Docs",
+    "pages": {
+      "/endpoints": "Endpoints",
+      "/": "Home"
+    }
+  }
 }
