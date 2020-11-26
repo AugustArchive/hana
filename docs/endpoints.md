@@ -61,7 +61,7 @@ $ curl -X GET https://api.floofy.dev/kadi
 ### Response
 ```js
 {
-    "data": String
+    "url": String
 }
 ```
 
