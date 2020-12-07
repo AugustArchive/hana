@@ -45,7 +45,7 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
     implementation("ch.qos.logback:logback-classic:1.2.3")
-    implementation("io.vertx:vertx-health-check:3.9.4")
+    implementation("io.vertx:vertx-health-check:4.0.0")
     implementation("com.charleskorn.kaml:kaml:0.26.0")
     implementation("io.vertx:vertx-web-client:3.9.4")
     implementation("com.google.guava:guava:30.0-jre")
