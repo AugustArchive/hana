@@ -50,7 +50,7 @@ dependencies {
     implementation("io.vertx:vertx-web-client:3.9.4")
     implementation("com.google.guava:guava:30.0-jre")
     implementation("org.slf4j:slf4j-api:1.7.30")
-    implementation("io.vertx:vertx-core:3.9.4")
+    implementation("io.vertx:vertx-core:4.0.0")
     implementation("io.vertx:vertx-web:3.9.4")
     implementation("org.koin:koin-core:2.1.6")
     implementation("io.sentry:sentry:3.2.0")
