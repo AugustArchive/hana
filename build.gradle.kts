@@ -47,7 +47,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("io.vertx:vertx-health-check:3.9.4")
     implementation("com.charleskorn.kaml:kaml:0.26.0")
-    implementation("io.vertx:vertx-web-client:3.9.4")
+    implementation("io.vertx:vertx-web-client:4.0.0")
     implementation("com.google.guava:guava:30.1-jre")
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("io.vertx:vertx-core:3.9.4")
