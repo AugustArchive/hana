@@ -41,7 +41,6 @@ jobs:
           # git is being dumb with this sooo
           script: |
             cd ~/api-v2
-            git stash
             git pull
             rm -fr build
             chmod +x gradlew

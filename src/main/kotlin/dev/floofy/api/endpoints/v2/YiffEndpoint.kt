@@ -71,6 +71,7 @@ class RandomYiffEndpoint: Endpoint(HttpMethod.GET, "/yiff") {
         val dimensions = try {
             converter.dimensions()
         } catch (ex: IOException) {
+            println(ex)
             null
         }
 
