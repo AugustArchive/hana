@@ -26,9 +26,6 @@ jobs:
       - name: Grant permissions to the build script
         run: chmod +x gradlew
 
-      - name: Apply ktlint
-        run: ./gradlew spotlessApply
-
       - name: Compile the project for any errors
         run: ./gradlew build
 
@@ -49,4 +46,4 @@ jobs:
             rm -fr build
             chmod +x gradlew
             ./gradlew build
-            pm2 restart api-v2
+            pm2 restart api.floofy.dev

@@ -33,8 +33,8 @@ data class Config(
     @SerialName("default_api_version")
     val defaultAPIVersion: Int = 2,
 
-    //@SerialName("saucenao_key")
-    //val saucenao: String,
+    // @SerialName("saucenao_key")
+    // val saucenao: String,
 
     @SerialName("sentry_dsn")
     val sentryDSN: String? = null,
