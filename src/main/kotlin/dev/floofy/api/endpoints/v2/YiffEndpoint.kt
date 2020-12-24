@@ -23,11 +23,14 @@
 package dev.floofy.api.endpoints.v2
 
 import dev.floofy.api.core.Endpoint
+import dev.floofy.api.core.Image
 import dev.floofy.api.end
 import io.vertx.core.http.HttpMethod
+import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 import java.io.File
+import java.io.IOException
 
 class YiffEndpoint: Endpoint(HttpMethod.GET, "/yiff/random") {
     override fun run(ctx: RoutingContext) {
@@ -63,7 +66,19 @@ class RandomYiffEndpoint: Endpoint(HttpMethod.GET, "/yiff") {
         }
 
         val file = files.random()
+        val converter = Image(file)
+
+        val dimensions = try {
+            converter.dimensions()
+        } catch (ex: IOException) {
+            null
+        }
+
         return res.setStatusCode(200).end(JsonObject().apply {
+            put("sources", JsonArray())
+            put("artists", JsonArray())
+            put("height", dimensions?.height ?: 0)
+            put("width", dimensions?.width ?: 0)
             put("url", "https://cdn.floofy.dev/yiff/${file.name}")
         })
     }
