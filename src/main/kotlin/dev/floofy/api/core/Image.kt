@@ -50,7 +50,7 @@ class Image(val file: File) {
 
                 val width = reader.getWidth(reader.minIndex)
                 val height = reader.getHeight(reader.minIndex)
-                Dimension(width, height)
+                return Dimension(width, height)
             } finally {
                 reader.dispose()
             }
