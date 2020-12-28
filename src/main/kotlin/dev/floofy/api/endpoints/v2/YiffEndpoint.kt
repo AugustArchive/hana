@@ -88,7 +88,7 @@ class RandomYiffEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "
 class YiffStatsEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "/yiff/stats") {
     override fun run(ctx: RoutingContext) {
         val res = ctx.response()
-        val images = YiffUtil.images("${config.imagesPath}/Yiff") ?: listOf()
+        val images = YiffUtil.images("${config.imagesPath}/yiff") ?: listOf()
         val sources = YiffUtil.sources()
         val tags = YiffUtil.tags()
 
