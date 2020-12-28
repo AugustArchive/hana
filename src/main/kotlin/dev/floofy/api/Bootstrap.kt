@@ -35,7 +35,7 @@ object Bootstrap {
         logger.info("Bootstrapping...")
         startKoin {
             environmentProperties()
-            modules(apiModule, endpointsModule, configModule)
+            modules(apiModule, endpointsModule, configModule, scriptModule)
         }
 
         val api = API()

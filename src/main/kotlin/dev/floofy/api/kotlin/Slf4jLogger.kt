@@ -20,34 +20,28 @@
  * SOFTWARE.
  */
 
-package dev.floofy.api.data
+package dev.floofy.api.kotlin
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-@Serializable
-data class Config(
-    @SerialName("github_access_token")
-    val githubAccessToken: String? = null,
+/**
+ * Provides a wrapper to created a delegated property for [org.slf4j.Logger],
+ * which is read-only.
+ *
+ * @param baseCls The base class to delegate the property from
+ */
+class DelegatedSlf4jLogger(private val baseCls: Class<*>): ReadOnlyProperty<Any?, Logger> {
+    override fun getValue(thisRef: Any?, property: KProperty<*>): Logger =
+        LoggerFactory.getLogger(baseCls)
+}
 
-    @SerialName("environment")
-    val environment: Environment = Environment.Development,
-
-    @SerialName("default_api_version")
-    val defaultAPIVersion: Int = 2,
-
-    @SerialName("images")
-    val imagesPath: String = "/var/www/cdn",
-
-    @SerialName("saucenao_key")
-    val saucenao: String,
-
-    @SerialName("sentry_dsn")
-    val sentryDSN: String? = null,
-
-    @SerialName("threads")
-    val threads: Int = 40,
-
-    @SerialName("port")
-    val port: Int = 3621
-)
+/**
+ * Inline function to create a [DelegatedSlf4jLogger] instance
+ * @param baseCls The base class to delegate the property from
+ * @returns The instance of [DelegatedSlf4jLogger]
+ */
+fun logging(baseCls: Class<*>): DelegatedSlf4jLogger =
+    DelegatedSlf4jLogger(baseCls)

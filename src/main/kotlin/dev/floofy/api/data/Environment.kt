@@ -26,28 +26,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Config(
-    @SerialName("github_access_token")
-    val githubAccessToken: String? = null,
+enum class Environment {
+    @SerialName("production")
+    Production,
 
-    @SerialName("environment")
-    val environment: Environment = Environment.Development,
-
-    @SerialName("default_api_version")
-    val defaultAPIVersion: Int = 2,
-
-    @SerialName("images")
-    val imagesPath: String = "/var/www/cdn",
-
-    @SerialName("saucenao_key")
-    val saucenao: String,
-
-    @SerialName("sentry_dsn")
-    val sentryDSN: String? = null,
-
-    @SerialName("threads")
-    val threads: Int = 40,
-
-    @SerialName("port")
-    val port: Int = 3621
-)
+    @SerialName("development")
+    Development
+}
