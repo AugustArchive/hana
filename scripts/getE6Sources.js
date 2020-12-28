@@ -100,9 +100,9 @@ async function main() {
     if (data.status === 200) {
       sources[file] = data.data.post.sources;
       tags[file] = {
-        characters: data.data.post.tags.characters,
+        characters: data.data.post.tags.character,
         copyright: data.data.post.tags.copyright,
-        artists: data.data.post.tags.artist
+        artists: data.data.post.tags.artist.filter(r => r !== 'conditional_dnp')
       };
     }
   }

@@ -39,9 +39,6 @@ data class Config(
     @SerialName("images")
     val imagesPath: String = "/var/www/cdn",
 
-    @SerialName("saucenao_key")
-    val saucenao: String,
-
     @SerialName("sentry_dsn")
     val sentryDSN: String? = null,
 

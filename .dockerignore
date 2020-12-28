@@ -1,0 +1,13 @@
+.github/
+.gradle/
+.idea/
+build/
+docs/
+logs/
+scripts/
+
+.gitignore
+config.example.yml
+LICENSE
+README.md
+renovate.json
