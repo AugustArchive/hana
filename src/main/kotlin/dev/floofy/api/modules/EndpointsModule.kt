@@ -35,10 +35,11 @@ import org.koin.dsl.module
 val endpointsModule = module {
     // v2 endpoints
     single { ListSponsorsEndpoint(get(), get()) } bind Endpoint::class
-    single { RandomYiffEndpoint() } bind Endpoint::class
+    single { RandomYiffEndpoint(get()) } bind Endpoint::class
+    single { YiffStatsEndpoint(get()) } bind Endpoint::class
+    single { YiffEndpoint(get()) } bind Endpoint::class
     single { SponsorsEndpoint() } bind Endpoint::class
     single { MainEndpoint() } bind Endpoint::class
-    single { YiffEndpoint() } bind Endpoint::class
 
     // v1 endpoints
     single { SponsorsV1Endpoint(get(), get()) } bind Endpoint::class

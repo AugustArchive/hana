@@ -1,0 +1,27 @@
+{
+  "0845d8fd4b6b570ee6a87ef4d462dbaf.png": {
+    "characters": [],
+    "copyright": [],
+    "artists": ["zeiro"]
+  },
+  "08abde09f775d92a0f90fdf3e66b4c02.gif": {
+    "characters": [],
+    "copyright": ["nintendo", "pokémon", "pokémon_mystery_dungeon"],
+    "artists": ["dacad"]
+  },
+  "0bb7b78bec475433a10fda172234bed0.png": {
+    "characters": ["kiggles", "pawp"],
+    "copyright": [],
+    "artists": ["yuniwolfsky"]
+  },
+  "0d58631a6c635ad632f0afc1471e558f.png": {
+    "characters": ["adrian_(firewolf)", "c-jen"],
+    "copyright": [],
+    "artists": ["zeiro"]
+  },
+  "10903eb.png": {
+    "characters": ["mauro_skyles"],
+    "copyright": ["nintendo", "pokémon"],
+    "artists": ["harlem"]
+  }
+}

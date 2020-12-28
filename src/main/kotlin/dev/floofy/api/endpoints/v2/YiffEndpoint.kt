@@ -24,50 +24,45 @@ package dev.floofy.api.endpoints.v2
 
 import dev.floofy.api.core.Endpoint
 import dev.floofy.api.core.Image
+import dev.floofy.api.core.YiffUtil
+import dev.floofy.api.data.Config
 import dev.floofy.api.end
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
-import java.io.File
 import java.io.IOException
 
-class YiffEndpoint: Endpoint(HttpMethod.GET, "/yiff/random") {
+class YiffEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "/yiff/random") {
     override fun run(ctx: RoutingContext) {
         val res = ctx.response()
-        val yiff = File("/var/www/cdn/yiff")
-        val files = mutableListOf<File>()
-        val listed = yiff.listFiles() ?: emptyArray()
+        val yiff = YiffUtil.image("${config.imagesPath}/yiff")
+        if (yiff == null) {
+            res.setStatusCode(404).end(JsonObject().apply {
+                put("message", "No images were found.")
+            })
 
-        for (l in listed) {
-            if (l.isDirectory) continue
-
-            files.add(l)
+            return
         }
 
-        val file = files.random()
-        res.setStatusCode(200).sendFile(file.canonicalPath)
-
+        res.setStatusCode(200).sendFile(yiff.canonicalPath)
         return
     }
 }
 
-class RandomYiffEndpoint: Endpoint(HttpMethod.GET, "/yiff") {
+class RandomYiffEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "/yiff") {
     override fun run(ctx: RoutingContext) {
         val res = ctx.response()
-        val yiff = File("/var/www/cdn/yiff")
-        val files = mutableListOf<File>()
-        val listed = yiff.listFiles() ?: emptyArray()
+        val file = YiffUtil.image("${config.imagesPath}/yiff")
+        if (file == null) {
+            res.setStatusCode(404).end(JsonObject().apply {
+                put("message", "No images were found.")
+            })
 
-        for (l in listed) {
-            if (l.isDirectory) continue
-
-            files.add(l)
+            return
         }
 
-        val file = files.random()
         val converter = Image(file)
-
         val dimensions = try {
             converter.dimensions()
         } catch (ex: IOException) {
@@ -75,12 +70,45 @@ class RandomYiffEndpoint: Endpoint(HttpMethod.GET, "/yiff") {
             null
         }
 
+        val sources = YiffUtil.source(file.name)
+        val tags = YiffUtil.tag(file.name)
+
         return res.setStatusCode(200).end(JsonObject().apply {
-            put("sources", JsonArray())
-            put("artists", JsonArray())
+            put("characters", tags.getJsonArray("characters", JsonArray()))
+            put("copyright", tags.getJsonArray("copyright", JsonArray()))
+            put("sources", sources)
+            put("artists", tags.getJsonArray("artists", JsonArray()))
             put("height", dimensions?.height ?: 0)
             put("width", dimensions?.width ?: 0)
             put("url", "https://cdn.floofy.dev/yiff/${file.name}")
+        })
+    }
+}
+
+class YiffStatsEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "/yiff/stats") {
+    override fun run(ctx: RoutingContext) {
+        val res = ctx.response()
+        val images = YiffUtil.images("${config.imagesPath}/Yiff") ?: listOf()
+        val sources = YiffUtil.sources()
+        val tags = YiffUtil.tags()
+
+        val hasSources = mutableListOf<String>()
+        val hasTags = mutableListOf<String>()
+
+        for (image in images) {
+            val source = sources.getJsonArray(image.name)
+            if (source != null) hasSources.add(image.name)
+
+            val tag = tags.getJsonObject(image.name)
+            if (tag != null) hasTags.add(image.name)
+        }
+
+        return res.setStatusCode(200).end(JsonObject().apply {
+            put("has_sources", ((images.size / hasSources.size) / 100).toFloat())
+            put("has_tags", ((images.size / hasTags.size) / 100).toFloat())
+            put("sources", sources.size())
+            put("images", images.size)
+            put("tags", tags.size())
         })
     }
 }
