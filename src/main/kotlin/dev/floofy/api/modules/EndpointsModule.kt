@@ -35,6 +35,7 @@ import org.koin.dsl.module
 val endpointsModule = module {
     // v2 endpoints
     single { ListSponsorsEndpoint(get(), get()) } bind Endpoint::class
+    single { YiffImageStatsEndpoint(get()) } bind Endpoint::class
     single { RandomYiffEndpoint(get()) } bind Endpoint::class
     single { YiffStatsEndpoint(get()) } bind Endpoint::class
     single { YiffEndpoint(get()) } bind Endpoint::class

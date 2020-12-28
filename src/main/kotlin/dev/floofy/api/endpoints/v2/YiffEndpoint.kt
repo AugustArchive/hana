@@ -112,3 +112,39 @@ class YiffStatsEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "/
         })
     }
 }
+
+class YiffImageStatsEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "/yiff/stats/:id") {
+    override fun run(ctx: RoutingContext) {
+        val res = ctx.response()
+        val req = ctx.request()
+        val params = req.params()
+
+        val image = params.get("id")
+        val files = YiffUtil.images("${config.imagesPath}/yiff") ?: listOf()
+
+        val file = files.find { it.name == image }
+            ?: return res.setStatusCode(404).end(JsonObject().apply {
+                put("message", "Image by '$image' was not found, did you exclude the extension?")
+            })
+
+        val sources = YiffUtil.source(file.name)
+        val tags = YiffUtil.tag(file.name)
+
+        val dimensions = try {
+            Image(file).dimensions()
+        } catch (ex: IOException) {
+            println(ex)
+            null
+        }
+
+        return res.setStatusCode(200).end(JsonObject().apply {
+            put("characters", tags.getJsonArray("characters", JsonArray()))
+            put("copyright", tags.getJsonArray("copyright", JsonArray()))
+            put("sources", sources)
+            put("artists", tags.getJsonArray("artists", JsonArray()))
+            put("height", dimensions?.height ?: 0)
+            put("width", dimensions?.width ?: 0)
+            put("url", "https://cdn.floofy.dev/yiff/${file.name}")
+        })
+    }
+}
