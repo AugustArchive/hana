@@ -14,6 +14,7 @@ on:
       - 'docs/**'
       - 'config.example.yml'
       - 'renovate.json'
+      - 'scripts/**'
   pull_request:
     branches:
       - 'features/**'
@@ -28,6 +29,7 @@ on:
       - '**.md'
       - 'config.example.yml'
       - 'renovate.json'
+      - 'scripts/**'
 jobs:
   ktlint:
     runs-on: ubuntu-latest

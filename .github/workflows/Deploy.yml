@@ -11,6 +11,7 @@ on:
       - '**.md'
       - 'config.example.yml'
       - 'renovate.json'
+      - 'scripts/**'
 jobs:
   deploy:
     runs-on: ubuntu-latest
