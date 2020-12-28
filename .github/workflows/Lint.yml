@@ -15,6 +15,7 @@ on:
       - 'config.example.yml'
       - 'renovate.json'
       - 'scripts/**'
+      - '.dockerignore'
   pull_request:
     branches:
       - 'features/**'
