@@ -133,7 +133,7 @@ async function cleanup() {
     const paths = key.split('\\');
     const p = paths[paths.length - 1];
 
-    cleanT[p] = sources[key];
+    cleanT[p] = tags[key];
   }
 
   await fs.writeFile('./src/main/resources/yiff/sources.json', JSON.stringify(cleanS, null, 4));
