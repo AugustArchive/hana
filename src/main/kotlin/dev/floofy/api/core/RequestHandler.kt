@@ -20,28 +20,6 @@
  * SOFTWARE.
  */
 
-package dev.floofy.api.modules
+package dev.floofy.api.core
 
-import dev.floofy.api.core.Sentry
-import dev.floofy.api.data.Config
-import io.vertx.core.Vertx
-import io.vertx.core.VertxOptions
-import io.vertx.ext.web.client.WebClient
-import io.vertx.ext.web.client.WebClientOptions
-import org.koin.dsl.module
-
-val apiModule = module {
-    single {
-        val config: Config = get()
-        val options = VertxOptions().setWorkerPoolSize(config.threads)
-
-        Vertx.vertx(options)
-    }
-
-    single {
-        val vertx: Vertx = get()
-        WebClient.create(vertx, WebClientOptions().setUserAgent("api.augu.dev"))
-    }
-
-    single { Sentry(get()) }
-}
+class RequestHandler

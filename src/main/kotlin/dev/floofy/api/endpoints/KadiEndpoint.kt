@@ -23,7 +23,7 @@
 package dev.floofy.api.endpoints
 
 import dev.floofy.api.core.Endpoint
-import dev.floofy.api.core.Image
+import dev.floofy.api.core.util.Image
 import dev.floofy.api.end
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonObject

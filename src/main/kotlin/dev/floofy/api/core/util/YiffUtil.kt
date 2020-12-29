@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package dev.floofy.api.core
+package dev.floofy.api.core.util
 
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject

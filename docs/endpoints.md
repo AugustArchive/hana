@@ -2,9 +2,10 @@
 List of endpoints available with the request and response types of v2.
 
 ## Constants
-- API Version: v2
-- Base URL:    **api.floofy.dev**
-- CDN URL:     **cdn.floofy.dev**
+- API Version:     v2
+- Indev Base URL:  **indev.api.floofy.dev**
+- Base URL:        **api.floofy.dev**
+- CDN URL:         **cdn.floofy.dev**
 
 ## GET /
 Returns the default homepage
@@ -76,6 +77,28 @@ $ curl -X GET https://api.floofy.dev/kadi/random
 ### Response
 ![cute wah](https://cdn.floofy.dev/kadi/kadi.png)
 
+## GET /stats
+Returns a list of statistics from the Telemetry API
+
+### Request
+```sh
+$ curl -X GET https://api.floofy.dev/stats
+```
+
+### Response
+```js
+{
+    "requests": Int,
+    "telemetry": {
+        "pressfbot": PressFBotStats
+    },
+    "endpoints": {
+        "most_used": Array<MostUsedEndpoint>,
+        "<endpoint>": Int
+    } 
+}
+```
+
 # Types
 List of types from the different request(s) above.
 
@@ -110,5 +133,49 @@ List of types from the different request(s) above.
     "name"?: String,
     "bio"?: String,
     "url": String
+}
+```
+
+## MostUsedEndpoint
+```js
+{
+    "endpoint": String,
+    "times": Int
+}
+```
+
+## PressFBotStats
+```js
+{
+    "messages_seen": MessageSeenStats,
+    "commands_executed": CommandExecutedStats,
+    "f_counter": FCounterStats
+}
+```
+
+### MessageSeenStats
+```js
+{
+    "total": Int,
+    "this_year": Int,
+    "current": Int
+}
+```
+
+### CommandExecutedStats
+```js
+{
+    "total": Int,
+    "this_year": Int,
+    "current": Int
+}
+```
+
+### FCounterStats
+```js
+{
+    "total": Int,
+    "this_year": Int,
+    "current": Int
 }
 ```

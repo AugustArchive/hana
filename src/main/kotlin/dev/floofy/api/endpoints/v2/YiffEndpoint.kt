@@ -23,8 +23,8 @@
 package dev.floofy.api.endpoints.v2
 
 import dev.floofy.api.core.Endpoint
-import dev.floofy.api.core.Image
 import dev.floofy.api.core.YiffUtil
+import dev.floofy.api.core.util.Image
 import dev.floofy.api.data.Config
 import dev.floofy.api.end
 import io.vertx.core.http.HttpMethod

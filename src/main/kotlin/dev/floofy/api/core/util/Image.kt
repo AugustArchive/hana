@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package dev.floofy.api.core
+package dev.floofy.api.core.util
 
 import java.awt.Dimension
 import java.io.File

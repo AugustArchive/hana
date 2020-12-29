@@ -34,7 +34,7 @@ plugins {
 
 val ver = Version(3, 0, 0, VersionCandidate.INDEV)
 
-group = "dev.floofy"
+group = "dev.floofy.api"
 version = ver.string()
 
 repositories {
@@ -45,10 +45,9 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
     implementation("ch.qos.logback:logback-classic:1.2.3")
-    implementation("io.vertx:vertx-health-check:3.9.4")
     implementation("com.charleskorn.kaml:kaml:0.26.0")
     implementation("io.vertx:vertx-web-client:3.9.4")
-    implementation("com.google.guava:guava:30.1-jre")
+    implementation("redis.clients:jedis:3.4.1")
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("io.vertx:vertx-core:3.9.4")
     implementation("io.vertx:vertx-web:3.9.4")

@@ -28,7 +28,6 @@ import dev.floofy.api.data.Config
 import dev.floofy.api.endpoints.NotFoundEndpoint
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.healthchecks.HealthCheckHandler
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
 import org.koin.core.KoinComponent
@@ -37,7 +36,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class API: KoinComponent {
-    private val health: HealthCheckHandler by inject()
     private val config: Config by inject()
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
     private val sentry: Sentry by inject()
@@ -78,10 +76,6 @@ class API: KoinComponent {
                 put("message", "Endpoint \"${req.rawMethod()} ${req.path()}\" didn't use a valid method.")
             })
         }
-
-        router
-                .route("/health")
-                .handler(health)
 
         val routes = getKoin().getAll<Endpoint>().filter { it !is NotFoundEndpoint }
         val v1 = routes.filter { it.version == 1 }
