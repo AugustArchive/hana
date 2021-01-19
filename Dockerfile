@@ -8,7 +8,7 @@ RUN apk add openjdk11 --repository=http://dl-cdn.alpinelinux.org/alpine/edge/com
 RUN java --version
 
 # Now we run the API
-WORKDIR /opt/api.floofy.dev
+WORKDIR /opt/API
 COPY . .
 
 # Expose port 3621 because networking owo
