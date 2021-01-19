@@ -23,7 +23,7 @@
 package dev.floofy.api.endpoints.v2
 
 import dev.floofy.api.core.Endpoint
-import dev.floofy.api.core.YiffUtil
+import dev.floofy.api.core.util.ImageUtil
 import dev.floofy.api.core.util.Image
 import dev.floofy.api.data.Config
 import dev.floofy.api.end
@@ -36,7 +36,7 @@ import java.io.IOException
 class YiffEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "/yiff/random") {
     override fun run(ctx: RoutingContext) {
         val res = ctx.response()
-        val yiff = YiffUtil.image("${config.imagesPath}/yiff")
+        val yiff = ImageUtil.image("${config.imagesPath}/yiff")
         if (yiff == null) {
             res.setStatusCode(404).end(JsonObject().apply {
                 put("message", "No images were found.")
@@ -53,7 +53,7 @@ class YiffEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "/yiff/
 class RandomYiffEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "/yiff") {
     override fun run(ctx: RoutingContext) {
         val res = ctx.response()
-        val file = YiffUtil.image("${config.imagesPath}/yiff")
+        val file = ImageUtil.image("${config.imagesPath}/yiff")
         if (file == null) {
             res.setStatusCode(404).end(JsonObject().apply {
                 put("message", "No images were found.")
@@ -70,8 +70,8 @@ class RandomYiffEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "
             null
         }
 
-        val sources = YiffUtil.source(file.name)
-        val tags = YiffUtil.tag(file.name)
+        val sources = ImageUtil.source(file.name)
+        val tags = ImageUtil.tag(file.name)
 
         return res.setStatusCode(200).end(JsonObject().apply {
             put("characters", tags.getJsonArray("characters", JsonArray()))
@@ -88,9 +88,9 @@ class RandomYiffEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "
 class YiffStatsEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "/yiff/stats") {
     override fun run(ctx: RoutingContext) {
         val res = ctx.response()
-        val images = YiffUtil.images("${config.imagesPath}/yiff") ?: listOf()
-        val sources = YiffUtil.sources()
-        val tags = YiffUtil.tags()
+        val images = ImageUtil.images("${config.imagesPath}/yiff") ?: listOf()
+        val sources = ImageUtil.sources()
+        val tags = ImageUtil.tags()
 
         val hasSources = mutableListOf<String>()
         val hasTags = mutableListOf<String>()
@@ -120,15 +120,15 @@ class YiffImageStatsEndpoint(private val config: Config): Endpoint(HttpMethod.GE
         val params = req.params()
 
         val image = params.get("id")
-        val files = YiffUtil.images("${config.imagesPath}/yiff") ?: listOf()
+        val files = ImageUtil.images("${config.imagesPath}/yiff") ?: listOf()
 
         val file = files.find { it.name == image }
             ?: return res.setStatusCode(404).end(JsonObject().apply {
                 put("message", "Image by '$image' was not found, did you exclude the extension?")
             })
 
-        val sources = YiffUtil.source(file.name)
-        val tags = YiffUtil.tag(file.name)
+        val sources = ImageUtil.source(file.name)
+        val tags = ImageUtil.tag(file.name)
 
         val dimensions = try {
             Image(file).dimensions()

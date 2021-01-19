@@ -29,6 +29,7 @@ import io.vertx.core.VertxOptions
 import io.vertx.ext.web.client.WebClient
 import io.vertx.ext.web.client.WebClientOptions
 import org.koin.dsl.module
+import redis.clients.jedis.Jedis
 
 val apiModule = module {
     single {
@@ -41,6 +42,11 @@ val apiModule = module {
     single {
         val vertx: Vertx = get()
         WebClient.create(vertx, WebClientOptions().setUserAgent("api.augu.dev"))
+    }
+
+    single {
+        val config: Config = get()
+        // todo redis here kekw
     }
 
     single { Sentry(get()) }

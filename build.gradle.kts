@@ -68,6 +68,10 @@ val metadata = task<Copy>("metadata") {
         filter<ReplaceTokens>(mapOf("tokens" to tokens))
     }
 
+    // Delete "app.properties" file :eyes:
+    val app = File("./src/main/resources/app.properties")
+    if (app.exists()) app.delete()
+
     rename { "app.properties" }
     into("src/main/resources")
     includeEmptyDirs = true

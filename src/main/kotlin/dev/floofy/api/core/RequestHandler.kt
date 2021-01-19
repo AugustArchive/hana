@@ -22,4 +22,15 @@
 
 package dev.floofy.api.core
 
-class RequestHandler
+import dev.floofy.api.kotlin.logging
+import io.vertx.core.http.HttpServerRequest
+import io.vertx.core.http.HttpServerResponse
+
+class RequestHandler {
+    private var requests: Int = 0
+    private val logger by logging(this::class.java)
+
+    fun onRequest() {
+
+    }
+}

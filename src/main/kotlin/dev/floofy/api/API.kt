@@ -54,7 +54,7 @@ class API: KoinComponent {
             put("error", throwable.localizedMessage)
         }
 
-        res.setStatusCode(ctx.statusCode()).end(obj)
+       return res.setStatusCode(ctx.statusCode()).end(obj)
     }
 
     fun start() {

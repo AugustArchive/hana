@@ -45,6 +45,9 @@ data class Config(
     @SerialName("threads")
     val threads: Int = 40,
 
+    @SerialName("redis")
+    val redis: RedisConfig = RedisConfig(), // default redis config
+
     @SerialName("port")
     val port: Int = 3621
 )

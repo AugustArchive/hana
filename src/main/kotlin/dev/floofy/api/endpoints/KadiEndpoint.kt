@@ -24,49 +24,44 @@ package dev.floofy.api.endpoints
 
 import dev.floofy.api.core.Endpoint
 import dev.floofy.api.core.util.Image
+import dev.floofy.api.core.util.ImageUtil
+import dev.floofy.api.data.Config
 import dev.floofy.api.end
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
-import java.io.File
 import java.io.IOException
 
-class KadiEndpoint: Endpoint(HttpMethod.GET, "/kadi/random", 0) {
+class KadiEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "/kadi/random", 0) {
     override fun run(ctx: RoutingContext) {
         val res = ctx.response()
-        val kadi = File("/var/www/cdn/kadi")
-        val files = mutableListOf<File>()
-        val listed = kadi.listFiles() ?: emptyArray()
+        val image = ImageUtil.image("${config.imagesPath}/yiff")
+        if (image == null) {
+            res.setStatusCode(404).end(JsonObject().apply {
+                put("message", "No images were found.")
+            })
 
-        for (l in listed) {
-            if (l.isDirectory) continue
-
-            files.add(l)
+            return
         }
 
-        val file = files.random()
-        res.setStatusCode(200).sendFile(file.canonicalPath)
-
+        res.setStatusCode(200).sendFile(image.canonicalPath)
         return
     }
 }
 
-class RandomKadiEndpoint: Endpoint(HttpMethod.GET, "/kadi", 0) {
+class RandomKadiEndpoint(private val config: Config): Endpoint(HttpMethod.GET, "/kadi", 0) {
     override fun run(ctx: RoutingContext) {
         val res = ctx.response()
-        val kadi = File("/var/www/cdn/kadi")
-        val files = mutableListOf<File>()
-        val listed = kadi.listFiles() ?: emptyArray()
+        val file = ImageUtil.image("${config.imagesPath}/yiff")
+        if (file == null) {
+            res.setStatusCode(404).end(JsonObject().apply {
+                put("message", "No images were found.")
+            })
 
-        for (l in listed) {
-            if (l.isDirectory) continue
-
-            files.add(l)
+            return
         }
 
-        val file = files.random()
         val converter = Image(file)
-
         val dimensions = try {
             converter.dimensions()
         } catch (ex: IOException) {
