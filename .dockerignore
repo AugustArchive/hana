@@ -5,6 +5,7 @@ build/
 docs/
 logs/
 scripts/
+src/
 
 .gitignore
 config.example.yml
