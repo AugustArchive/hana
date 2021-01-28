@@ -22,7 +22,7 @@
         </encoder>
     </appender>
 
-    <logger name="dev.floofy.api" level="info" additivity="false">
+    <logger name="dev.floofy.api_old" level="info" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 

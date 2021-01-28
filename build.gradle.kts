@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020 August
+ * Copyright (c) 2020-2021 August
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ plugins {
     application
 }
 
-val ver = Version(2, 4, 1, VersionCandidate.RELEASED)
+val ver = Version(3, 0, 0, VersionCandidate.INDEV)
 
 group = "dev.floofy"
 version = ver.string()
@@ -43,18 +43,26 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
-    implementation("ch.qos.logback:logback-classic:1.2.3")
-    implementation("io.vertx:vertx-health-check:3.9.4")
-    implementation("com.charleskorn.kaml:kaml:0.26.0")
-    implementation("io.vertx:vertx-web-client:3.9.4")
-    implementation("com.google.guava:guava:30.1-jre")
-    implementation("org.slf4j:slf4j-api:1.7.30")
-    implementation("io.vertx:vertx-core:3.9.4")
-    implementation("io.vertx:vertx-web:3.9.4")
-    implementation("org.koin:koin-core:2.1.6")
-    implementation("io.sentry:sentry:4.0.0")
+    // Kotlin Libraries
     implementation(kotlin("stdlib"))
+
+    // Ktor + Serialization
+    implementation("io.ktor:ktor-client-serialization:1.5.0")
+    implementation("io.ktor:ktor-serialization:1.5.0")
+    implementation("io.ktor:ktor-client-okhttp:1.5.0")
+    implementation("io.ktor:ktor-server-netty:1.5.0")
+    implementation("io.ktor:ktor-server-core:1.5.0")
+
+    // Logging Utilities
+    implementation("ch.qos.logback:logback-classic:1.2.3")
+    implementation("org.slf4j:slf4j-api:1.7.30")
+
+    // Dependency Injection
+    implementation("org.koin:koin-ktor:2.2.2")
+    implementation("org.koin:koin-core:2.2.1")
+
+    // Other
+    implementation("io.sentry:sentry:4.0.0")
 }
 
 val metadata = task<Copy>("metadata") {
@@ -69,6 +77,7 @@ val metadata = task<Copy>("metadata") {
         filter<ReplaceTokens>(mapOf("tokens" to tokens))
     }
 
+    delete("src/main/resources/app.properties")
     rename { "app.properties" }
     into("src/main/resources")
     includeEmptyDirs = true
@@ -121,6 +130,7 @@ tasks {
     }
 
     build {
+        dependsOn(spotlessApply)
         dependsOn(shadowJar)
         dependsOn(metadata)
     }
