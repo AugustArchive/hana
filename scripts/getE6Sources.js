@@ -1,7 +1,10 @@
 const { promises: fs, createReadStream } = require('fs');
+const loadProperties = require('./loadProperties');
 const { createHash } = require('crypto');
 const { join } = require('path');
 const https = require('https');
+
+let metadata;
 
 /**
  * Asynchronouslly read a directory's contents and returns a list of files
@@ -53,7 +56,7 @@ const request = (hash) => {
       port: url.port,
       host: url.hostname,
       headers: {
-        'user-agent': 'api.floofy.dev/2.4.0'
+        'user-agent': `api.floofy.dev/${metadata['app.version']}`
       }
     }, (res) => {
       res.on('error', reject);
@@ -75,31 +78,36 @@ const request = (hash) => {
   });
 };
 
-const hashes = {};
+const hashes = { yiff: [], bulge: [] };
 const sources = {};
 const tags = {};
 
 async function main() {
-  const files = await readdir('D:\\Cache\\Yiff', ['videos']);
+  metadata = await loadProperties(join(__dirname, '..', 'src', 'main', 'resources', 'app.properties'));
 
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
+  const yiff = await readdir('D:/Cache/Yiff/gay');
+  const bulge = await readdir('D:/Cache/Yiff/bulge');
+
+  console.log(`[info] Found ${yiff.length} gay and ${bulge.length} bulge images!`);
+
+  for (let i = 0; i < yiff.length; i++) {
+    const file = yiff[i];
     const hash = await getHash(file);
     let data;
 
     try {
       data = await request(hash);
     } catch(ex) {
-      console.error(`[${i + 1}/${files.length}] Unable to get source from hash ${hash}\n`, ex);
+      console.error(`[${i + 1}/${yiff.length} ~ yiff] Unable to fetch source from hash '${hash}'\n`, ex);
       continue;
     }
 
-    console.log(`[${i + 1}/${files.length} | ${data.status}] ${file} -> ${hash}`);
-    hashes[file] = hash;
-    
-    if (data.status === 200) {
-      sources[file] = data.data.post.sources;
-      tags[file] = {
+    console.log(`[${i + 1}/${yiff.length} ~ yiff ~ ${data.status}] ${file} | ${hash}`);
+    hashes.yiff.push(hash);
+
+    if (data.source === 200) {
+      sources.yiff[file] = data.data.post.sources;
+      tags.yiff[file] = {
         characters: data.data.post.tags.character,
         copyright: data.data.post.tags.copyright,
         artists: data.data.post.tags.artist.filter(r => r !== 'conditional_dnp')
@@ -107,12 +115,41 @@ async function main() {
     }
   }
 
-  console.log(`Found ${Object.keys(sources).length} sources and tags.`);
-  await fs.writeFile('./src/main/resources/yiff/hashes.json', JSON.stringify(hashes, null, 4));
-  await fs.writeFile('./src/main/resources/yiff/sources.json', JSON.stringify(sources, null, 4));
-  await fs.writeFile('./src/main/resources/yiff/tags.json', JSON.stringify(tags, null, 4));
+  for (let i = 0; i < bulge.length; i++) {
+    const file = bulge[i];
+    const hash = await getHash(file);
+    let data;
 
-  cleanup();
+    try {
+      data = await request(hash);
+    } catch(ex) {
+      console.error(`[${i + 1}/${bulge.length} ~ bulge] Unable to fetch source from hash '${hash}'\n`, ex);
+      continue;
+    }
+
+    console.log(`[${i + 1}/${bulge.length} ~ bulge ~ ${data.status}] ${file} | ${hash}`);
+    hashes.bulge.push(hash);
+
+    if (data.source === 200) {
+      sources.bulge[file] = data.data.post.sources;
+      tags.bulge[file] = {
+        characters: data.data.post.tags.character,
+        copyright: data.data.post.tags.copyright,
+        artists: data.data.post.tags.artist.filter(r => r !== 'conditional_dnp')
+      };
+    }
+  }
+
+  console.log(`[info ~ yiff] Found ${Object.keys(sources.yiff).length} sources and ${Object.keys(sources.tags).length} tags.`);
+  console.log(`[info ~ bulge] Found ${Object.keys(sources.yiff).length} sources and ${Object.keys(sources.tags).length} tags.`);
+
+  await Promise.all(
+    fs.writeFile('./src/main/resources/yiff/sources.json', JSON.stringify(sources, null, 4)),
+    fs.writeFile('./src/main/resources/yiff/hashes.json', JSON.stringify(hashes, null, 4)),
+    fs.writeFile('./src/main/resources/yiff/tags.json', JSON.stringify(tags, null, 4))
+  );
+
+  //cleanup();
 }
 
 async function cleanup() {

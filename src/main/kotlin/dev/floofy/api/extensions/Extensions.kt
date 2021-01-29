@@ -19,4 +19,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package dev.floofy.api.extensions
+
+import io.ktor.application.*
+
+fun Application.module() {
+}

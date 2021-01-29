@@ -32,7 +32,7 @@ plugins {
     application
 }
 
-val ver = Version(3, 0, 0, VersionCandidate.INDEV)
+val ver = Version(3, 0, 0, 0, VersionCandidate.INDEV)
 
 group = "dev.floofy"
 version = ver.string()
@@ -63,6 +63,9 @@ dependencies {
 
     // Other
     implementation("io.sentry:sentry:4.0.0")
+
+    // Configuration
+    implementation("com.charleskorn.kaml:kaml:0.26.0")
 }
 
 val metadata = task<Copy>("metadata") {
@@ -147,9 +150,10 @@ class Version(
         private val major: Int,
         private val minor: Int,
         private val revision: Int,
+        private val build: Int,
         private val candidate: VersionCandidate
 ) {
-    fun string(): String = "$major.$minor.${candidate.value}$revision"
+    fun string(): String = "$major.$minor.$revision${candidate.value}$build"
     fun commit(): String = exec("git rev-parse HEAD")
 }
 

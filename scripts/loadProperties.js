@@ -20,4 +20,24 @@
  * SOFTWARE.
  */
 
-package dev.floofy.api.endpoints
+const { promises: fs } = require('fs');
+
+/**
+ * Asynchronouslly load a .properties file and parses it
+ * @param {string} path The path to find the file
+ * @returns {Promise<{ [x: string]: string | object; }>} A object of the properties file
+ */
+module.exports = async function loadProperties(path) {
+  const contents = await fs.readFile(path, { encoding: 'utf8' });
+  const ast = contents.split('\n').filter(r => !r.startsWith('#') || !/\r\n/.test(r));
+  const props = {};
+
+  for (let i = 0; i < ast.length; i++) {
+    const [key, value] = ast[i].split(' = ');
+    if (!value) continue;
+
+    props[key.trim()] = value.trim();
+  }
+  
+  return props;
+};
