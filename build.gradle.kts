@@ -62,7 +62,7 @@ dependencies {
     implementation("org.koin:koin-core:2.2.1")
 
     // Other
-    implementation("io.sentry:sentry:4.0.0")
+    implementation("io.sentry:sentry:4.1.0")
 
     // Configuration
     implementation("com.charleskorn.kaml:kaml:0.26.0")
