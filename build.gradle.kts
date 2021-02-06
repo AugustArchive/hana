@@ -65,7 +65,7 @@ dependencies {
     implementation("io.sentry:sentry:4.0.0")
 
     // Configuration
-    implementation("com.charleskorn.kaml:kaml:0.26.0")
+    implementation("com.charleskorn.kaml:kaml:0.27.0")
 }
 
 val metadata = task<Copy>("metadata") {
