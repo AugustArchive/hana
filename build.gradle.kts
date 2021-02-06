@@ -50,7 +50,7 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:1.5.0")
     implementation("io.ktor:ktor-serialization:1.5.0")
     implementation("io.ktor:ktor-client-okhttp:1.5.0")
-    implementation("io.ktor:ktor-server-netty:1.5.0")
+    implementation("io.ktor:ktor-server-netty:1.5.1")
     implementation("io.ktor:ktor-server-core:1.5.0")
 
     // Logging Utilities
