@@ -14,12 +14,15 @@
     "@augu/http": "1.1.0",
     "@augu/orchid": "2.1.2",
     "@augu/utils": "1.0.3",
-    "@ayanaware/logger": "2.2.1"
+    "@ayanaware/logger": "2.2.1",
+    "express-rate-limit": "5.2.6",
+    "image-size": "0.9.3"
   },
   "devDependencies": {
     "@augu/eslint-config": "1.10.0",
     "@augu/tsconfig": "1.0.1",
     "@types/express": "4.17.11",
+    "@types/express-rate-limit": "5.1.1",
     "@types/node": "14.14.28",
     "@typescript-eslint/eslint-plugin": "4.15.1",
     "@typescript-eslint/parser": "4.15.1",
