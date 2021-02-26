@@ -10,7 +10,7 @@
     "lint": "eslint src --ext .ts --fix"
   },
   "dependencies": {
-    "@augu/dotenv": "1.2.0",
+    "@augu/dotenv": "1.3.0",
     "@augu/http": "1.1.0",
     "@augu/orchid": "2.1.2",
     "@augu/utils": "1.0.3",
