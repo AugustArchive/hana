@@ -13,7 +13,7 @@
     "@augu/dotenv": "1.2.0",
     "@augu/http": "1.1.0",
     "@augu/orchid": "2.1.2",
-    "@augu/utils": "1.0.3",
+    "@augu/utils": "1.4.2",
     "@ayanaware/logger": "2.2.1"
   },
   "devDependencies": {
