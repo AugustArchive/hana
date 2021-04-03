@@ -20,18 +20,18 @@
  * SOFTWARE.
  */
 
-import { Application } from '@augu/lilith';
-import ParentLogger from './singletons/logger';
-import { join } from 'path';
+import { hostname } from 'os';
+import { Logger } from 'tslog';
 
-const app = new Application()
-  .findComponentsIn(join(process.cwd(), 'components'));
-
-const logger = ParentLogger.getChildLogger({
-  name: '花 ("hana") - lilith'
+const logger = new Logger({
+  displayFunctionName: true,
+  exposeErrorCodeFrame: true,
+  displayInstanceName: true,
+  displayFilePath: 'hideNodeModulesOnly',
+  dateTimePattern: '[ day-month-year / hour:minute:second ]',
+  displayTypes: false,
+  instanceName: hostname(),
+  name: '花 ("hana")'
 });
 
-app.on('component.loaded', component => logger.info(`component ${component.name} loaded`));
-app.addSingleton(ParentLogger);
-
-export default app;
+export default logger;

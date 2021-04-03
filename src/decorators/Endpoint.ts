@@ -20,18 +20,29 @@
  * SOFTWARE.
  */
 
-import { Application } from '@augu/lilith';
-import ParentLogger from './singletons/logger';
-import { join } from 'path';
+import type { Request, Response } from 'express';
 
-const app = new Application()
-  .findComponentsIn(join(process.cwd(), 'components'));
+const ENDPOINT_METADATA_KEY = '$hana.endpoint';
+const ROUTE_METADATA_KEY    = '$hana.route';
 
-const logger = ParentLogger.getChildLogger({
-  name: '花 ("hana") - lilith'
-});
+interface EndpointReference {
+  version: 'global' | 1 | 2;
+  prefix: string;
+}
 
-app.on('component.loaded', component => logger.info(`component ${component.name} loaded`));
-app.addSingleton(ParentLogger);
+interface RouteReference {
+  methodName: string;
+  path: string;
+}
 
-export default app;
+export const getEndpointRef   = (target: any): EndpointReference | undefined => Reflect.getMetadata(ENDPOINT_METADATA_KEY, target);
+export const getRouteRefs     = (target: any): RouteReference[] => Reflect.getMetadata(ROUTE_METADATA_KEY, target) ?? [];
+
+export const Endpoint = ({ version, prefix }: Pick<EndpointReference, 'version' | 'prefix'>): ClassDecorator =>
+  (target) => Reflect.defineMetadata(ENDPOINT_METADATA_KEY, { version, prefix }, target);
+
+export const Route = (path: string): MethodDecorator => {
+  return (target: any, prop, descriptor: TypedPropertyDescriptor<any>) => {
+    // todo: this
+  };
+};

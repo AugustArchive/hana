@@ -20,18 +20,39 @@
  * SOFTWARE.
  */
 
-import { Application } from '@augu/lilith';
-import ParentLogger from './singletons/logger';
+import { Component, Inject } from '@augu/lilith';
+import { parse } from '@augu/dotenv';
+import { Logger } from 'tslog';
 import { join } from 'path';
 
-const app = new Application()
-  .findComponentsIn(join(process.cwd(), 'components'));
+interface ConfigDetails {
+  KADI_IMAGE_PATH: string;
+  YIFF_IMAGE_PATH: string;
+  PORT: number;
+}
 
-const logger = ParentLogger.getChildLogger({
-  name: '花 ("hana") - lilith'
-});
+export default class Config implements Component {
+  public priority: number = 0;
+  private config!: ConfigDetails;
+  public name: string = 'config';
 
-app.on('component.loaded', component => logger.info(`component ${component.name} loaded`));
-app.addSingleton(ParentLogger);
+  @Inject
+  private logger!: Logger;
 
-export default app;
+  load() {
+    this.logger.info('loaded config');
+    this.config = parse<ConfigDetails>({
+      populate: false,
+      file: join(__dirname, '..', '..', '.env'),
+      schema: {
+        KADI_IMAGE_PATH: 'string',
+        YIFF_IMAGE_PATH: 'string',
+        PORT: 'int'
+      }
+    });
+  }
+
+  get<K extends keyof ConfigDetails>(key: K): ConfigDetails[K] {
+    return this.config[key]!;
+  }
+}
