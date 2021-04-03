@@ -1,5 +1,2 @@
-# api.floofy.dev
-> :black_heart: **API service to do certain things, mainly for webhooks and proxying.**
-
-## License
-**API** is released under the MIT License, read [here](/LICENSE) for more information.
+# Hana (花, "flower")
+> 🥀 **花 ("hana") is a API to proxy different APIs and for porn, duh. What did you expect, really?**
