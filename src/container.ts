@@ -20,18 +20,23 @@
  * SOFTWARE.
  */
 
-import { Application } from '@augu/lilith';
-import ParentLogger from './singletons/logger';
+import { Container } from '@augu/lilith';
 import { join } from 'path';
+import Logger from './singletons/logger';
+import Http from './singletons/http';
 
-const app = new Application()
-  .findComponentsIn(join(process.cwd(), 'components'));
-
-const logger = ParentLogger.getChildLogger({
-  name: '花 ("hana") - lilith'
+const logger = Logger.getChildLogger({
+  name: '花 ("hana") ~ lilith'
 });
 
-app.on('component.loaded', component => logger.info(`component ${component.name} loaded`));
-app.addSingleton(ParentLogger);
+const container = new Container({
+  componentsDir: join(__dirname, 'components'),
+  servicesDir: join(__dirname, 'services'),
+  singletons: [Logger, Http]
+});
 
-export default app;
+container.on('onBeforeInit', cls => logger.info(`Initializing ${cls.type} ${cls.name}`));
+container.on('onAfterInit', cls  => logger.info(`✔ Initialized ${cls.type} ${cls.name}`));
+container.on('initError', (cls, error) => logger.error(`Unable to initalize ${cls.type} ${cls.name}`, error));
+
+export default container;

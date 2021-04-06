@@ -19,31 +19,3 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import container from './container';
-import Logger from './singletons/logger';
-
-const logger = Logger.getChildLogger({
-  name: '花 ("hana") ~ bootstrap'
-});
-
-(async() => {
-  logger.info('~ ... ; loading ; ... ~');
-  try {
-    await container.load();
-  } catch(ex) {
-    logger.error('unable to bootstrap -', ex);
-    process.exit(1);
-  }
-
-  logger.info('✔ 花 has bootstrapped successfully');
-  process.on('SIGINT', () => {
-    logger.warn('told to disconnect');
-
-    container.dispose();
-    process.exit(0);
-  });
-})();
-
-process.on('unhandledRejection', error => logger.error('花 was unable to handle this promise rejection', error));
-process.on('uncaughtException', error  => logger.error('花 was unable to handle this exception', error));

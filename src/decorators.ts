@@ -19,30 +19,3 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import type { Request, Response } from 'express';
-
-const ENDPOINT_METADATA_KEY = '$hana.endpoint';
-const ROUTE_METADATA_KEY    = '$hana.route';
-
-interface EndpointReference {
-  version: 'global' | 1 | 2;
-  prefix: string;
-}
-
-interface RouteReference {
-  methodName: string;
-  path: string;
-}
-
-export const getEndpointRef   = (target: any): EndpointReference | undefined => Reflect.getMetadata(ENDPOINT_METADATA_KEY, target);
-export const getRouteRefs     = (target: any): RouteReference[] => Reflect.getMetadata(ROUTE_METADATA_KEY, target) ?? [];
-
-export const Endpoint = ({ version, prefix }: Pick<EndpointReference, 'version' | 'prefix'>): ClassDecorator =>
-  (target) => Reflect.defineMetadata(ENDPOINT_METADATA_KEY, { version, prefix }, target);
-
-export const Route = (path: string): MethodDecorator => {
-  return (target: any, prop, descriptor: TypedPropertyDescriptor<any>) => {
-    // todo: this
-  };
-};
