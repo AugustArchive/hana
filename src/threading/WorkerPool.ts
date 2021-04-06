@@ -19,3 +19,83 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import AsyncPoolResource from './AsyncResource';
+import type { Logger } from 'tslog';
+import { Worker } from 'worker_threads';
+import logger from '../singletons/logger';
+
+const RESOURCE_INFO = Symbol('$hana::threading::resource-info');
+
+/**
+ * Represents a pool of threaded workers for parallel JavaScript execution
+ */
+export default class WorkerThreadPool {
+  /**
+   * Number of threads to take for this [WorkerThreadPool]
+   */
+  public numThreads: number;
+
+  /**
+   * Logger for logging messages
+   */
+  private logger: Logger;
+
+  /**
+   * List of workers available
+   */
+  public worker: Worker | null = null;
+
+  /**
+   * Creates a new [WorkerThreadPool] instance
+   * @param filename The filename to run
+   * @param numThreads Number of threads to take for this [WorkerThreadPool]
+   */
+  constructor(numThreads: number) {
+    this.numThreads = numThreads;
+    this.logger = logger.getChildLogger({
+      name: '花 ("hana") ~ thread-pool'
+    });
+  }
+
+  run<T = unknown, TTask extends Record<string, unknown> = {}>(filename: string, task: TTask, env?: { [x: string]: string }) {
+    if (this.worker === null) {
+      const worker = new Worker(filename, { stdout: true, stderr: true, env });
+      worker.on('message', result => {
+        worker[RESOURCE_INFO]?.done(null, result);
+        worker[RESOURCE_INFO] = null;
+      });
+
+      worker.on('error', error => {
+        worker[RESOURCE_INFO]?.done(error);
+        this.logger.error(`Worker #${worker.threadId} was unable to resolve data`, error);
+      });
+
+      // Log messages from files
+      worker.stdout.on('data', console.log);
+      worker.stderr.on('data', console.log);
+
+      this.worker = worker;
+      this.logger.info(`Dispatched worker #${worker.threadId} to run file ${filename}`);
+    } else {
+      this.logger.info(`Worker #${this.worker.threadId} is gonna run file ${filename} again.`);
+    }
+
+    return new Promise<T>((resolve, reject) => {
+      this.worker![RESOURCE_INFO] = new AsyncPoolResource(this.worker!, (w, error, result) => {
+        if (error) return reject(error);
+        if (this.worker!.threadId !== w.threadId) return reject(new Error(`Received data on thread ${w.threadId} when it was on thread ${this.worker!.threadId}`));
+
+        return resolve(result as T);
+      });
+
+      this.worker!.postMessage(task);
+    });
+  }
+
+  destroy() {
+    this.logger.warn(`Terminated thread #${this.worker!.threadId}`);
+    this.worker?.terminate();
+    this.worker = null;
+  }
+}

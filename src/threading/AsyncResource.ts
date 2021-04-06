@@ -19,3 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import { AsyncResource } from 'async_hooks';
+import type { Worker } from 'worker_threads';
+
+type ResourceCallback<T = null, R = any> = (this: T, worker: Worker, error: Error | null, result: R) => void;
+
+export default class AsyncPoolResource extends AsyncResource {
+  #callback: ResourceCallback;
+  #worker: Worker;
+
+  constructor(worker: Worker, callback: ResourceCallback) {
+    super('AsyncPoolResource');
+
+    this.#callback = callback;
+    this.#worker = worker;
+  }
+
+  done<R>(error: Error): void;
+  done<R>(error: null, result: R): void;
+  done<R>(error: Error | null, result?: R) {
+    this.runInAsyncScope(this.#callback, null, this.#worker, error, result);
+    this.emitDestroy();
+  }
+}
