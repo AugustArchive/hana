@@ -30,7 +30,7 @@ const { version } = require('../package.json');
 const { Logger } = require('tslog');
 
 const http = new HttpClient({
-  userAgent: `花 ("hana") ~ v${version}`
+  userAgent: `hana / v${version}`
 });
 
 const logger = new Logger({
@@ -61,13 +61,13 @@ const hashPath = (path) => {
   });
 };
 
-(async() => {
+const rehydrate = async() => {
   logger.info('Running e621 script...');
 
   const sources = {};
   const hashes = {};
   const tags = {};
-  const files = await readdir(process.env.YIFF_PATH, { exclude: ['videos', 'comics'] });
+  const files = await readdir('D:\\Cache\\Yiff', { exclude: ['videos', 'comics'] });
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     const hash = await hashPath(file);
@@ -81,11 +81,11 @@ const hashPath = (path) => {
     hashes[file] = hash;
 
     if (res.statusCode === 200) {
-      sources[file] = data.data.post.sources;
+      sources[file] = data.post.sources;
       tags[file] = {
-        characters: data.data.post.tags.character,
-        copyright: data.data.post.tags.copyright,
-        artists: data.data.post.artist.filer(owo => owo !== 'conditional_dnp')
+        characters: data.post.tags.character,
+        copyright: data.post.tags.copyright,
+        artists: data.post.artist.filter(owo => owo !== 'conditional_dnp')
       };
     }
   }
@@ -128,4 +128,9 @@ const hashPath = (path) => {
   await cleanup();
   logger.info('Re-hydrated yiff cache');
   parentPort.postMessage({ done: true });
-})();
+};
+
+parentPort.once('message', async data => {
+  if (data.hydrate === true)
+    await rehydrate();
+});

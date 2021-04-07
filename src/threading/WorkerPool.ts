@@ -72,8 +72,8 @@ export default class WorkerThreadPool {
       });
 
       // Log messages from files
-      worker.stdout.on('data', console.log);
-      worker.stderr.on('data', console.log);
+      worker.stdout.on('data', buf => console.info(buf.toString()));
+      worker.stderr.on('data', buf => console.error(buf.toString()));
 
       this.worker = worker;
       this.logger.info(`Dispatched worker #${worker.threadId} to run file ${filename}`);

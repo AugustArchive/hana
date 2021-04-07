@@ -20,33 +20,17 @@
  * SOFTWARE.
  */
 
-import 'source-map-support/register';
-import 'reflect-metadata';
+import type { Request, Response } from 'express';
+import { Router } from '@augu/http';
+import { Get } from '../decorators';
 
-import container from './container';
-import Logger from './singletons/logger';
-
-const logger = Logger.getChildLogger({
-  name: '花 ("hana") ~ bootstrap'
-});
-
-(async() => {
-  logger.info('~ ... ; loading ; ... ~');
-  try {
-    await container.load();
-  } catch(ex) {
-    logger.error('unable to bootstrap -', ex);
-    process.exit(1);
+export default class MainRouter extends Router {
+  constructor() {
+    super('/');
   }
 
-  logger.info('✔ 花 has bootstrapped successfully');
-  process.on('SIGINT', () => {
-    logger.warn('told to disconnect');
-
-    container.dispose();
-    process.exit(0);
-  });
-})();
-
-process.on('unhandledRejection', error => logger.error('花 was unable to handle this promise rejection', error));
-process.on('uncaughtException', error  => logger.error('花 was unable to handle this exception', error));
+  @Get('/')
+  main(_: Request, res: Response) {
+    return res.status(200).json({ hello: 'world' });
+  }
+}

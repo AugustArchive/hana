@@ -24,5 +24,5 @@ import { HttpClient } from '@augu/orchid';
 
 const { version } = require('../../package.json');
 export default new HttpClient({
-  userAgent: `花 ("hana") ~ v${version}`
+  userAgent: `hana / v${version}`
 });

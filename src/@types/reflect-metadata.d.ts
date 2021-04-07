@@ -20,33 +20,30 @@
  * SOFTWARE.
  */
 
-import 'source-map-support/register';
-import 'reflect-metadata';
+/** */
+declare namespace Reflect {
+  /**
+   * Gets the metadata value for the provided metadata key on the target object or its prototype chain.
+   * @param metadataKey A key used to store and retrieve metadata.
+   * @param target The target object on which the metadata is defined.
+   * @returns The metadata value for the metadata key if found; otherwise, `undefined`.
+   * @example
+   *
+   *     class Example {
+   *     }
+   *
+   *     // constructor
+   *     result = Reflect.getMetadata("custom:annotation", Example);
+   *
+   */
+  function getMetadata<T>(metadataKey: any, target: any): T;
 
-import container from './container';
-import Logger from './singletons/logger';
-
-const logger = Logger.getChildLogger({
-  name: '花 ("hana") ~ bootstrap'
-});
-
-(async() => {
-  logger.info('~ ... ; loading ; ... ~');
-  try {
-    await container.load();
-  } catch(ex) {
-    logger.error('unable to bootstrap -', ex);
-    process.exit(1);
-  }
-
-  logger.info('✔ 花 has bootstrapped successfully');
-  process.on('SIGINT', () => {
-    logger.warn('told to disconnect');
-
-    container.dispose();
-    process.exit(0);
-  });
-})();
-
-process.on('unhandledRejection', error => logger.error('花 was unable to handle this promise rejection', error));
-process.on('uncaughtException', error  => logger.error('花 was unable to handle this exception', error));
+  /**
+   * Gets the metadata value for the provided metadata key on the target object or its prototype chain.
+   * @param metadataKey A key used to store and retrieve metadata.
+   * @param target The target object on which the metadata is defined.
+   * @param propertyKey The property key for the target.
+   * @returns The metadata value for the metadata key if found; otherwise, `undefined`.
+   */
+  function getMetadata<T>(metadataKey: any, target: any, propertyKey: string | symbol): T;
+}

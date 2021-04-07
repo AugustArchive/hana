@@ -31,7 +31,7 @@ const logger = Logger.getChildLogger({
 
 const container = new Container({
   componentsDir: join(__dirname, 'components'),
-  servicesDir: join(__dirname, 'services'),
+  //servicesDir: join(__dirname, 'services'),
   singletons: [Logger, Http]
 });
 

@@ -19,3 +19,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import type { Request, Response } from 'express';
+
+export interface RouteDefinition {
+  run(req: Request, res: Response): any;
+  method: 'get' | 'patch' | 'delete';
+  path: string;
+}
+
+export const ROUTE_METAKEY = Symbol('$hana::api-route');
+
+export function Get(path: string): MethodDecorator {
+  return (target: any, _, descriptor: TypedPropertyDescriptor<any>) => {
+    const routes = Reflect.getMetadata<RouteDefinition[]>(ROUTE_METAKEY, target) ?? [];
+    routes.push({
+      method: 'get',
+      path,
+      run: descriptor.value
+    });
+
+    Reflect.defineMetadata(ROUTE_METAKEY, routes, target);
+  };
+}
