@@ -3,6 +3,11 @@ on:
   workflow_dispatch:
   push:
     branches: [master]
+    paths:
+      - 'assets/**'
+      - 'scripts/**'
+      - 'src/**'
+      - 'Dockerfile'
 jobs:
   build-container:
     runs-on: ubuntu-latest
