@@ -8,6 +8,7 @@
     "clean:node_modules": "rm -rf node_modules/**/node_modules && rm -rf node_modules/@types/**/node_modules && rm -rf node_modules/@augu/**/node_modules",
     "clean:win:tar": "cp node_modules/@augu/collections/build/index.js.* node_modules/@augu/collections/build/index.js && rm node_modules/@augu/collections/build/index.js.*",
     "build": "npm run lint && rm -rf build && tsc",
+    "start": "cd build && node main.js",
     "lint": "eslint src --ext .ts --fix",
     "dev": "cd src && ts-node --files --project ../tsconfig.json main.ts"
   },
