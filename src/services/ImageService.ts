@@ -81,9 +81,9 @@ export default class ImageService implements ComponentOrServiceHooks {
       throw new SyntaxError('Missing contents!');
 
     this._imagePool = {
-      polarbois: listObj.Contents!.filter(c => c.Key! !== 'polarbois/').map(content => `https://cdn.floofy.dev/${content.Key}`),
-      yiff: listObj.Contents!.filter(c => c.Key! !== 'yiff/').map(content => `https://cdn.floofy.dev/${content.Key}`),
-      kadi: listObj.Contents!.filter(c => c.Key! !== 'kadi/').map(content => `https://cdn.floofy.dev/${content.Key}`)
+      polarbois: (listObj.Contents ?? []).filter(c => c.Key! !== 'polarbois/').filter(c => c.Key!.startsWith('polarbois/')).map(content => `https://cdn.floofy.dev/${content.Key}`),
+      yiff: listObj.Contents!.filter(c => c.Key! !== 'yiff/').filter(c => c.Key!.startsWith('yiff/')).map(content => `https://cdn.floofy.dev/${content.Key}`),
+      kadi: listObj.Contents!.filter(c => c.Key! !== 'kadi/').filter(c => c.Key!.startsWith('kadi/')).map(content => `https://cdn.floofy.dev/${content.Key}`)
     };
 
     this._refreshImageCache = setInterval(this._refreshImagePool.bind(this), 86400000);
@@ -104,9 +104,9 @@ export default class ImageService implements ComponentOrServiceHooks {
     }
 
     this._imagePool = {
-      polarbois: (listObj.Contents ?? []).filter(c => c.Key! !== 'polarbois/').map(content => `https://cdn.floofy.dev/${content.Key}`),
-      yiff: listObj.Contents!.filter(c => c.Key! !== 'yiff/').map(content => `https://cdn.floofy.dev/${content.Key}`),
-      kadi: listObj.Contents!.filter(c => c.Key! !== 'kadi/').map(content => `https://cdn.floofy.dev/${content.Key}`)
+      polarbois: (listObj.Contents ?? []).filter(c => c.Key! !== 'polarbois/').filter(c => c.Key!.startsWith('polarbois/')).map(content => `https://cdn.floofy.dev/${content.Key}`),
+      yiff: listObj.Contents!.filter(c => c.Key! !== 'yiff/').filter(c => c.Key!.startsWith('yiff/')).map(content => `https://cdn.floofy.dev/${content.Key}`),
+      kadi: listObj.Contents!.filter(c => c.Key! !== 'kadi/').filter(c => c.Key!.startsWith('kadi/')).map(content => `https://cdn.floofy.dev/${content.Key}`)
     };
   }
 
