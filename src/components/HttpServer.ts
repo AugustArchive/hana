@@ -20,99 +20,135 @@
  * SOFTWARE.
  */
 
-import { Component, Inject, PendingInjectDefinition } from '@augu/lilith';
-import { HttpServer as Server, middleware, Router } from '@augu/http';
-import { RouteDefinition, ROUTE_METAKEY } from '../decorators';
-import { readdir, Ctor, firstUpper } from '@augu/utils';
-import ThreadPool from '../threading/WorkerPool';
+import { Component, Inject, ComponentOrServiceHooks } from '@augu/lilith';
+import fastify, { FastifyReply, FastifyRequest } from 'fastify';
+import { MetadataKeys, RouteDefinition } from '../types';
 import { Logger } from 'tslog';
+import container from '../container';
+import rateLimit from 'fastify-rate-limit';
 import { join } from 'path';
 import Config from './Config';
-import app from '../container';
 
 @Component({
-  priority: 1,
-  name: 'http'
+  priority: 0,
+  children: join(process.cwd(), 'endpoints'),
+  name: 'http:server'
 })
-export default class HttpServer {
-  protected _rehydrateYiffCache?: NodeJS.Timer;
-  private threadPool!: ThreadPool;
-
-  #server!: Server;
+export default class HttpServer implements ComponentOrServiceHooks<any> {
+  @Inject
+  private readonly logger!: Logger;
 
   @Inject
-  private logger!: Logger;
-
-  @Inject
-  private config!: Config;
+  private readonly config!: Config;
+  #app!: ReturnType<typeof fastify>;
 
   async load() {
-    this.threadPool = new ThreadPool(2);
-    this.#server = new Server({
-      middleware: [middleware.headers()],
-      port: this.config.getProperty('PORT')
-    });
+    this.logger.info('attempting to connect to the world...');
 
-    this.logger.info('now loading routes...');
-    const files = await readdir(join(process.cwd(), 'endpoints'));
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const ctor: Ctor<Router> = await import(file);
+    const fastifyLogger = this.logger.getChildLogger({ name: 'hana: fastify' });
+    this.#app = fastify();
+    this
+      .#app
+      .register(require('fastify-cors'))
+      .register(require('fastify-no-icon'))
+      .register(rateLimit, {
+        timeWindow: '10s',
+        max: 1000
+      })
+      .setErrorHandler((error, _, reply) => {
+        fastifyLogger.fatal('unable to fulfill request', error);
 
-      // TODO(auguwu): make this as a function in @augu/lilith
-      const injections = Reflect.getMetadata<PendingInjectDefinition[]>('$lilith::api::injections::pending', global) ?? [];
-      for (const inject of injections) app.inject(inject);
+        const send: Record<string, any> = {
+          message: 'Unable to fulfill request',
+          error: `[${error.name}:${error.code}]: ${error.message}`
+        };
 
-      const router = new ctor.default!();
-      const routes = Reflect.getMetadata<RouteDefinition[]>(ROUTE_METAKEY, router) ?? [];
-      this.logger.info(`found ${routes.length} routes to load`);
+        if (error.validation !== undefined)
+          send.validate = error.validation.map(v => ({
+            key: v.keyword,
+            message: v.params
+          }));
 
-      for (const route of routes) {
-        router[route.method](route.path, async (req, res) => {
-          try {
-            await route.run.call(router, req, res);
-          } catch(ex) {
-            this.logger.error(`Unable to run route "${route.method.toUpperCase()} ${route.path}"`, ex);
-            return res.status(500).json({
-              message: `An unexpected error has occured while running "${route.method.toUpperCase()} ${route.path}". Contact August#5820 in #support under the API category at discord.gg/ATmjFH9kMH if this continues.`
-            });
-          }
+        return reply.status(500).send(send);
+      })
+      .setNotFoundHandler((req, reply) => {
+        fastifyLogger.warn(`Path "${req.method.toUpperCase()} ${req.url}" was not found.`);
+        return reply.status(404).send({
+          message: `Route "${req.method.toUpperCase()} ${req.url}" was not found.`
         });
+      })
+      .addHook('onRequest', (_, res, done) => {
+        res.headers({
+          'Cache-Control': 'public, max-age=7776000',
+          'X-Powered-By': 'A cute furry doing cute things :3 (https://github.com/auguwu/hana)'
+        });
+
+        done();
+      });
+
+    const host = this.config.getPropertyOrNull('host');
+    return this.#app.listen({
+      port: 4010,
+      host: host === null || host === undefined ? undefined : host
+    }, (err, address) => {
+      if (err) {
+        this.logger.fatal('unable to listen to :4010\n', err);
+        process.exit(1);
       }
 
-      this.logger.info(`✔ init ${router.prefix} with ${routes.length} route(s)`);
-      this.#server.router(router);
+      this.logger.info(`now listening at ${address}`);
+    });
+  }
+
+  onChildLoad(endpoint: any) {
+    container.runInjections();
+
+    const routes = Reflect.getMetadata<RouteDefinition[]>(MetadataKeys.APIRoute, endpoint);
+    if (routes.length === 0) {
+      this.logger.warn(`endpoint class ${endpoint.constructor.name} has no routes attached.`);
+      return;
     }
 
-    this.logger.info('now rehydrating yiff cache...');
-    await this.rehydrateCache();
+    const v2PrefixRoutes = routes.map(route => ({
+      method: route.method,
+      path: `/v2${route.path}`,
+      run: route.run
+    }));
 
-    this._rehydrateYiffCache = setInterval(async () => {
-      this.logger.info('it has been a day, rehydrating...');
-      await this.rehydrateCache();
-    }, 86400000);
+    for (let i = 0; i < routes.length; i++) {
+      const route = routes[i];
+      this.logger.info(`init: "${route.method.toUpperCase()} ${route.path}"`);
 
-    this.#server.on('listening', (networks) =>
-      this.logger.info('API service is now listening on the following URLs:\n', networks.map(network => `• ${firstUpper(network.type)} | ${network.host}`).join('\n'))
-    );
+      this.#app[route.method](route.path, async (req: FastifyRequest, reply: FastifyReply) => {
+        try {
+          await route.run.call(endpoint, req, reply);
+        } catch(ex) {
+          this.logger.fatal(`unable to run "${route.method.toUpperCase()} ${route.path}"`, ex);
+          reply.status(500).send({
+            message: 'Unable to run route',
+            error: `[${ex.name}] ${ex.message}`
+          });
+        }
+      });
+    }
 
-    this.#server.on('request', (props) =>
-      this.logger.debug(`API: ${props.method} ${props.path} (${props.status}) | ${props.time}ms`)
-    );
+    for (let i = 0; i < v2PrefixRoutes.length; i++) {
+      const route = v2PrefixRoutes[i];
+      this.logger.info(`init: "${route.method.toUpperCase()} ${route.path}"`);
 
-    this.#server.on('error', error => this.logger.fatal(error));
-    return this.#server.start();
-  }
+      this.#app[route.method](route.path, async (req: FastifyRequest, reply: FastifyReply) => {
+        try {
+          await route.run.call(endpoint, req, reply);
+        } catch(ex) {
+          this.logger.fatal(`unable to run "${route.method.toUpperCase()} ${route.path}"`, ex);
+          reply.status(500).send({
+            message: 'Unable to run route',
+            error: `[${ex.name}] ${ex.message}`
+          });
+        }
+      });
+    }
 
-  dispose() {
-    return this.#server.close();
-  }
-
-  private async rehydrateCache() {
-    await this.threadPool.run(join(process.cwd(), '..', 'scripts', 'e621.js'), {
-      hydrate: true
-    }, {
-      YIFF_CACHE: this.config.getProperty('YIFF_PATH')
-    });
+    this.logger.info(`initialized ${routes.length} routes on endpoint class "${endpoint.constructor.name}"`);
   }
 }

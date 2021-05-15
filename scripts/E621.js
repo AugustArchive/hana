@@ -67,7 +67,7 @@ const rehydrate = async() => {
   const sources = {};
   const hashes = {};
   const tags = {};
-  const files = await readdir('D:\\Cache\\Yiff', { exclude: ['videos', 'comics'] });
+  const files = await readdir('E:\\Images\\Yiff', { exclude: ['videos', 'comics'] });
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     const hash = await hashPath(file);

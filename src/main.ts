@@ -27,15 +27,15 @@ import container from './container';
 import Logger from './singletons/logger';
 
 const logger = Logger.getChildLogger({
-  name: '花 ("hana") ~ bootstrap'
+  name: 'hana: bootstrap'
 });
 
 (async() => {
-  logger.info('~ ... ; loading ; ... ~');
+  logger.info('~... loading ...~');
   try {
     await container.load();
   } catch(ex) {
-    logger.error('unable to bootstrap -', ex);
+    logger.error('unable to bootstrap -\n', ex);
     process.exit(1);
   }
 

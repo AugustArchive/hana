@@ -26,12 +26,12 @@ import Logger from './singletons/logger';
 import Http from './singletons/http';
 
 const logger = Logger.getChildLogger({
-  name: '花 ("hana") ~ lilith'
+  name: 'hana: lilith'
 });
 
 const container = new Container({
   componentsDir: join(__dirname, 'components'),
-  //servicesDir: join(__dirname, 'services'),
+  servicesDir: join(__dirname, 'services'),
   singletons: [Logger, Http]
 });
 

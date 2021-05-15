@@ -31,7 +31,7 @@ const logger = new Logger({
   dateTimePattern: '[ day-month-year / hour:minute:second ]',
   displayTypes: false,
   instanceName: hostname(),
-  name: '花 ("hana")'
+  name: 'hana'
 });
 
 export default logger;

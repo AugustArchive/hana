@@ -20,26 +20,15 @@
  * SOFTWARE.
  */
 
-import { AsyncResource } from 'async_hooks';
-import type { Worker } from 'worker_threads';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 
-type ResourceCallback<T = null, R = any> = (this: T, worker: Worker, error: Error | null, result: R) => void;
+export interface RouteDefinition {
+  run(req: FastifyRequest, reply: FastifyReply): void | Promise<void>;
 
-export default class AsyncPoolResource extends AsyncResource {
-  #callback: ResourceCallback;
-  #worker: Worker;
+  method: string;
+  path: string;
+}
 
-  constructor(worker: Worker, callback: ResourceCallback) {
-    super('AsyncPoolResource');
-
-    this.#callback = callback;
-    this.#worker = worker;
-  }
-
-  done<R>(error: Error): void;
-  done<R>(error: null, result: R): void;
-  done<R>(error: Error | null, result?: R) {
-    this.runInAsyncScope(this.#callback, null, this.#worker, error, result);
-    this.emitDestroy();
-  }
+export const enum MetadataKeys {
+  APIRoute = '$hana::api-route'
 }

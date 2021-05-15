@@ -1,7 +1,8 @@
 node_modules/
 .husky/_/
+scripts/
 build/
-.env
 
+config.yml
 *.lock
 *.log

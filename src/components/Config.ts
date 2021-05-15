@@ -20,52 +20,100 @@
  * SOFTWARE.
  */
 
-import { Component, Inject } from '@augu/lilith';
+import { Component, Inject, ComponentOrServiceHooks } from '@augu/lilith';
+import { readFile, writeFile } from 'fs/promises';
+import { randomBytes } from 'crypto';
+import { load, dump } from 'js-yaml';
+import { existsSync } from 'fs';
 import { Logger } from 'tslog';
-import { parse } from '@augu/dotenv';
 import { join } from 'path';
 
-interface ConfigDetails {
-  GITHUB_SECRET?: string;
-  YIFF_PATH: string;
-  KADI_PATH: string;
-  PORT: number;
+type ConfigKeyedAsDotNotation = {
+  [P in keyof Configuration]: Configuration[P];
+} & {
+  [P in keyof S3Config as `s3.${P}`]: S3Config[P];
+};
+
+interface Configuration {
+  githubSecret: string;
+  secret: string;
+  host?: string;
+  s3: S3Config;
 }
+
+interface S3Config {
+  secretKey: string;
+  accessKey: string;
+  provider: 'amazon' | 'wasabi';
+  region: string;
+  bucket: string;
+}
+
+const NotFoundSymbol = Symbol.for('$hana::config::value::404');
 
 @Component({
   priority: 0,
   name: 'config'
 })
-export default class Config {
-  private config!: ConfigDetails;
-
+export default class Config implements ComponentOrServiceHooks {
   @Inject
-  private logger!: Logger;
+  private readonly logger!: Logger;
+  #config!: Configuration;
 
-  load() {
-    this.logger.info('loading config...');
-    this.config = parse<ConfigDetails>({
-      populate: false,
-      file: join(__dirname, '..', '..', '.env'),
-      schema: {
-        GITHUB_SECRET: {
-          type: 'string',
-          default: undefined
-        },
-
-        YIFF_PATH: 'string',
-        KADI_PATH: 'string',
-        PORT: {
-          type: 'int',
-          default: 3621
+  async load() {
+    const path = join(process.cwd(), '..', 'config.yml');
+    if (!existsSync(path)) {
+      const config: Configuration = {
+        githubSecret: '',
+        secret: randomBytes(16).toString('hex'),
+        s3: {
+          secretKey: '',
+          accessKey: '',
+          provider: 'amazon',
+          region: 'us-east-1',
+          bucket: 'hana'
         }
-      }
-    });
+      };
 
-    this.logger.info('✔ loaded config');
+      const contents = dump(config, {
+        noArrayIndent: false,
+        skipInvalid: true,
+        sortKeys: true,
+        quotingType: "'" // eslint-disable-line quotes
+      });
+
+      await writeFile(path, contents);
+      throw new SyntaxError(`Well well, that seems... obviously weird... No config path was found in "${path}"? Why why do you got to make me do this? Well, I created one for you anyway, please edit it to your liking...`);
+    }
+
+    this.logger.info('attempting to load config...');
+    const contents = await readFile(path, { encoding: 'utf-8' });
+    const config = load(contents) as unknown as Configuration;
+
+    this.logger.info(`found config at path "${path}"`);
+    this.#config = config;
   }
 
-  getProperty<K extends keyof ConfigDetails>(key: K): ConfigDetails[K] {
-    return this.config[key];
+  getPropertyOrNull<K extends keyof ConfigKeyedAsDotNotation>(key: K): ConfigKeyedAsDotNotation[K] | null {
+    const nodes = key.split('.');
+    let value: any = this.#config;
+
+    for (let i = 0; i < nodes.length; i++) {
+      try {
+        value = value[nodes[i]];
+      } catch {
+        value = NotFoundSymbol;
+      }
+    }
+
+    return value === NotFoundSymbol ? null : value;
+  }
+
+  getProperty<K extends keyof ConfigKeyedAsDotNotation>(key: K) {
+    const value = this.getPropertyOrNull(key);
+    if (value === null)
+      throw new TypeError(`Node \`${key}\` was not found in config.`);
+
+    return value;
   }
 }

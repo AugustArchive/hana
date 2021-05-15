@@ -20,9 +20,20 @@
  * SOFTWARE.
  */
 
-import { HttpClient } from '@augu/orchid';
+import { HttpClient, middleware } from '@augu/orchid';
+import Logger from './logger';
 
 const { version } = require('../../package.json');
+const logger = Logger.getChildLogger({ name: 'hana: orchid' });
+
 export default new HttpClient({
-  userAgent: `hana / v${version}`
+  userAgent: `hana (+https://github.com/auguwu/hana; v${version})`,
+  middleware: [
+    middleware.logging({
+      useConsole: false,
+      log: (message) => logger.info(message)
+    }),
+
+    middleware.pings
+  ]
 });

@@ -20,17 +20,73 @@
  * SOFTWARE.
  */
 
-import type { Request, Response } from 'express';
-import { Router } from '@augu/http';
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { HttpClient } from '@augu/orchid';
+import GitHubService from '../services/GitHubService';
+import ImageService from '../services/ImageService';
+import { Inject } from '@augu/lilith';
 import { Get } from '../decorators';
+import imageSize from 'image-size';
 
-export default class MainRouter extends Router {
-  constructor() {
-    super('/');
-  }
+export default class MainRouter {
+  public ['constructor']: typeof MainRouter;
+
+  @Inject
+  private readonly github!: GitHubService;
+
+  @Inject
+  private readonly images!: ImageService;
+
+  @Inject
+  private readonly http!: HttpClient;
 
   @Get('/')
-  main(_: Request, res: Response) {
-    return res.status(200).json({ hello: 'world' });
+  main(_: FastifyRequest, res: FastifyReply) {
+    return res.status(200).send({ hello: 'world' });
+  }
+
+  @Get('/yiff')
+  async yiffJson(_: FastifyRequest, reply: FastifyReply) {
+    const url = this.images.random('yiff');
+    const res = await this.http.request({ url, method: 'GET' });
+    const raw = res.buffer();
+    const size = imageSize(raw);
+
+    return reply
+      .type('application/json')
+      .status(200)
+      .send({
+        height: size.height ?? 0,
+        width: size.width ?? 0,
+        url
+      });
+  }
+
+  @Get('/yiff/random')
+  async yiffBuffer(_: FastifyRequest, reply: FastifyReply) {
+    const url = this.images.random('yiff');
+    const res = await this.http.request({ url, method: 'GET' });
+    const raw = res.buffer();
+    const size = imageSize(raw);
+
+    return reply.type(`image/${size.type ?? url.split('.')[1]}`).send(raw);
+  }
+
+  @Get('/sponsors')
+  sponsorRedirect(_: FastifyRequest, reply: FastifyReply) {
+    return reply.status(200).send({
+      message: 'Missing :login params.'
+    });
+  }
+
+  @Get('/sponsors/:login')
+  async getSponsor(req: FastifyRequest<{ Params: { login: string }, Querystring: { private?: boolean; pricing?: 'dollars' | 'cents'; } }>, reply: FastifyReply) {
+    if (req.query?.pricing !== undefined && !['dollars', 'cents'].includes(req.query?.pricing))
+      return reply.type('application/json').status(400).send({
+        message: '?pricing must be the following: `dollars` or `cents`.'
+      });
+
+    const data = await this.github.getSponsorships(req.params.login, req.query?.pricing ?? 'cents', req.query?.private !== undefined || req.query.private! === true);
+    return reply.type('application/json; charset=utf-8').status(data.hasOwnProperty('errors') ? 500 : 200).send(data);
   }
 }
