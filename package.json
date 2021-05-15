@@ -34,7 +34,7 @@
     "@augu/tsconfig": "1.1.0",
     "@types/ioredis": "4.26.3",
     "@types/js-yaml": "4.0.1",
-    "@types/node": "15.0.3",
+    "@types/node": "15.3.0",
     "@typescript-eslint/eslint-plugin": "4.23.0",
     "@typescript-eslint/parser": "4.23.0",
     "eslint": "7.26.0",
