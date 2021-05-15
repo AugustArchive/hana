@@ -3,7 +3,7 @@ FROM node:16-alpine
 LABEL MAINTAINER="August <cutie@floofy.dev>"
 RUN apk update && apk add git ca-certificates
 
-WORKDIR /opt/Nino
+WORKDIR /opt/hana
 COPY . .
 RUN apk add --no-cache git
 RUN npm i -g typescript eslint typeorm
