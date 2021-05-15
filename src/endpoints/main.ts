@@ -89,4 +89,31 @@ export default class MainRouter {
     const data = await this.github.getSponsorships(req.params.login, req.query?.pricing ?? 'cents', req.query?.private !== undefined || req.query.private! === true);
     return reply.type('application/json; charset=utf-8').status(data.hasOwnProperty('errors') ? 500 : 200).send(data);
   }
+
+  @Get('/kadi')
+  async kadiJson(_: FastifyRequest, reply: FastifyReply) {
+    const url = this.images.random('kadi');
+    const res = await this.http.request({ url, method: 'GET' });
+    const raw = res.buffer();
+    const size = imageSize(raw);
+
+    return reply
+      .type('application/json')
+      .status(200)
+      .send({
+        height: size.height ?? 0,
+        width: size.width ?? 0,
+        url
+      });
+  }
+
+  @Get('/kadi/random')
+  async kadiBuffer(_: FastifyRequest, reply: FastifyReply) {
+    const url = this.images.random('kadi');
+    const res = await this.http.request({ url, method: 'GET' });
+    const raw = res.buffer();
+    const size = imageSize(raw);
+
+    return reply.type(`image/${size.type ?? url.split('.')[1]}`).send(raw);
+  }
 }
