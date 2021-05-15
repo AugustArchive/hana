@@ -3,11 +3,12 @@ on:
   workflow_dispatch:
   push:
     branches: [master]
-    paths:
-      - 'assets/**'
-      - 'scripts/**'
-      - 'src/**'
-      - 'Dockerfile'
+    paths-ignore:
+      - '.github/**'
+      - '.vscode/**'
+      - '.gitignore'
+      - 'LICENSE'
+      - '**.md'
 jobs:
   build-container:
     runs-on: ubuntu-latest
