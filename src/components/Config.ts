@@ -94,7 +94,7 @@ export default class Config implements ComponentOrServiceHooks {
     this.#config = config;
   }
 
-  getPropertyOrNull<K extends keyof ConfigKeyedAsDotNotation>(key: K): ConfigKeyedAsDotNotation[K] | null {
+  getPropertyOrNull<K extends ObjectKeysWithSeperator<Configuration>>(key: K): KeyToPropType<Configuration, K> | null {
     const nodes = key.split('.');
     let value: any = this.#config;
 
@@ -109,7 +109,7 @@ export default class Config implements ComponentOrServiceHooks {
     return value === NotFoundSymbol ? null : value;
   }
 
-  getProperty<K extends keyof ConfigKeyedAsDotNotation>(key: K) {
+  getProperty<K extends ObjectKeysWithSeperator<Configuration>>(key: K) {
     const value = this.getPropertyOrNull(key);
     if (value === null)
       throw new TypeError(`Node \`${key}\` was not found in config.`);
