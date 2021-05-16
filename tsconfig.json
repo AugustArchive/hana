@@ -5,7 +5,7 @@
     "typeRoots": ["./src/@types", "./node_modules/@types"],
     "sourceMap": true,
     "rootDir": "./src",
-    "types": ["node", "reflect-metadata"],
+    "types": ["node", "reflect-metadata", "@augu/utils"],
     "outDir": "./build",
     "skipLibCheck": true
   },
