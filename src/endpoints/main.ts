@@ -116,9 +116,4 @@ export default class MainRouter {
 
     return reply.type(`image/${size.type ?? url.split('.')[1]}`).send(raw);
   }
-
-  @Get('/favicon.ico')
-  favicon(_: FastifyRequest, reply: FastifyReply) {
-    return reply.status(404).send('Cannot GET /favicon.ico');
-  }
 }
