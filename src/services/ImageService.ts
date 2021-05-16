@@ -50,15 +50,15 @@ export default class ImageService implements ComponentOrServiceHooks {
     this.logger.info('setting up image cache...');
 
     const provider = this.config.getProperty('s3.provider');
-    const region = this.config.getProperty('s3.region');
+    const region = this.config.getPropertyOrNull('s3.region');
 
     this.s3 = new S3Client({
       credentialDefaultProvider: () => this.credentialsProvider.bind(this),
-      endpoint: this.config.getProperty('s3.provider') === 'wasabi' ? 'https://s3.wasabisys.com' : undefined,
-      region: this.config.getProperty('s3.region') ?? 'us-east-1'
+      endpoint: provider === 'wasabi' ? 'https://s3.wasabisys.com' : undefined,
+      region: region ?? 'us-east-1'
     });
 
-    this.logger.info(`created s3 client with provider ${region} in region ${provider ?? 'us-east-1'}.`);
+    this.logger.info(`created s3 client with provider ${provider} in region ${region ?? 'us-east-1'}.`);
 
     const result = await this.s3.send(new ListBucketsCommand({}));
     if (result.Buckets === undefined)

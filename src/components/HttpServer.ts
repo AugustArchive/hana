@@ -28,6 +28,8 @@ import container from '../container';
 import rateLimit from 'fastify-rate-limit';
 import { join } from 'path';
 import Config from './Config';
+import { STATUS_CODES } from 'http';
+import { calculateHRTime } from '@augu/utils';
 
 @Component({
   priority: 0,
@@ -40,6 +42,9 @@ export default class HttpServer implements ComponentOrServiceHooks<any> {
 
   @Inject
   private readonly config!: Config;
+
+  #lastPing!: [number, number];
+  #pings: number[] = [];
   #app!: ReturnType<typeof fastify>;
 
   async load() {
@@ -77,12 +82,21 @@ export default class HttpServer implements ComponentOrServiceHooks<any> {
           message: `Route "${req.method.toUpperCase()} ${req.url}" was not found.`
         });
       })
-      .addHook('onRequest', (_, res, done) => {
+      .addHook('onRequest', (req, res, done) => {
         res.headers({
           'Cache-Control': 'public, max-age=7776000',
           'X-Powered-By': 'A cute furry doing cute things :3 (https://github.com/auguwu/hana)'
         });
 
+        this.#lastPing = process.hrtime();
+        done();
+      })
+      .addHook('onResponse', (req, res, done) => {
+        const duration = calculateHRTime(this.#lastPing);
+        this.#pings.push(duration);
+
+        const avg = this.#pings.reduce((acc, curr) => acc + curr, 0) / this.#pings.length;
+        fastifyLogger.info(`\n[${req.ip === '::1' ? 'localhost' : req.ip}] ${res.statusCode} (${STATUS_CODES[res.statusCode]}): ${req.method.toUpperCase()} ${req.url} (~${duration.toFixed(2)}ms; avg: ~${avg.toFixed(2)}ms)`);
         done();
       });
 

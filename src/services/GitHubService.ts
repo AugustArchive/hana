@@ -310,7 +310,6 @@ export default class GitHubService {
 
     // @ts-ignore
     const data = res.json<GitHubGraphQLResult<GitHubSponsorshipResult>>();
-    console.log((data as GitHubSponsorshipResult).data.user.sponsorshipsAsSponsor.nodes[0]);
 
     if (data.hasOwnProperty('errors'))
       return data as GraphQLErrorResult;
