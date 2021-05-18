@@ -25,8 +25,9 @@ import { HttpClient } from '@augu/orchid';
 import GitHubService from '../services/GitHubService';
 import ImageService from '../services/ImageService';
 import { Inject } from '@augu/lilith';
-import { Get } from '../decorators';
 import imageSize from 'image-size';
+import { Get } from '../decorators';
+import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 
 export default class MainRouter {
   public ['constructor']: typeof MainRouter;
@@ -50,14 +51,20 @@ export default class MainRouter {
     const url = this.images.random('yiff');
     const res = await this.http.request({ url, method: 'GET' });
     const raw = res.buffer();
-    const size = imageSize(raw);
+    let size!: ISizeCalculationResult;
+
+    try {
+      size = imageSize(raw);
+    } catch {
+      size = { width: 0, height: 0 };
+    }
 
     return reply
       .type('application/json')
       .status(200)
       .send({
-        height: size.height ?? 0,
-        width: size.width ?? 0,
+        height: size.height,
+        width: size.width,
         url
       });
   }
@@ -95,14 +102,20 @@ export default class MainRouter {
     const url = this.images.random('kadi');
     const res = await this.http.request({ url, method: 'GET' });
     const raw = res.buffer();
-    const size = imageSize(raw);
+    let size!: ISizeCalculationResult;
+
+    try {
+      size = imageSize(raw);
+    } catch {
+      size = { width: 0, height: 0 };
+    }
 
     return reply
       .type('application/json')
       .status(200)
       .send({
-        height: size.height ?? 0,
-        width: size.width ?? 0,
+        height: size.height,
+        width: size.width,
         url
       });
   }
