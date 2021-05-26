@@ -28,12 +28,6 @@ import { existsSync } from 'fs';
 import { Logger } from 'tslog';
 import { join } from 'path';
 
-type ConfigKeyedAsDotNotation = {
-  [P in keyof Configuration]: Configuration[P];
-} & {
-  [P in keyof S3Config as `s3.${P}`]: S3Config[P];
-};
-
 interface Configuration {
   githubSecret: string;
   secret: string;
