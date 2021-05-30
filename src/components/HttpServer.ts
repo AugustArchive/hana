@@ -82,7 +82,7 @@ export default class HttpServer implements ComponentOrServiceHooks<any> {
           message: `Route "${req.method.toUpperCase()} ${req.url}" was not found.`
         });
       })
-      .addHook('onRequest', (req, res, done) => {
+      .addHook('onRequest', (_, res, done) => {
         res.headers({
           'Cache-Control': 'public, max-age=7776000',
           'X-Powered-By': 'A cute furry doing cute things :3 (https://github.com/auguwu/hana)'
@@ -115,7 +115,7 @@ export default class HttpServer implements ComponentOrServiceHooks<any> {
   }
 
   onChildLoad(endpoint: any) {
-    container.runInjections();
+    container.runInjections(endpoint);
 
     const routes = Reflect.getMetadata<RouteDefinition[]>(MetadataKeys.APIRoute, endpoint);
     if (routes.length === 0) {
