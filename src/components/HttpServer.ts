@@ -163,6 +163,6 @@ export default class HttpServer implements ComponentOrServiceHooks<any> {
       });
     }
 
-    this.logger.info(`initialized ${routes.length} routes on endpoint class "${endpoint.constructor.name}"`);
+    this.logger.info(`initialized ${routes.length} routes on endpoint class "${endpoint.constructor.name ?? 'UnknownEndpoint'}"`);
   }
 }
