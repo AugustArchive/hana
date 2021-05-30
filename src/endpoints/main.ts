@@ -93,7 +93,7 @@ export default class MainRouter {
         message: '?pricing must be the following: `dollars` or `cents`.'
       });
 
-    const data = await this.github.getSponsorships(req.params.login, req.query?.pricing ?? 'cents', req.query?.private !== undefined || req.query.private! === true);
+    const data = await this.github.getSponsorships(req.params.login, req.query?.pricing ?? 'cents', req.query?.private !== undefined && req.query.private! === true);
     return reply.type('application/json; charset=utf-8').status(data.hasOwnProperty('errors') ? 500 : 200).send(data);
   }
 
