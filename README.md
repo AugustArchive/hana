@@ -1,5 +1,5 @@
-# Hana (花, "flower")
-> 🥀 **花 ("hana"; flower) is a API to proxy different APIs.**
+# Hana
+> 🥀 **花 (Hana) is a API to proxy different APIs like GitHub Sponsors, source code for [api.floofy.dev](https://api.floofy.dev)**
 
 ## Installation
 No. I will not provide instructions on how to configure Hana (`api.floofy.dev`), it's basically: if you know how to, do it yourself.
