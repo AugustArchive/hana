@@ -13,7 +13,7 @@
     "dev": "cd src && ts-node --files --project ../tsconfig.json main.ts"
   },
   "dependencies": {
-    "@augu/lilith": "3.2.3",
+    "@augu/lilith": "3.2.4",
     "@augu/orchid": "3.1.1",
     "@augu/utils": "1.5.3",
     "@aws-sdk/client-s3": "3.17.0",
