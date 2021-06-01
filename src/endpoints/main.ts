@@ -21,17 +21,15 @@
  */
 
 import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { ISizeCalculationResult } from 'image-size/dist/types/interface';
 import { HttpClient } from '@augu/orchid';
 import GitHubService from '../services/GitHubService';
 import ImageService from '../services/ImageService';
 import { Inject } from '@augu/lilith';
 import imageSize from 'image-size';
 import { Get } from '../decorators';
-import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 
 export default class MainRouter {
-  public ['constructor']: typeof MainRouter;
-
   @Inject
   private readonly github!: GitHubService;
 

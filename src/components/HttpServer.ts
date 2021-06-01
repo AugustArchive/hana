@@ -115,8 +115,6 @@ export default class HttpServer implements ComponentOrServiceHooks<any> {
   }
 
   onChildLoad(endpoint: any) {
-    console.log(endpoint);
-
     const routes = Reflect.getMetadata<RouteDefinition[]>(MetadataKeys.APIRoute, endpoint);
     if (routes.length === 0) {
       this.logger.warn(`endpoint class ${endpoint.constructor.name} has no routes attached.`);
