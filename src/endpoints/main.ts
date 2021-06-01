@@ -48,6 +48,7 @@ export default class MainRouter {
 
   @Get('/yiff')
   async yiffJson(_: FastifyRequest, reply: FastifyReply) {
+    console.log(this);
     const url = this.images.random('yiff');
     const res = await this.http.request({ url, method: 'GET' });
     const raw = res.buffer();
