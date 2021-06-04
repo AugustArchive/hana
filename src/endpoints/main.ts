@@ -28,6 +28,7 @@ import ImageService from '../services/ImageService';
 import { Inject } from '@augu/lilith';
 import imageSize from 'image-size';
 import { Get } from '../decorators';
+import { realpathSync } from 'fs';
 
 export default class MainRouter {
   @Inject
@@ -73,7 +74,13 @@ export default class MainRouter {
     const url = this.images.random('yiff');
     const res = await this.http.request({ url, method: 'GET' });
     const raw = res.buffer();
-    const size = imageSize(raw);
+    let size!: ISizeCalculationResult;
+
+    try {
+      size = imageSize(raw);
+    } catch {
+      size = { width: 0, height: 0 };
+    }
 
     return reply.type(`image/${size.type ?? url.split('.')[1]}`).send(raw);
   }
@@ -124,7 +131,13 @@ export default class MainRouter {
     const url = this.images.random('kadi');
     const res = await this.http.request({ url, method: 'GET' });
     const raw = res.buffer();
-    const size = imageSize(raw);
+    let size!: ISizeCalculationResult;
+
+    try {
+      size = imageSize(raw);
+    } catch {
+      size = { width: 0, height: 0 };
+    }
 
     return reply.type(`image/${size.type ?? url.split('.')[1]}`).send(raw);
   }
