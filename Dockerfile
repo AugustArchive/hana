@@ -7,7 +7,7 @@ WORKDIR /opt/hana
 COPY . .
 RUN apk add --no-cache git
 RUN npm i -g typescript eslint typeorm
-RUN npm ci
+RUN yarn
 RUN yarn build:no-lint
 RUN yarn cache clean
 RUN rm -rf src
