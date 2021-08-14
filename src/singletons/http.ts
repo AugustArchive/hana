@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 August
+ * Copyright (c) 2020-2021 Noel
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,9 +31,9 @@ export default new HttpClient({
   middleware: [
     middleware.logging({
       useConsole: false,
-      log: (message) => logger.info(message)
+      log: (message) => logger.info(message),
     }),
 
-    middleware.pings
-  ]
+    middleware.pings,
+  ],
 });

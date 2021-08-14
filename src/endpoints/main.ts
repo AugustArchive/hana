@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 August
+ * Copyright (c) 2020-2021 Noel
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@ import ImageService from '../services/ImageService';
 import { Inject } from '@augu/lilith';
 import imageSize from 'image-size';
 import { Get } from '../decorators';
-import { realpathSync } from 'fs';
 
 export default class MainRouter {
   @Inject
@@ -47,7 +46,6 @@ export default class MainRouter {
 
   @Get('/yiff')
   async yiffJson(_: FastifyRequest, reply: FastifyReply) {
-    console.log(this);
     const url = this.images.random('yiff');
     const res = await this.http.request({ url, method: 'GET' });
     const raw = res.buffer();
@@ -59,14 +57,11 @@ export default class MainRouter {
       size = { width: 0, height: 0 };
     }
 
-    return reply
-      .type('application/json')
-      .status(200)
-      .send({
-        height: size.height,
-        width: size.width,
-        url
-      });
+    return reply.type('application/json').status(200).send({
+      height: size.height,
+      width: size.width,
+      url,
+    });
   }
 
   @Get('/yiff/random')
@@ -88,19 +83,32 @@ export default class MainRouter {
   @Get('/sponsors')
   sponsorRedirect(_: FastifyRequest, reply: FastifyReply) {
     return reply.status(200).send({
-      message: 'Missing :login params.'
+      message: 'Missing :login params.',
     });
   }
 
   @Get('/sponsors/:login')
-  async getSponsor(req: FastifyRequest<{ Params: { login: string }, Querystring: { private?: boolean; pricing?: 'dollars' | 'cents'; } }>, reply: FastifyReply) {
+  async getSponsor(
+    req: FastifyRequest<{
+      Params: { login: string };
+      Querystring: { private?: boolean; pricing?: 'dollars' | 'cents' };
+    }>,
+    reply: FastifyReply
+  ) {
     if (req.query?.pricing !== undefined && !['dollars', 'cents'].includes(req.query?.pricing))
       return reply.type('application/json').status(400).send({
-        message: '?pricing must be the following: `dollars` or `cents`.'
+        message: '?pricing must be the following: `dollars` or `cents`.',
       });
 
-    const data = await this.github.getSponsorships(req.params.login, req.query?.pricing ?? 'cents', req.query?.private !== undefined && req.query.private! === true);
-    return reply.type('application/json; charset=utf-8').status(data.hasOwnProperty('errors') ? 500 : 200).send(data);
+    const data = await this.github.getSponsorships(
+      req.params.login,
+      req.query?.pricing ?? 'cents',
+      req.query?.private !== undefined && req.query.private! === true
+    );
+    return reply
+      .type('application/json; charset=utf-8')
+      .status(data.hasOwnProperty('errors') ? 500 : 200)
+      .send(data);
   }
 
   @Get('/kadi')
@@ -116,14 +124,11 @@ export default class MainRouter {
       size = { width: 0, height: 0 };
     }
 
-    return reply
-      .type('application/json')
-      .status(200)
-      .send({
-        height: size.height,
-        width: size.width,
-        url
-      });
+    return reply.type('application/json').status(200).send({
+      height: size.height,
+      width: size.width,
+      url,
+    });
   }
 
   @Get('/kadi/random')

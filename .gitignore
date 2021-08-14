@@ -3,5 +3,4 @@ node_modules/
 build/
 
 config.yml
-*.lock
 *.log

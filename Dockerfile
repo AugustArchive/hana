@@ -1,6 +1,6 @@
 FROM node:16-alpine
 
-LABEL MAINTAINER="August <cutie@floofy.dev>"
+LABEL MAINTAINER="Noel <cutie@floofy.dev>"
 RUN apk update && apk add git ca-certificates
 
 WORKDIR /opt/hana
@@ -8,15 +8,8 @@ COPY . .
 RUN apk add --no-cache git
 RUN npm i -g typescript eslint typeorm
 RUN npm ci
-RUN eslint src --ext .ts
-RUN rm -rf build
-
-# TODO: Fix this
-# Override --sourceMap in the container
-# so this doesn't happen: SyntaxError: Unexpected token ':'
-RUN tsc --sourceMap false
-
+RUN yarn build:no-lint
+RUN yarn cache clean
 RUN rm -rf src
-RUN npm cache clean --force
 
-ENTRYPOINT [ "npm", "run", "start" ]
+ENTRYPOINT [ "yarn", "start" ]

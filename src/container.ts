@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 August
+ * Copyright (c) 2020-2021 Noel
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,17 +26,17 @@ import Logger from './singletons/logger';
 import Http from './singletons/http';
 
 const logger = Logger.getChildLogger({
-  name: 'hana: lilith'
+  name: 'hana: lilith',
 });
 
 const container = new Container({
   componentsDir: join(__dirname, 'components'),
   servicesDir: join(__dirname, 'services'),
-  singletons: [Logger, Http]
+  singletons: [Logger, Http],
 });
 
-container.on('onBeforeInit', cls => logger.info(`Initializing ${cls.type} ${cls.name}`));
-container.on('onAfterInit', cls  => logger.info(`✔ Initialized ${cls.type} ${cls.name}`));
+container.on('onBeforeInit', (cls) => logger.info(`Initializing ${cls.type} ${cls.name}`));
+container.on('onAfterInit', (cls) => logger.info(`✔ Initialized ${cls.type} ${cls.name}`));
 container.on('initError', (cls, error) => logger.error(`Unable to initalize ${cls.type} ${cls.name}`, error));
 
 export default container;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 August
+ * Copyright (c) 2020-2021 Noel
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ const NotFoundSymbol = Symbol.for('$hana::config::value::404');
 
 @Component({
   priority: 0,
-  name: 'config'
+  name: 'config',
 })
 export default class Config implements ComponentOrServiceHooks {
   @Inject
@@ -65,19 +65,21 @@ export default class Config implements ComponentOrServiceHooks {
           accessKey: '',
           provider: 'amazon',
           region: 'us-east-1',
-          bucket: 'hana'
-        }
+          bucket: 'hana',
+        },
       };
 
       const contents = dump(config, {
         noArrayIndent: false,
         skipInvalid: true,
         sortKeys: true,
-        quotingType: "'" // eslint-disable-line quotes
+        quotingType: "'", // eslint-disable-line quotes
       });
 
       await writeFile(path, contents);
-      throw new SyntaxError(`Well well, that seems... obviously weird... No config path was found in "${path}"? Why why do you got to make me do this? Well, I created one for you anyway, please edit it to your liking...`);
+      throw new SyntaxError(
+        `Well well, that seems... obviously weird... No config path was found in "${path}"? Why why do you got to make me do this? Well, I created one for you anyway, please edit it to your liking...`
+      );
     }
 
     this.logger.info('attempting to load config...');
@@ -105,8 +107,7 @@ export default class Config implements ComponentOrServiceHooks {
 
   getProperty<K extends ObjectKeysWithSeperator<Configuration>>(key: K) {
     const value = this.getPropertyOrNull(key);
-    if (value === null)
-      throw new TypeError(`Node \`${key}\` was not found in config.`);
+    if (value === null) throw new TypeError(`Node \`${key}\` was not found in config.`);
 
     return value;
   }

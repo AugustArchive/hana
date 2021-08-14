@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 August
+ * Copyright (c) 2020-2021 Noel
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,14 +27,14 @@ import container from './container';
 import Logger from './singletons/logger';
 
 const logger = Logger.getChildLogger({
-  name: 'hana: bootstrap'
+  name: 'hana: bootstrap',
 });
 
-(async() => {
+(async () => {
   logger.info('~... loading ...~');
   try {
     await container.load();
-  } catch(ex) {
+  } catch (ex) {
     logger.error('unable to bootstrap -\n', ex);
     process.exit(1);
   }
@@ -48,5 +48,5 @@ const logger = Logger.getChildLogger({
   });
 })();
 
-process.on('unhandledRejection', error => logger.error('花 was unable to handle this promise rejection', error));
-process.on('uncaughtException', error  => logger.error('花 was unable to handle this exception', error));
+process.on('unhandledRejection', (error) => logger.error('花 was unable to handle this promise rejection', error));
+process.on('uncaughtException', (error) => logger.error('花 was unable to handle this exception', error));

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 August
+ * Copyright (c) 2020-2021 Noel
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ const { version } = require('../package.json');
 const { Logger } = require('tslog');
 
 const http = new HttpClient({
-  userAgent: `hana / v${version}`
+  userAgent: `hana / v${version}`,
 });
 
 const logger = new Logger({
@@ -41,7 +41,7 @@ const logger = new Logger({
   dateTimePattern: '[ day-month-year / hour:minute:second ]',
   displayTypes: false,
   instanceName: hostname(),
-  name: '花 ("hana") ~ scripts/e621'
+  name: '花 ("hana") ~ scripts/e621',
 });
 
 if (isMainThread) {
@@ -61,7 +61,7 @@ const hashPath = (path) => {
   });
 };
 
-const rehydrate = async() => {
+const rehydrate = async () => {
   logger.info('Running e621 script...');
 
   const sources = {};
@@ -73,7 +73,7 @@ const rehydrate = async() => {
     const hash = await hashPath(file);
     const res = await http.request({
       method: 'GET',
-      url: `https://e621.net/posts.json?md5=${hash}`
+      url: `https://e621.net/posts.json?md5=${hash}`,
     });
 
     const data = res.json();
@@ -85,18 +85,25 @@ const rehydrate = async() => {
       tags[file] = {
         characters: data.post.tags.character,
         copyright: data.post.tags.copyright,
-        artists: data.post.artist.filter(owo => owo !== 'conditional_dnp')
+        artists: data.post.artist.filter((owo) => owo !== 'conditional_dnp'),
       };
     }
   }
 
   logger.info(`Found ${Object.entries(sources).length} sources and ${Object.entries(tags).length} tags`);
-  await fs.writeFile('../assets/yiff.json', JSON.stringify({
-    version: 2,
-    sources,
-    hashes,
-    tags
-  }, null, '\t'));
+  await fs.writeFile(
+    '../assets/yiff.json',
+    JSON.stringify(
+      {
+        version: 2,
+        sources,
+        hashes,
+        tags,
+      },
+      null,
+      '\t'
+    )
+  );
 
   async function cleanup() {
     const { sources, tags, hashes, version } = require('../assets/yiff.json');
@@ -117,12 +124,19 @@ const rehydrate = async() => {
       cleanT[p] = tags[key];
     }
 
-    await fs.writeFile('../assets/yiff.json', JSON.stringify({
-      version,
-      sources,
-      hashes,
-      tags
-    }, null, '\t'));
+    await fs.writeFile(
+      '../assets/yiff.json',
+      JSON.stringify(
+        {
+          version,
+          sources,
+          hashes,
+          tags,
+        },
+        null,
+        '\t'
+      )
+    );
   }
 
   await cleanup();
@@ -130,7 +144,6 @@ const rehydrate = async() => {
   parentPort.postMessage({ done: true });
 };
 
-parentPort.once('message', async data => {
-  if (data.hydrate === true)
-    await rehydrate();
+parentPort.once('message', async (data) => {
+  if (data.hydrate === true) await rehydrate();
 });

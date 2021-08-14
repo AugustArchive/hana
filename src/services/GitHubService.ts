@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 August
+ * Copyright (c) 2020-2021 Noel
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -189,13 +189,13 @@ interface GitHubSponsorshipResult {
       sponsorshipsAsMaintainer: {
         totalCount: number;
         nodes: GitHubSponsorEntityData[];
-      }
+      };
       sponsorshipsAsSponsor: {
         totalCount: number;
         nodes: GitHubSponsorableData[];
-      }
-    }
-  }
+      };
+    };
+  };
 }
 
 interface GitHubSponsorEntityData {
@@ -215,7 +215,7 @@ interface GitHubSponsorEntityData {
     login: string;
     name: string | null;
     bio: string | null;
-  }
+  };
 }
 
 interface GitHubSponsorableData {
@@ -235,7 +235,7 @@ interface GitHubSponsorableData {
     login: string;
     name: string | null;
     bio: string | null;
-  }
+  };
 }
 
 interface GitHubUserStatus {
@@ -282,7 +282,7 @@ interface GitHubAPIErrorResult {
 
 @Service({
   priority: 0,
-  name: 'github'
+  name: 'github',
 })
 export default class GitHubService {
   @Inject
@@ -301,51 +301,49 @@ export default class GitHubService {
       url: 'https://api.github.com/graphql',
       method: 'POST',
       data: {
-        query: graphqlQuery(login)
+        query: graphqlQuery(login),
       },
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     // @ts-ignore
     const data = res.json<GitHubGraphQLResult<GitHubSponsorshipResult>>();
 
-    if (data.hasOwnProperty('errors'))
-      return data as GraphQLErrorResult;
+    if (data.hasOwnProperty('errors')) return data as GraphQLErrorResult;
 
-    if (data.hasOwnProperty('message'))
-      return data as GitHubAPIErrorResult;
+    if (data.hasOwnProperty('message')) return data as GitHubAPIErrorResult;
 
-    return ({
+    return {
       sponsoring: {
         total_count: (data as GitHubSponsorshipResult).data.user.sponsorshipsAsSponsor.totalCount,
-        data: (data as GitHubSponsorshipResult)
-          .data
-          .user
-          .sponsorshipsAsSponsor
-          .nodes
-          //.filter(node => includePrivate ? false : node.privacyLevel === 'PRIVATE')
-          .map<ISerializedSponsorData>(node => ({
+        data: (data as GitHubSponsorshipResult).data.user.sponsorshipsAsSponsor.nodes
+          .filter((node) => (includePrivate ? true : node.privacyLevel !== 'PRIVATE'))
+          .map<ISerializedSponsorData>((node) => ({
             joined_at: new Date(node.createdAt),
             tier: {
               custom_amount: node.tier.isCustomAmount,
               created_at: new Date(node.tier.createdAt),
               price: amount === 'dollars' ? node.tier.monthlyPriceInDollars! : node.tier.monthlyPriceInCents!,
-              name: node.tier.name
+              name: node.tier.name,
             },
             tier_selected_at: node.tierSelectedAt,
 
             followers: node.sponsorable.followers.totalCount,
             following: node.sponsorable.following.totalCount,
-            status: node.sponsorable.status !== null ? {
-              emoji: node.sponsorable.status.emojiHTML
-                .replace(EmojiStatusPrefixRegex, '')
-                .replace(EmojiStatusSuffixRegex, ''),
+            status:
+              node.sponsorable.status !== null
+                ? {
+                    emoji: node.sponsorable.status.emojiHTML
+                      .replace(EmojiStatusPrefixRegex, '')
+                      .replace(EmojiStatusSuffixRegex, ''),
 
-              message: node.sponsorable.status.message,
-              expires_at: node.sponsorable.status.expiresAt !== null ? new Date(node.sponsorable.status.expiresAt) : null
-            } : null,
+                    message: node.sponsorable.status.message,
+                    expires_at:
+                      node.sponsorable.status.expiresAt !== null ? new Date(node.sponsorable.status.expiresAt) : null,
+                  }
+                : null,
             website_url: node.sponsorable.websiteUrl,
             twitter_handle: node.sponsorable.twitterUsername,
             has_sponsors_listing: node.sponsorable.hasSponsorsListing,
@@ -353,38 +351,40 @@ export default class GitHubService {
             company: node.sponsorable.company,
             login: node.sponsorable.login,
             name: node.sponsorable.name,
-            bio: node.sponsorable.bio
-          }))
+            bio: node.sponsorable.bio,
+          })),
       },
 
       sponsors: {
         total_count: (data as GitHubSponsorshipResult).data.user.sponsorshipsAsMaintainer.totalCount,
-        data: (data as GitHubSponsorshipResult)
-          .data
-          .user
-          .sponsorshipsAsMaintainer
-          .nodes
-          //.filter(node => includePrivate ? false : node.privacyLevel === 'PRIVATE')
-          .map<ISerializedSponsorData>(node => ({
+        data: (data as GitHubSponsorshipResult).data.user.sponsorshipsAsMaintainer.nodes
+          .filter((node) => (includePrivate ? true : node.privacyLevel !== 'PRIVATE'))
+          .map<ISerializedSponsorData>((node) => ({
             joined_at: new Date(node.createdAt),
             tier: {
               custom_amount: node.tier.isCustomAmount,
               created_at: new Date(node.tier.createdAt),
               price: amount === 'dollars' ? node.tier.monthlyPriceInDollars! : node.tier.monthlyPriceInCents!,
-              name: node.tier.name
+              name: node.tier.name,
             },
             tier_selected_at: node.tierSelectedAt,
 
             followers: node.sponsorEntity.followers.totalCount,
             following: node.sponsorEntity.following.totalCount,
-            status: node.sponsorEntity.status !== null ? {
-              emoji: node.sponsorEntity.status.emojiHTML
-                .replace(EmojiStatusPrefixRegex, '')
-                .replace(EmojiStatusSuffixRegex, ''),
+            status:
+              node.sponsorEntity.status !== null
+                ? {
+                    emoji: node.sponsorEntity.status.emojiHTML
+                      .replace(EmojiStatusPrefixRegex, '')
+                      .replace(EmojiStatusSuffixRegex, ''),
 
-              message: node.sponsorEntity.status.message,
-              expires_at: node.sponsorEntity.status.expiresAt !== null ? new Date(node.sponsorEntity.status.expiresAt) : null
-            } : null,
+                    message: node.sponsorEntity.status.message,
+                    expires_at:
+                      node.sponsorEntity.status.expiresAt !== null
+                        ? new Date(node.sponsorEntity.status.expiresAt)
+                        : null,
+                  }
+                : null,
             website_url: node.sponsorEntity.websiteUrl,
             twitter_handle: node.sponsorEntity.twitterUsername,
             has_sponsors_listing: node.sponsorEntity.hasSponsorsListing,
@@ -392,9 +392,9 @@ export default class GitHubService {
             company: node.sponsorEntity.company,
             login: node.sponsorEntity.login,
             name: node.sponsorEntity.name,
-            bio: node.sponsorEntity.bio
-          }))
-      }
-    } as HanaSponsorshipResult);
+            bio: node.sponsorEntity.bio,
+          })),
+      },
+    } as HanaSponsorshipResult;
   }
 }

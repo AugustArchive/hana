@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 August
+ * Copyright (c) 2020-2021 Noel
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@ export function Get(path: string): MethodDecorator {
     routes.push({
       method: 'get',
       path,
-      run: descriptor.value
+      run: descriptor.value,
     });
 
     Reflect.defineMetadata(MetadataKeys.APIRoute, routes, target);

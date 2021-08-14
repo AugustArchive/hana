@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2021 August
+ * Copyright (c) 2020-2021 Noel
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,11 +29,11 @@ import Config from '../components/Config';
 type Image = 'yiff' | 'kadi' | 'polarbois';
 type ImageCache = {
   [P in Image]: string[];
-}
+};
 
 @Service({
   priority: 1,
-  name: 'images'
+  name: 'images',
 })
 export default class ImageService implements ComponentOrServiceHooks {
   protected _refreshImageCache?: NodeJS.Timer;
@@ -55,20 +55,27 @@ export default class ImageService implements ComponentOrServiceHooks {
     this.s3 = new S3Client({
       credentialDefaultProvider: () => this.credentialsProvider.bind(this),
       endpoint: provider === 'wasabi' ? 'https://s3.wasabisys.com' : undefined,
-      region: region ?? 'us-east-1'
+      region: region ?? 'us-east-1',
     });
 
     this.logger.info(`created s3 client with provider ${provider} in region ${region ?? 'us-east-1'}.`);
 
     const result = await this.s3.send(new ListBucketsCommand({}));
-    if (result.Buckets === undefined)
-      throw new TypeError('result from s3 was corrupted?');
+    if (result.Buckets === undefined) throw new TypeError('result from s3 was corrupted?');
 
     const bucket = this.config.getProperty('s3.bucket');
-    this.logger.debug(`got result back with ${result.Buckets.length} buckets\n`, result.Buckets.map(bucket => `- ${bucket.Name ?? '(unknown)'} @ ${bucket.CreationDate !== undefined ? new Date(bucket.CreationDate).toLocaleString('en-US') : '(unknown)'}`).join('\n'));
+    this.logger.debug(
+      `got result back with ${result.Buckets.length} buckets\n`,
+      result.Buckets.map(
+        (bucket) =>
+          `- ${bucket.Name ?? '(unknown)'} @ ${
+            bucket.CreationDate !== undefined ? new Date(bucket.CreationDate).toLocaleString('en-US') : '(unknown)'
+          }`
+      ).join('\n')
+    );
     this.logger.info(`using bucket ${bucket}...`);
 
-    if (!result.Buckets.find(b => b.Name === bucket)) {
+    if (!result.Buckets.find((b) => b.Name === bucket)) {
       this.logger.warn(`missing bucket ${bucket}! creating...`);
 
       const o = await this.s3.send(new CreateBucketCommand({ Bucket: bucket }));
@@ -76,13 +83,21 @@ export default class ImageService implements ComponentOrServiceHooks {
     }
 
     const listObj = await this.s3.send(new ListObjectsCommand({ Bucket: bucket }));
-    if (!listObj.Contents)
-      throw new SyntaxError('Missing contents!');
+    if (!listObj.Contents) throw new SyntaxError('Missing contents!');
 
     this._imagePool = {
-      polarbois: (listObj.Contents ?? []).filter(c => c.Key! !== 'polarbois/').filter(c => c.Key!.startsWith('polarbois/')).map(content => `https://cdn.floofy.dev/${content.Key}`),
-      yiff: listObj.Contents!.filter(c => c.Key! !== 'yiff/').filter(c => c.Key!.startsWith('yiff/')).map(content => `https://cdn.floofy.dev/${content.Key}`),
-      kadi: listObj.Contents!.filter(c => c.Key! !== 'kadi/').filter(c => c.Key!.startsWith('kadi/')).map(content => `https://cdn.floofy.dev/${content.Key}`)
+      polarbois: (listObj.Contents ?? [])
+        .filter((c) => c.Key! !== 'polarbois/')
+        .filter((c) => c.Key!.startsWith('polarbois/'))
+        .map((content) => `https://cdn.floofy.dev/${content.Key}`),
+      yiff: listObj
+        .Contents!.filter((c) => c.Key! !== 'yiff/')
+        .filter((c) => c.Key!.startsWith('yiff/'))
+        .map((content) => `https://cdn.floofy.dev/${content.Key}`),
+      kadi: listObj
+        .Contents!.filter((c) => c.Key! !== 'kadi/')
+        .filter((c) => c.Key!.startsWith('kadi/'))
+        .map((content) => `https://cdn.floofy.dev/${content.Key}`),
     };
 
     this._refreshImageCache = setInterval(this._refreshImagePool.bind(this), 86400000);
@@ -103,9 +118,18 @@ export default class ImageService implements ComponentOrServiceHooks {
     }
 
     this._imagePool = {
-      polarbois: (listObj.Contents ?? []).filter(c => c.Key! !== 'polarbois/').filter(c => c.Key!.startsWith('polarbois/')).map(content => `https://cdn.floofy.dev/${content.Key}`),
-      yiff: listObj.Contents!.filter(c => c.Key! !== 'yiff/').filter(c => c.Key!.startsWith('yiff/')).map(content => `https://cdn.floofy.dev/${content.Key}`),
-      kadi: listObj.Contents!.filter(c => c.Key! !== 'kadi/').filter(c => c.Key!.startsWith('kadi/')).map(content => `https://cdn.floofy.dev/${content.Key}`)
+      polarbois: (listObj.Contents ?? [])
+        .filter((c) => c.Key! !== 'polarbois/')
+        .filter((c) => c.Key!.startsWith('polarbois/'))
+        .map((content) => `https://cdn.floofy.dev/${content.Key}`),
+      yiff: listObj
+        .Contents!.filter((c) => c.Key! !== 'yiff/')
+        .filter((c) => c.Key!.startsWith('yiff/'))
+        .map((content) => `https://cdn.floofy.dev/${content.Key}`),
+      kadi: listObj
+        .Contents!.filter((c) => c.Key! !== 'kadi/')
+        .filter((c) => c.Key!.startsWith('kadi/'))
+        .map((content) => `https://cdn.floofy.dev/${content.Key}`),
     };
   }
 
@@ -115,9 +139,12 @@ export default class ImageService implements ComponentOrServiceHooks {
   }
 
   get credentialsProvider(): Provider<Credentials> {
-    return () => new Promise<Credentials>(resolve => resolve({
-      secretAccessKey: this.config.getProperty('s3.secretKey'),
-      accessKeyId: this.config.getProperty('s3.accessKey')
-    }));
+    return () =>
+      new Promise<Credentials>((resolve) =>
+        resolve({
+          secretAccessKey: this.config.getProperty('s3.secretKey'),
+          accessKeyId: this.config.getProperty('s3.accessKey'),
+        })
+      );
   }
 }
