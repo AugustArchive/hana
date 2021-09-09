@@ -26,7 +26,7 @@
     "image-size": "1.0.0",
     "js-yaml": "4.1.0",
     "reflect-metadata": "0.1.13",
-    "source-map-support": "0.5.19",
+    "source-map-support": "0.5.20",
     "tslog": "3.2.2"
   },
   "devDependencies": {
