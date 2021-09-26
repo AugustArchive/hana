@@ -54,6 +54,11 @@
   resolved "https://registry.yarnpkg.com/@augu/utils/-/utils-1.5.5.tgz#aea7f748c8254f4533dc394d190da470dcf0826a"
   integrity sha512-MX3cUASPPttAU2LGzMcyw8Fr+HQFeJc+Re0Atem+KQwxd/dA3NM+Sk1A/6u1TQhUDm35ZmDRNORzInySabpkQg==
 
+"@augu/utils@1.5.6":
+  version "1.5.6"
+  resolved "https://registry.yarnpkg.com/@augu/utils/-/utils-1.5.6.tgz#655a5bc6d6452a33ca3a088d6efb49d43311454e"
+  integrity sha512-V252riszvwGlYrXEyXJKdCAi7M1kbCi2gTGF3Pd4d32riu/bo6gSUvdCHJsjjN9iEsLbWXad5ATUfzR5eSwEBg==
+
 "@aws-crypto/crc32@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@aws-crypto/crc32/-/crc32-1.1.0.tgz#aff048e207798fad0b0e7765b12d474c273779b6"
