@@ -18,7 +18,7 @@
     "@augu/lilith": "5.3.3",
     "@augu/orchid": "3.1.1",
     "@augu/utils": "1.5.6",
-    "@aws-sdk/client-s3": "3.41.0",
+    "@aws-sdk/client-s3": "3.42.0",
     "fastify": "3.21.0",
     "fastify-cors": "6.0.2",
     "fastify-no-icon": "4.0.0",
