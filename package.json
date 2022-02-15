@@ -22,7 +22,7 @@
     "fastify": "3.21.0",
     "fastify-cors": "6.0.2",
     "fastify-no-icon": "4.0.0",
-    "fastify-rate-limit": "5.7.1",
+    "fastify-rate-limit": "5.7.2",
     "image-size": "1.0.1",
     "js-yaml": "4.1.0",
     "reflect-metadata": "0.1.13",
