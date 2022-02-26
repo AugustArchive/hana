@@ -158,10 +158,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@aws-sdk/client-s3@3.53.0":
-  version "3.53.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-s3/-/client-s3-3.53.0.tgz#9fb892fbf38026d0f2e7e5506fb27d1ff6b14a9b"
-  integrity sha512-2RSGn8ggS1Uu2f/n1IAhPNShlXMoof2uyjr/N236uVvyQHwxmsG/yJCc/lYJHSZyIBlYhqBiQ0DGGV2QuwzS8A==
+"@aws-sdk/client-s3@3.53.1":
+  version "3.53.1"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-s3/-/client-s3-3.53.1.tgz#d727f0105c4fed8e6e1d018365790a7bddc93074"
+  integrity sha512-uAhjR/TAuXNct6BL/shVg2f/6Zg1EZoXTG8KIywfmLitiUF0PvYwfwSPtNohkz6czgTs/rtirAZHAQKi8jjieA==
   dependencies:
     "@aws-crypto/sha1-browser" "2.0.0"
     "@aws-crypto/sha256-browser" "2.0.0"
@@ -175,7 +175,7 @@
     "@aws-sdk/fetch-http-handler" "3.53.0"
     "@aws-sdk/hash-blob-browser" "3.53.0"
     "@aws-sdk/hash-node" "3.53.0"
-    "@aws-sdk/hash-stream-node" "3.53.0"
+    "@aws-sdk/hash-stream-node" "3.53.1"
     "@aws-sdk/invalid-dependency" "3.53.0"
     "@aws-sdk/md5-js" "3.53.0"
     "@aws-sdk/middleware-bucket-endpoint" "3.53.0"
@@ -464,10 +464,10 @@
     "@aws-sdk/util-buffer-from" "3.52.0"
     tslib "^2.3.0"
 
-"@aws-sdk/hash-stream-node@3.53.0":
-  version "3.53.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/hash-stream-node/-/hash-stream-node-3.53.0.tgz#25ae8d321e1a7da0fbf3be6ab3b4927ec822a17c"
-  integrity sha512-AggSL/LQ/B1T9Ho+EVKlTmuSe/hE74KFNCQWXJUF21zYVZY7ssUd67lEpzCWkhNgcCqt8TE5uE7S0scPA/vDxw==
+"@aws-sdk/hash-stream-node@3.53.1":
+  version "3.53.1"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/hash-stream-node/-/hash-stream-node-3.53.1.tgz#a902e0c05a5f95e1c93d92b16ac7f7102a8b3e82"
+  integrity sha512-y7pUc6EtkG3TscZR9dpR/BCauP/lRepU+Td43Oe9VUhD6l3lS3TuIHUwB7PEU7NeSU9iqWuflBVK/IBWXrfH3w==
   dependencies:
     "@aws-sdk/types" "3.53.0"
     tslib "^2.3.0"
