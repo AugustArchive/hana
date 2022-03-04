@@ -1,0 +1,12 @@
+ ,dPYb,
+ IP'`Yb
+ I8  8I
+ I8  8'
+ I8 dPgg,     ,gggg,gg   ,ggg,,ggg,     ,gggg,gg
+ I8dP" "8I   dP"  "Y8I  ,8" "8P" "8,   dP"  "Y8I
+ I8P    I8  i8'    ,8I  I8   8I   8I  i8'    ,8I
+,d8     I8,,d8,   ,d8b,,dP   8I   Yb,,d8,   ,d8b,
+88P     `Y8P"Y8888P"`Y88P'   8I   `Y8P"Y8888P"`Y8
+
+|> hana v{{.Version}} ({{.CommitSha}}, built at {{.BuildDate}}) <|
+|>   Using Java v{{.JavaVersion}}; Kotlin v{{.KotlinVersion}}   <|
