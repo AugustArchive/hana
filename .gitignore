@@ -620,3 +620,4 @@ config.yml
 logs/*.log
 src/main/resources/config/logging.properties
 !src/main/resources/config/logging.example.properties
+.gradle/
