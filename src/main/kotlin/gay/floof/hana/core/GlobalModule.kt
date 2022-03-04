@@ -22,3 +22,55 @@
  */
 
 package gay.floof.hana.core
+
+import gay.floof.hana.core.interceptors.LoggingInterceptor
+import gay.floof.hana.core.interceptors.SentryInterceptor
+import gay.floof.hana.core.metrics.MetricsHandler
+import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.features.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
+import io.sentry.Sentry
+import kotlinx.serialization.json.Json
+import org.koin.dsl.module
+
+val hanaModule = module {
+    single {
+        Hana()
+    }
+
+    single {
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+        }
+    }
+
+    single {
+        HttpClient(OkHttp) {
+            engine {
+                config {
+                    followRedirects(true)
+                    addInterceptor(LoggingInterceptor)
+
+                    if (Sentry.isEnabled()) {
+                        addInterceptor(SentryInterceptor)
+                    }
+                }
+            }
+
+            install(JsonFeature) {
+                serializer = KotlinxSerializer(get())
+            }
+
+            install(UserAgent) {
+                agent = "noel/hana (+https://github.com/auguwu/hana; v${HanaInfo.VERSION})"
+            }
+        }
+    }
+
+    single {
+        MetricsHandler(get())
+    }
+}

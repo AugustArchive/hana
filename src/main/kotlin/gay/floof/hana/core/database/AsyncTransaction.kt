@@ -22,3 +22,20 @@
  */
 
 package gay.floof.hana.core.database
+
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.future.await
+import kotlinx.coroutines.future.future
+import org.jetbrains.exposed.sql.Transaction
+import org.jetbrains.exposed.sql.transactions.transaction
+
+class AsyncTransaction<T>(private val block: Transaction.() -> T) {
+    @OptIn(DelicateCoroutinesApi::class)
+    suspend fun execute(): T = CoroutineScope(GlobalScope.coroutineContext).future {
+        transaction { block() }
+    }.await()
+}
+
+suspend fun <T> asyncTransaction(block: Transaction.() -> T): T = AsyncTransaction(block).execute()

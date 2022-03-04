@@ -22,3 +22,28 @@
  */
 
 package gay.floof.hana.core.plugins
+
+import io.ktor.application.*
+import io.ktor.util.*
+import io.sentry.Sentry
+
+class KtorSentryPlugin {
+    companion object: ApplicationFeature<ApplicationCallPipeline, Unit, KtorSentryPlugin> {
+        override val key: AttributeKey<KtorSentryPlugin> = AttributeKey("KtorSentryPlugin")
+        override fun install(pipeline: ApplicationCallPipeline, configure: Unit.() -> Unit): KtorSentryPlugin {
+            pipeline.intercept(ApplicationCallPipeline.Call) {
+                call.response
+
+                try {
+                    proceed()
+                } catch (e: Exception) {
+                    if (Sentry.isEnabled()) Sentry.captureException(e)
+
+                    throw e
+                }
+            }
+
+            return KtorSentryPlugin()
+        }
+    }
+}

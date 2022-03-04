@@ -22,3 +22,16 @@
  */
 
 package gay.floof.hana.core.discord.executors
+
+import gay.floof.hana.core.discord.commands.CreateApiKeyCommand
+import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
+import net.perfectdreams.discordinteraktions.common.commands.slashCommand
+
+object CreateApiKeyCommandExecutor: SlashCommandDeclarationWrapper {
+    override fun declaration() = slashCommand(
+        "create-key",
+        "Creates an API key that is registered within api.floofy.dev!"
+    ) {
+        executor = CreateApiKeyCommand
+    }
+}

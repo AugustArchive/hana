@@ -22,3 +22,15 @@
  */
 
 package gay.floof.hana.routing
+
+import gay.floof.hana.routing.endpoints.HealthEndpoint
+import gay.floof.hana.routing.endpoints.MainEndpoint
+import gay.floof.hana.routing.endpoints.MetricsEndpoint
+import org.koin.dsl.bind
+import org.koin.dsl.module
+
+val routingModule = module {
+    single { MetricsEndpoint() } bind AbstractEndpoint::class
+    single { HealthEndpoint() } bind AbstractEndpoint::class
+    single { MainEndpoint() } bind AbstractEndpoint::class
+}

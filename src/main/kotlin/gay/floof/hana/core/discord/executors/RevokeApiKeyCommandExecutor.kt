@@ -22,3 +22,16 @@
  */
 
 package gay.floof.hana.core.discord.executors
+
+import gay.floof.hana.core.discord.commands.RevokeApiKeyCommand
+import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
+import net.perfectdreams.discordinteraktions.common.commands.slashCommand
+
+object RevokeApiKeyCommandExecutor: SlashCommandDeclarationWrapper {
+    override fun declaration() = slashCommand(
+        "revoke",
+        "Revokes one or all API keys that are registered to your Discord account."
+    ) {
+        executor = RevokeApiKeyCommand
+    }
+}

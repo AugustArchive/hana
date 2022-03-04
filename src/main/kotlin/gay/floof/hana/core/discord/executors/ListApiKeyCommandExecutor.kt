@@ -22,3 +22,16 @@
  */
 
 package gay.floof.hana.core.discord.executors
+
+import gay.floof.hana.core.discord.commands.ListApiKeysCommand
+import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
+import net.perfectdreams.discordinteraktions.common.commands.slashCommand
+
+object ListApiKeyCommandExecutor: SlashCommandDeclarationWrapper {
+    override fun declaration() = slashCommand(
+        "list-keys",
+        "Lists all the API keys that you have created."
+    ) {
+        executor = ListApiKeysCommand
+    }
+}

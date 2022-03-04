@@ -22,3 +22,23 @@
  */
 
 package gay.floof.hana.core.database.tables
+
+import org.jetbrains.exposed.dao.LongEntity
+import org.jetbrains.exposed.dao.LongEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
+
+object ApiKeysTable: SnowflakeTable("api_keys") {
+    val permissions = long("permissions").default(0L)
+    val description = varchar("description", 240).nullable()
+    val token = text("token")
+    val name = varchar("name", 32)
+}
+
+class ApiKeyEntity(id: EntityID<Long>): LongEntity(id) {
+    companion object: LongEntityClass<ApiKeyEntity>(ApiKeysTable)
+
+    var permissions by ApiKeysTable.permissions
+    var description by ApiKeysTable.description
+    var token by ApiKeysTable.token
+    var name by ApiKeysTable.name
+}

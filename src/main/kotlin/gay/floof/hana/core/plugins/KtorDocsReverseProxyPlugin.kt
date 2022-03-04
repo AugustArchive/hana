@@ -21,25 +21,4 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.core.discord.commands
-
-import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
-import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutor
-import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutorDeclaration
-import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
-import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
-
-class RevokeApiKeyCommand: SlashCommandExecutor() {
-    companion object: SlashCommandExecutorDeclaration(RevokeApiKeyCommand::class) {
-        object Options: ApplicationCommandOptions() {
-            val all = optionalBoolean("revoke_all", "If all API keys should be revoked from your Discord account.").register()
-            val singleKey = optionalString("revoke_this", "Revokes this single API key from the database.").register()
-        }
-
-        override val options: ApplicationCommandOptions = Options
-    }
-
-    override suspend fun execute(context: ApplicationCommandContext, args: SlashCommandArguments) {
-        context.deferChannelMessageEphemerally()
-    }
-}
+package gay.floof.hana.core.plugins

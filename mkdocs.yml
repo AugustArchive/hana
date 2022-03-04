@@ -1,0 +1,4 @@
+site_name: hana - API Documentation
+site_url: https://api.floofy.dev/docs/
+theme:
+  name: material

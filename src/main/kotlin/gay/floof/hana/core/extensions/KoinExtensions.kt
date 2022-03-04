@@ -21,4 +21,30 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.core.discord
+package gay.floof.hana.core.extensions
+
+import org.koin.core.context.GlobalContext
+import kotlin.properties.ReadOnlyProperty
+
+/**
+ * Injects a singleton into a property.
+ * ```kt
+ * class Owo {
+ *    val kord: Kord by inject()
+ * }
+ * ```
+ */
+inline fun <reified T> inject(): ReadOnlyProperty<Any?, T> =
+    ReadOnlyProperty<Any?, T> { _, _ ->
+        val koin = GlobalContext.get()
+        koin.get()
+    }
+
+/**
+ * Returns a list of singletons that match with type [T].
+ * ```kt
+ * val commands: List<AbstractCommand> = GlobalContext.retrieveAll()
+ * // => List<Command> [ ... ]
+ * ```
+ */
+inline fun <reified T> GlobalContext.retrieveAll(): List<T> = get().getAll()

@@ -21,4 +21,8 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.core.images
+package gay.floof.hana.core.interfaces
+
+interface SuspendAutoCloseable {
+    suspend fun close()
+}

@@ -22,3 +22,16 @@
  */
 
 package gay.floof.hana.core.discord.commands
+
+import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
+import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutor
+import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutorDeclaration
+import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
+
+class ListApiKeysCommand: SlashCommandExecutor() {
+    companion object: SlashCommandExecutorDeclaration(ListApiKeysCommand::class) {}
+
+    override suspend fun execute(context: ApplicationCommandContext, args: SlashCommandArguments) {
+        context.deferChannelMessageEphemerally()
+    }
+}

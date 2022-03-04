@@ -21,25 +21,30 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.core.discord.commands
+package gay.floof.hana.core.interceptors
 
-import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
-import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutor
-import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutorDeclaration
-import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
-import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
+import gay.floof.utils.slf4j.logging
+import okhttp3.Interceptor
+import okhttp3.Response
+import org.apache.commons.lang3.time.StopWatch
+import java.util.concurrent.TimeUnit
 
-class RevokeApiKeyCommand: SlashCommandExecutor() {
-    companion object: SlashCommandExecutorDeclaration(RevokeApiKeyCommand::class) {
-        object Options: ApplicationCommandOptions() {
-            val all = optionalBoolean("revoke_all", "If all API keys should be revoked from your Discord account.").register()
-            val singleKey = optionalString("revoke_this", "Revokes this single API key from the database.").register()
-        }
+object LoggingInterceptor: Interceptor {
+    private val log by logging<LoggingInterceptor>()
 
-        override val options: ApplicationCommandOptions = Options
-    }
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request()
+        val watch = StopWatch.createStarted()
 
-    override suspend fun execute(context: ApplicationCommandContext, args: SlashCommandArguments) {
-        context.deferChannelMessageEphemerally()
+        log.info("-> ${request.method.uppercase()} ${request.url}")
+        val res = chain.proceed(request)
+        watch.stop()
+
+        log.info(
+            "<- [${res.code} ${res.message.ifEmpty { "OK" }} / ${res.protocol.toString().replace("h2", "http/2")}] ${request.method.uppercase()} ${request.url} [${watch.getTime(
+                TimeUnit.MILLISECONDS
+            )}ms]"
+        )
+        return res
     }
 }

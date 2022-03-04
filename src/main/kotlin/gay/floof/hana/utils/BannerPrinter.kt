@@ -21,25 +21,23 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.core.discord.commands
+package gay.floof.hana.utils
 
-import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
-import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutor
-import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutorDeclaration
-import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
-import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
+import gay.floof.hana.core.HanaInfo
+import java.io.File
 
-class RevokeApiKeyCommand: SlashCommandExecutor() {
-    companion object: SlashCommandExecutorDeclaration(RevokeApiKeyCommand::class) {
-        object Options: ApplicationCommandOptions() {
-            val all = optionalBoolean("revoke_all", "If all API keys should be revoked from your Discord account.").register()
-            val singleKey = optionalString("revoke_this", "Revokes this single API key from the database.").register()
+object BannerPrinter {
+    fun print() {
+        val lines = File("./assets/banner.txt").readText(Charsets.UTF_8).split("\n")
+        for (l in lines) {
+            val line = l
+                .replace("{{.Version}}", HanaInfo.VERSION)
+                .replace("{{.CommitSha}}", HanaInfo.COMMIT_HASH)
+                .replace("{{.BuildDate}}", HanaInfo.BUILD_DATE)
+                .replace("{{.JavaVersion}}", System.getProperty("java.version"))
+                .replace("{{.KotlinVersion}}", KotlinVersion.CURRENT.toString())
+
+            println(line)
         }
-
-        override val options: ApplicationCommandOptions = Options
-    }
-
-    override suspend fun execute(context: ApplicationCommandContext, args: SlashCommandArguments) {
-        context.deferChannelMessageEphemerally()
     }
 }

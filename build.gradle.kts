@@ -106,6 +106,7 @@ dependencies {
 
     // Ktor Server libraries
     implementation("io.ktor:ktor-server-netty")
+    implementation("io.ktor:ktor-serialization")
     api(platform("io.ktor:ktor-bom:1.6.7"))
 
     // Koin
@@ -133,6 +134,28 @@ dependencies {
 
     // Discord Interactions
     implementation("net.perfectdreams.discordinteraktions:webserver-ktor-kord:0.0.12-SNAPSHOT")
+
+    // Redis (for ratelimiting cache)
+    implementation("io.lettuce:lettuce-core:6.1.6.RELEASE")
+
+    // PostgreSQL (for holding API keys)
+    api(platform("org.jetbrains.exposed:exposed-bom:0.36.1"))
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime")
+    implementation("org.jetbrains.exposed:exposed-core")
+    implementation("org.jetbrains.exposed:exposed-jdbc")
+    implementation("org.jetbrains.exposed:exposed-dao")
+    implementation("org.postgresql:postgresql:42.3.2")
+    implementation("com.zaxxer:HikariCP:5.0.1")
+
+    // YAML (configuration)
+    implementation("com.charleskorn.kaml:kaml:0.40.0")
+
+    // OkHttp (for ktor client)
+    implementation("io.ktor:ktor-client-okhttp")
+    implementation("io.ktor:ktor-client-core")
+
+    // Kord
+    implementation("dev.kord:kord-core:0.8.0-M10")
 }
 
 spotless {

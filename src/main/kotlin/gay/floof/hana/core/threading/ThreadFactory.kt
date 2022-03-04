@@ -21,25 +21,22 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.core.discord.commands
+package gay.floof.hana.core.threading
 
-import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
-import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutor
-import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutorDeclaration
-import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
-import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
+import java.util.concurrent.ThreadFactory
+import java.util.concurrent.atomic.AtomicLong
 
-class RevokeApiKeyCommand: SlashCommandExecutor() {
-    companion object: SlashCommandExecutorDeclaration(RevokeApiKeyCommand::class) {
-        object Options: ApplicationCommandOptions() {
-            val all = optionalBoolean("revoke_all", "If all API keys should be revoked from your Discord account.").register()
-            val singleKey = optionalString("revoke_this", "Revokes this single API key from the database.").register()
-        }
+fun threadFactory(name: String): ThreadFactory = object: ThreadFactory {
+    private val threadId = AtomicLong(0)
+    private val threadGroup = Thread.currentThread().threadGroup
 
-        override val options: ApplicationCommandOptions = Options
-    }
+    override fun newThread(r: Runnable): Thread {
+        val tName = "$name[${threadId.incrementAndGet()}]"
+        val thread = Thread(threadGroup, r, tName)
 
-    override suspend fun execute(context: ApplicationCommandContext, args: SlashCommandArguments) {
-        context.deferChannelMessageEphemerally()
+        if (thread.priority != Thread.NORM_PRIORITY)
+            thread.priority = Thread.NORM_PRIORITY
+
+        return thread
     }
 }

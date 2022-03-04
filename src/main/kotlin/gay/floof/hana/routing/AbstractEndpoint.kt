@@ -22,3 +22,18 @@
  */
 
 package gay.floof.hana.routing
+
+import io.ktor.application.*
+import io.ktor.http.*
+
+/**
+ * Represents an abstracted class to use as the endpoint module class.
+ * @param path The path to use.
+ * @param method The HTTP method to use for this endpoint.
+ */
+abstract class AbstractEndpoint(
+    val path: String = "/",
+    val method: HttpMethod = HttpMethod.Get
+) {
+    abstract suspend fun call(call: ApplicationCall)
+}

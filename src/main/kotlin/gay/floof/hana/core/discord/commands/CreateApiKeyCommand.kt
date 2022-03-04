@@ -22,3 +22,27 @@
  */
 
 package gay.floof.hana.core.discord.commands
+
+import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
+import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutor
+import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutorDeclaration
+import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
+import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
+
+class CreateApiKeyCommand: SlashCommandExecutor() {
+    companion object: SlashCommandExecutorDeclaration(CreateApiKeyCommand::class) {
+        object Options: ApplicationCommandOptions() {
+            val name = string("name", "The application name.").register()
+            val description = optionalString("description", "The application's description").register()
+            val nsfwEnabled = optionalBoolean("nsfw_enabled", "If any NSFW endpoints should be enabled. You must be 18 years of age or older to use this.").register()
+            val imageManipulationEnabled = optionalBoolean("im_enabled", "If image manipulation should be enabled for this API key.").register()
+        }
+
+        override val options: ApplicationCommandOptions = Options
+    }
+
+    override suspend fun execute(context: ApplicationCommandContext, args: SlashCommandArguments) {
+        // Defer the message so it can send messages ephemerally.
+        context.deferChannelMessageEphemerally()
+    }
+}

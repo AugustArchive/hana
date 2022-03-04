@@ -22,3 +22,25 @@
  */
 
 package gay.floof.hana.routing.endpoints
+
+import gay.floof.hana.routing.AbstractEndpoint
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.response.*
+
+@kotlinx.serialization.Serializable
+private data class MainResponse(
+    val message: String,
+    val docsUri: String
+) {
+    companion object {
+        fun new(): MainResponse = MainResponse(
+            message = "hello world!",
+            docsUri = "https://api.floofy.dev/docs"
+        )
+    }
+}
+
+class MainEndpoint: AbstractEndpoint(method = HttpMethod.Get) {
+    override suspend fun call(call: ApplicationCall) = call.respond(MainResponse.new())
+}

@@ -21,4 +21,11 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.core.images
+package gay.floof.hana.core.database.tables
+
+import org.jetbrains.exposed.dao.id.IdTable
+
+open class SnowflakeTable(name: String = ""): IdTable<Long>(name) {
+    override val id = long("id").entityId()
+    override val primaryKey = PrimaryKey(id, name = "PK_$name")
+}

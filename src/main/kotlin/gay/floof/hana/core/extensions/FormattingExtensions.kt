@@ -21,4 +21,19 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.routing.endpoints
+package gay.floof.hana.core.extensions
+
+/**
+ * Format this [Long] into a readable byte format.
+ */
+fun Long.formatSize(): String {
+    val kilo = this / 1024L
+    val mega = kilo / 1024L
+    val giga = mega / 1024L
+
+    return when {
+        kilo < 1024 -> "${kilo}KB"
+        mega < 1024 -> "${mega}MB"
+        else -> "${giga}GB"
+    }
+}

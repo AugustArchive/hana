@@ -22,3 +22,111 @@
  */
 
 package gay.floof.hana
+
+import com.charleskorn.kaml.Yaml
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
+import com.zaxxer.hikari.util.IsolationLevel
+import gay.floof.hana.core.Hana
+import gay.floof.hana.core.database.tables.ApiKeysTable
+import gay.floof.hana.core.hanaModule
+import gay.floof.hana.core.managers.RedisManager
+import gay.floof.hana.data.Environment
+import gay.floof.hana.data.HanaConfig
+import gay.floof.hana.routing.routingModule
+import gay.floof.hana.utils.BannerPrinter
+import gay.floof.utils.slf4j.logging
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.DatabaseConfig
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.Slf4jSqlDebugLogger
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
+import java.io.File
+import kotlin.system.exitProcess
+
+object Bootstrap {
+    private val log by logging<Bootstrap>()
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        Thread.currentThread().name = "Hana-BootstrapThread"
+        BannerPrinter.print()
+
+        addShutdownHook()
+
+        log.info("* Initializing configuration...")
+        val configPathEnv = System.getenv("HANA_CONFIG_PATH")
+        val configFile = File(configPathEnv ?: "./config.yml")
+
+        if (!configFile.exists())
+            throw IllegalStateException("Missing configuration path in \$ROOT/config.yml or under HANA_CONFIG_PATH=... environment variable!")
+
+        val config = Yaml.default.decodeFromString(HanaConfig.serializer(), configFile.readText(Charsets.UTF_8))
+
+        log.info("* Initialized configuration! Now connecting to PostgreSQL...")
+        val dataSource = HikariDataSource(
+            HikariConfig().apply {
+                jdbcUrl = "jdbc:postgresql://${config.database.host}:${config.database.port}/${config.database.name}"
+                username = config.database.username
+                password = config.database.password
+                schema = config.database.schema
+                driverClassName = "org.postgresql.Driver"
+                isAutoCommit = false
+                transactionIsolation = IsolationLevel.TRANSACTION_REPEATABLE_READ.name
+                leakDetectionThreshold = 30 * 1000
+                poolName = "Hana-HikariPool"
+            }
+        )
+
+        Database.connect(
+            dataSource,
+            databaseConfig = DatabaseConfig.invoke {
+                defaultRepetitionAttempts = 5
+                defaultIsolationLevel = IsolationLevel.TRANSACTION_REPEATABLE_READ.levelId
+                sqlLogger = if (config.environment == Environment.Development) {
+                    Slf4jSqlDebugLogger
+                } else {
+                    null
+                }
+            }
+        )
+
+        transaction {
+            SchemaUtils.createMissingTablesAndColumns(ApiKeysTable)
+        }
+
+        log.info("* Connected to PostgreSQL! Now connecting to Redis...")
+
+        val redis = RedisManager(config)
+        redis.connect()
+
+        log.info("* Connected to Redis! Now initializing Koin...")
+        val koin = startKoin {
+            modules(
+                hanaModule,
+                routingModule,
+                module {
+                    single { config }
+                    single { dataSource }
+                    single { redis }
+                }
+            )
+        }
+
+        val hana = koin.koin.get<Hana>()
+        runBlocking {
+            try {
+                hana.start()
+            } catch (e: Exception) {
+                log.error("* Unable to bootstrap hana:", e)
+                exitProcess(1)
+            }
+        }
+    }
+
+    private fun addShutdownHook() {
+    }
+}

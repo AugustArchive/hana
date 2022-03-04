@@ -21,25 +21,38 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.core.discord.commands
+package gay.floof.hana.core.metrics
 
-import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
-import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutor
-import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutorDeclaration
-import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
-import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
+import gay.floof.hana.data.HanaConfig
+import io.prometheus.client.CollectorRegistry
+import io.prometheus.client.Counter
+import io.prometheus.client.Histogram
 
-class RevokeApiKeyCommand: SlashCommandExecutor() {
-    companion object: SlashCommandExecutorDeclaration(RevokeApiKeyCommand::class) {
-        object Options: ApplicationCommandOptions() {
-            val all = optionalBoolean("revoke_all", "If all API keys should be revoked from your Discord account.").register()
-            val singleKey = optionalString("revoke_this", "Revokes this single API key from the database.").register()
+class MetricsHandler(config: HanaConfig) {
+    val requestLatency: Histogram?
+    val requestsCount: Counter?
+    val registry: CollectorRegistry?
+
+    val enabled = config.metrics
+
+    init {
+        if (enabled) {
+            registry = CollectorRegistry()
+
+            requestLatency = Histogram.build()
+                .name("hana_request_latency")
+                .help("Returns the average latency on all API requests.")
+                .register(registry)
+
+            requestsCount = Counter.build()
+                .name("hana_request_count")
+                .help("Returns how many requests by endpoint + method have been executed.")
+                .labelNames("endpoint", "method")
+                .register(registry)
+        } else {
+            requestLatency = null
+            requestsCount = null
+            registry = null
         }
-
-        override val options: ApplicationCommandOptions = Options
-    }
-
-    override suspend fun execute(context: ApplicationCommandContext, args: SlashCommandArguments) {
-        context.deferChannelMessageEphemerally()
     }
 }
