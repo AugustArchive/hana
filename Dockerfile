@@ -23,7 +23,7 @@
 FROM eclipse-temurin:17.0.2-alpine AS builder
 
 # Install common libraries we will need
-RUN apk update && apk add git
+RUN apk update && apk add --no-cache git
 
 # Change the directory to `/build`
 WORKDIR /build
@@ -57,8 +57,8 @@ RUN rm /app/noel/hana/bin/hana.bat
 USER 1001
 
 # Give our scripts executable permissions
-RUN chmod +x /app/noel/hana/scripts/docker-entrypoint.sh
-RUN chmod +x /app/noel/hana/scripts/runner.sh
+RUN chmod +x /app/noel/hana/scripts/docker-entrypoint.sh \
+    chmod +x /app/noel/hana/scripts/runner.sh
 
 # Add in the entrypoint (which will be /docker-entrypoint.sh)
 ENTRYPOINT ["/app/noel/hana/scripts/docker-entrypoint.sh"]
