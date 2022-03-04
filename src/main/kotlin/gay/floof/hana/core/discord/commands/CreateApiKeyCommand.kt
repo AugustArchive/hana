@@ -23,13 +23,16 @@
 
 package gay.floof.hana.core.discord.commands
 
+import dev.kord.common.Color
+import gay.floof.hana.core.managers.JwtManager
+import net.perfectdreams.discordinteraktions.common.builder.message.embed
 import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
 import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutor
 import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutorDeclaration
 import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
 
-class CreateApiKeyCommand: SlashCommandExecutor() {
+class CreateApiKeyCommand(private val jwt: JwtManager): SlashCommandExecutor() {
     companion object: SlashCommandExecutorDeclaration(CreateApiKeyCommand::class) {
         object Options: ApplicationCommandOptions() {
             val name = string("name", "The application name.").register()
@@ -42,7 +45,54 @@ class CreateApiKeyCommand: SlashCommandExecutor() {
     }
 
     override suspend fun execute(context: ApplicationCommandContext, args: SlashCommandArguments) {
-        // Defer the message so it can send messages ephemerally.
         context.deferChannelMessageEphemerally()
+
+        // Grab the arguments
+        val name = args[Options.name]
+        val description = args[Options.description] ?: "this app doesn't have a description"
+        val nsfwEnabled = args[Options.nsfwEnabled] ?: false
+        val imEnabled = args[Options.imageManipulationEnabled] ?: false
+
+        try {
+            val token = jwt.create(context.sender.id.value.toLong(), name, description, nsfwEnabled, imEnabled)
+            context.sendEphemeralMessage {
+                content = buildString {
+                    appendLine(":thumbsup: **Application \"$name\" has been created into the database!**")
+                    appendLine("> The embed is basically what you filled out. If you want to edit anything,")
+                    appendLine("> you can use the `/edit` command!")
+                    appendLine()
+
+                    if (nsfwEnabled) {
+                        appendLine("> ")
+                        appendLine("> :warning: You have enabled the NSFW endpoints: `/yiff`, `/yiff/random`, by enabling this,")
+                        appendLine("> you are saying that you are 18 years or older to use these endpoints. **Noel** or the **Noelware** team")
+                        appendLine("> is not responsible if you're underage and using these endpoints, since we do not want to add security risks")
+                        appendLine("> of verifying user identification descriptors.")
+                    }
+
+                    if (imEnabled) {
+                        appendLine("> ")
+                        appendLine("> :warning: You have enabled the **alpha** image manipulation endpoints to do image editing.")
+                        appendLine("> By enabling this, you are agreeing for more stricter ratelimits (since these types of endpoints use a lot of CPU and memory usage)")
+                        appendLine("> and can take a while to generate if using huge data.")
+                    }
+                }
+
+                embed {
+                    color = Color(0x6AAFDC)
+                    this.description = buildString {
+                        appendLine("• **Application Name**: $name")
+                        appendLine("• **Application Description**: $description")
+                        appendLine("• **API Key**: ||$token||")
+                        appendLine("• **NSFW Enabled**: ${if (nsfwEnabled) "Yes" else "No"}")
+                        appendLine("• **(Alpha) Image Manipulation Enabled**: ${if (imEnabled) "Yes" else "No"}")
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            context.sendEphemeralMessage {
+                content = "An unknown exception has occurred while generating your API key. Try again later!"
+            }
+        }
     }
 }

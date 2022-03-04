@@ -21,24 +21,17 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.core.database.tables
+package gay.floof.hana.core.discord.executors
 
-import org.jetbrains.exposed.dao.LongEntity
-import org.jetbrains.exposed.dao.LongEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
+import gay.floof.hana.core.discord.commands.InfoOnApiKeyCommand
+import net.perfectdreams.discordinteraktions.common.commands.SlashCommandDeclarationWrapper
+import net.perfectdreams.discordinteraktions.common.commands.slashCommand
 
-object ApiKeysTable: SnowflakeTable("api_keys") {
-    var permissions = text("permissions").nullable()
-    var description = varchar("description", 240).nullable()
-    val token = text("token")
-    val name = varchar("name", 32)
-}
-
-class ApiKeyEntity(id: EntityID<Long>): LongEntity(id) {
-    companion object: LongEntityClass<ApiKeyEntity>(ApiKeysTable)
-
-    var permissions by ApiKeysTable.permissions
-    var description by ApiKeysTable.description
-    var token by ApiKeysTable.token
-    var name by ApiKeysTable.name
+object InfoOnApiKeyCommandExecutor: SlashCommandDeclarationWrapper {
+    override fun declaration() = slashCommand(
+        "info",
+        "Retrieves information about your API key if registered."
+    ) {
+        executor = InfoOnApiKeyCommand
+    }
 }

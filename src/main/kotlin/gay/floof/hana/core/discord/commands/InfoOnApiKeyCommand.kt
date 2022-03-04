@@ -23,15 +23,47 @@
 
 package gay.floof.hana.core.discord.commands
 
+import dev.kord.common.Color
+import gay.floof.hana.core.database.asyncTransaction
+import gay.floof.hana.core.database.tables.ApiKeyEntity
+import net.perfectdreams.discordinteraktions.common.builder.message.embed
 import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
 import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutor
 import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutorDeclaration
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
 
-class ListApiKeysCommand: SlashCommandExecutor() {
-    companion object: SlashCommandExecutorDeclaration(ListApiKeysCommand::class) {}
+class InfoOnApiKeyCommand: SlashCommandExecutor() {
+    companion object: SlashCommandExecutorDeclaration(InfoOnApiKeyCommand::class)
 
     override suspend fun execute(context: ApplicationCommandContext, args: SlashCommandArguments) {
         context.deferChannelMessageEphemerally()
+
+        // Check if the user has an API key registered.
+        val found = asyncTransaction {
+            ApiKeyEntity.findById(context.sender.id.value.toLong())
+        }
+
+        if (found == null) {
+            context.sendEphemeralMessage {
+                content = ":thinking: **| You don't have any API keys registered. Use the `/create` slash command to register one!**"
+            }
+        }
+
+        context.sendEphemeralMessage {
+            embed {
+                color = Color(0x6AAFDC)
+                this.description = buildString {
+                    appendLine("• **Application Name**: ${found!!.name}")
+                    appendLine("• **Application Description**: ${found.description}")
+                    appendLine("• **API Key**: ||${found.token}||")
+
+                    val nsfw = found.permissions?.split("|")?.contains("nsfw") ?: false
+                    val im = found.permissions?.split("|")?.contains("im") ?: false
+
+                    appendLine("• **NSFW Enabled**: ${if (nsfw) "Yes" else "No"}")
+                    appendLine("• **(Alpha) Image Manipulation Enabled**: ${if (im) "Yes" else "No"}")
+                }
+            }
+        }
     }
 }

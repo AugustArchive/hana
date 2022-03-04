@@ -26,10 +26,12 @@ package gay.floof.hana.core
 import dev.kord.common.entity.Snowflake
 import dev.kord.rest.service.RestClient
 import gay.floof.hana.core.discord.commands.CreateApiKeyCommand
-import gay.floof.hana.core.discord.commands.ListApiKeysCommand
+import gay.floof.hana.core.discord.commands.EditApiKeyCommand
+import gay.floof.hana.core.discord.commands.InfoOnApiKeyCommand
 import gay.floof.hana.core.discord.commands.RevokeApiKeyCommand
 import gay.floof.hana.core.discord.executors.CreateApiKeyCommandExecutor
-import gay.floof.hana.core.discord.executors.ListApiKeyCommandExecutor
+import gay.floof.hana.core.discord.executors.EditApiKeyCommandExecutor
+import gay.floof.hana.core.discord.executors.InfoOnApiKeyCommandExecutor
 import gay.floof.hana.core.discord.executors.RevokeApiKeyCommandExecutor
 import gay.floof.hana.core.extensions.formatSize
 import gay.floof.hana.core.extensions.inject
@@ -122,17 +124,22 @@ class Hana: SuspendAutoCloseable {
 
         commandManager.register(
             CreateApiKeyCommandExecutor,
-            CreateApiKeyCommand()
-        )
-
-        commandManager.register(
-            ListApiKeyCommandExecutor,
-            ListApiKeysCommand()
+            CreateApiKeyCommand(koin.get())
         )
 
         commandManager.register(
             RevokeApiKeyCommandExecutor,
             RevokeApiKeyCommand()
+        )
+
+        commandManager.register(
+            EditApiKeyCommandExecutor,
+            EditApiKeyCommand()
+        )
+
+        commandManager.register(
+            InfoOnApiKeyCommandExecutor,
+            InfoOnApiKeyCommand()
         )
 
         registry.updateAllCommandsInGuild(Snowflake(824066105102303232), true)

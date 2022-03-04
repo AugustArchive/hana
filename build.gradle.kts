@@ -156,6 +156,9 @@ dependencies {
 
     // Kord
     implementation("dev.kord:kord-core:0.8.0-M10")
+
+    // JWT
+    implementation("com.auth0:java-jwt:3.18.3")
 }
 
 spotless {

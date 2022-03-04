@@ -62,7 +62,7 @@ class RedisManager(config: HanaConfig): AutoCloseable {
             }
 
             if (config.redis.password != null) {
-                sentinelRedisUri.withPassword(config.redis.password!!.toCharArray())
+                sentinelRedisUri.withPassword(config.redis.password.toCharArray())
             }
 
             builder
@@ -75,7 +75,7 @@ class RedisManager(config: HanaConfig): AutoCloseable {
                 .withDatabase(config.redis.index)
 
             if (config.redis.password != null) {
-                builder.withPassword(config.redis.password!!.toCharArray())
+                builder.withPassword(config.redis.password.toCharArray())
             }
 
             builder.build()

@@ -23,23 +23,41 @@
 
 package gay.floof.hana.core.discord.commands
 
+import gay.floof.hana.core.database.asyncTransaction
+import gay.floof.hana.core.database.tables.ApiKeyEntity
+import gay.floof.hana.core.database.tables.ApiKeysTable
 import net.perfectdreams.discordinteraktions.common.commands.ApplicationCommandContext
 import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutor
 import net.perfectdreams.discordinteraktions.common.commands.SlashCommandExecutorDeclaration
-import net.perfectdreams.discordinteraktions.common.commands.options.ApplicationCommandOptions
 import net.perfectdreams.discordinteraktions.common.commands.options.SlashCommandArguments
+import org.jetbrains.exposed.sql.deleteWhere
 
 class RevokeApiKeyCommand: SlashCommandExecutor() {
-    companion object: SlashCommandExecutorDeclaration(RevokeApiKeyCommand::class) {
-        object Options: ApplicationCommandOptions() {
-            val all = optionalBoolean("revoke_all", "If all API keys should be revoked from your Discord account.").register()
-            val singleKey = optionalString("revoke_this", "Revokes this single API key from the database.").register()
-        }
-
-        override val options: ApplicationCommandOptions = Options
-    }
+    companion object: SlashCommandExecutorDeclaration(RevokeApiKeyCommand::class)
 
     override suspend fun execute(context: ApplicationCommandContext, args: SlashCommandArguments) {
         context.deferChannelMessageEphemerally()
+
+        // Check if we can find the user's token
+        val found = asyncTransaction {
+            ApiKeyEntity.findById(context.sender.id.value.toLong())
+        }
+
+        if (found == null) {
+            context.sendEphemeralMessage {
+                content = ":thinking: **| You don't have any API keys registered. Use the `/create` slash command to register one!**"
+            }
+        }
+
+        // delete it
+        asyncTransaction {
+            ApiKeysTable.deleteWhere {
+                ApiKeysTable.id eq context.sender.id.value.toLong()
+            }
+        }
+
+        context.sendEphemeralMessage {
+            content = ":thumbsup: **| Successfully deleted your API key. You will now receive 401 status codes when using restricted endpoints.**"
+        }
     }
 }

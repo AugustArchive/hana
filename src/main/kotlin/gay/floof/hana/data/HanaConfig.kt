@@ -41,6 +41,7 @@ enum class Environment {
 
 @kotlinx.serialization.Serializable
 data class HanaConfig(
+    val secretKeyBase: String,
     val environment: Environment = Environment.Development,
     val sentryDsn: String? = null,
     val publicKey: String,
