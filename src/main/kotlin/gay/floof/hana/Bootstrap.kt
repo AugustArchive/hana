@@ -29,6 +29,7 @@ import com.zaxxer.hikari.HikariDataSource
 import com.zaxxer.hikari.util.IsolationLevel
 import gay.floof.hana.core.Hana
 import gay.floof.hana.core.database.tables.ApiKeysTable
+import gay.floof.hana.core.extensions.inject
 import gay.floof.hana.core.hanaModule
 import gay.floof.hana.core.managers.RedisManager
 import gay.floof.hana.data.Environment
@@ -45,9 +46,10 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import java.io.File
+import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
-object Bootstrap {
+object Bootstrap: AutoCloseable {
     private val log by logging<Bootstrap>()
 
     @JvmStatic
@@ -55,7 +57,12 @@ object Bootstrap {
         Thread.currentThread().name = "Hana-BootstrapThread"
         BannerPrinter.print()
 
-        addShutdownHook()
+        val runtime = Runtime.getRuntime()
+        runtime.addShutdownHook(
+            thread(start = false, name = "Hana-ShutdownThread") {
+                close()
+            }
+        )
 
         log.info("* Initializing configuration...")
         val configPathEnv = System.getenv("HANA_CONFIG_PATH")
@@ -127,6 +134,19 @@ object Bootstrap {
         }
     }
 
-    private fun addShutdownHook() {
+    override fun close() {
+        log.info("Shutting down hana...")
+
+        runBlocking {
+            val hana: Hana by inject()
+
+            hana.close()
+        }
+
+        val redis: RedisManager by inject()
+        val ds: HikariDataSource by inject()
+
+        redis.close()
+        ds.close()
     }
 }

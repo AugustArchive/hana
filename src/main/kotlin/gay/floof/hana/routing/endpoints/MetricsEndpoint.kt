@@ -23,11 +23,27 @@
 
 package gay.floof.hana.routing.endpoints
 
+import gay.floof.hana.core.metrics.MetricsHandler
 import gay.floof.hana.routing.AbstractEndpoint
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
+import io.prometheus.client.exporter.common.TextFormat
 
-class MetricsEndpoint: AbstractEndpoint("/metrics", HttpMethod.Get) {
-    override suspend fun call(call: ApplicationCall) = call.respondText("coming soon!")
+class MetricsEndpoint(private val metrics: MetricsHandler): AbstractEndpoint("/metrics", HttpMethod.Get) {
+    override suspend fun call(call: ApplicationCall) {
+        if (!metrics.enabled) {
+            call.respondText(
+                "Cannot GET /metrics",
+                contentType = ContentType.Text.Plain,
+                status = HttpStatusCode.NotFound
+            )
+
+            return
+        }
+
+        call.respondTextWriter(ContentType.parse(TextFormat.CONTENT_TYPE_004), HttpStatusCode.OK) {
+            TextFormat.write004(this, metrics.registry!!.metricFamilySamples())
+        }
+    }
 }

@@ -38,7 +38,7 @@ RUN ./gradlew installDist --stacktrace
 FROM eclipse-temurin:17.0.2-alpine
 
 # Install common libraries we need
-RUN apk update && apk add bash
+RUN apk update && apk add --no-cache bash
 
 # Change the working directory to `/app/noel/hana` to add
 # our Docker scripts!

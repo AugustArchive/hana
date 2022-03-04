@@ -36,8 +36,10 @@ import gay.floof.hana.core.discord.executors.RevokeApiKeyCommandExecutor
 import gay.floof.hana.core.extensions.formatSize
 import gay.floof.hana.core.extensions.inject
 import gay.floof.hana.core.interfaces.SuspendAutoCloseable
+import gay.floof.hana.core.metrics.MetricsHandler
 import gay.floof.hana.core.plugins.KtorDocsReverseProxyPlugin
 import gay.floof.hana.core.plugins.KtorLoggingPlugin
+import gay.floof.hana.core.plugins.KtorRatelimitingPlugin
 import gay.floof.hana.core.threading.threadFactory
 import gay.floof.hana.data.Environment
 import gay.floof.hana.data.HanaConfig
@@ -56,6 +58,7 @@ import net.perfectdreams.discordinteraktions.common.commands.CommandManager
 import net.perfectdreams.discordinteraktions.platforms.kord.commands.KordCommandRegistry
 import net.perfectdreams.discordinteraktions.webserver.DefaultInteractionRequestHandler
 import net.perfectdreams.discordinteraktions.webserver.installDiscordInteractions
+import org.apache.commons.lang3.time.StopWatch
 import org.koin.core.context.GlobalContext
 import org.slf4j.LoggerFactory
 import java.lang.management.ManagementFactory
@@ -66,7 +69,7 @@ import java.util.concurrent.TimeUnit
 class Hana: SuspendAutoCloseable {
     companion object {
         val executorPool: ExecutorService = Executors.newFixedThreadPool(16, threadFactory("Hana-ExecutorPool"))
-        val bootTime = System.currentTimeMillis()
+        val bootTime = StopWatch.createStarted()
     }
 
     private val log by logging<Hana>()
@@ -159,6 +162,7 @@ class Hana: SuspendAutoCloseable {
                 val json: Json by inject()
 
                 install(KtorDocsReverseProxyPlugin)
+                install(KtorRatelimitingPlugin)
                 install(KtorLoggingPlugin)
 
                 install(ContentNegotiation) {
@@ -185,13 +189,26 @@ class Hana: SuspendAutoCloseable {
                     }
                 }
 
+                var visited = 0
                 routing {
                     val endpoints = koin.getAll<AbstractEndpoint>()
                     log.info("Found ${endpoints.size} endpoints to register.")
 
                     for (endpoint in endpoints) {
+                        // Hacky solution since Koin adds the same MainEndpoint instance
+                        if (endpoint.path == "/") {
+                            visited++
+                            if (visited > 1) {
+                                continue
+                            }
+                        }
+
+                        log.info("Registering endpoint ${endpoint.method.value} ${endpoint.path}")
                         route(endpoint.path, endpoint.method) {
                             handle {
+                                val metrics: MetricsHandler by inject()
+                                metrics.requestsCount?.labels(endpoint.path, endpoint.method.value)?.inc()
+
                                 try {
                                     endpoint.call(call)
                                 } catch (e: Exception) {
@@ -241,6 +258,9 @@ class Hana: SuspendAutoCloseable {
             log.warn("Server was never established, skipping!")
             return
         }
+
+        val ratelimiting = server.application.featureOrNull(KtorRatelimitingPlugin)
+        ratelimiting?.ratelimiter?.close()
 
         server.stop(1, 5, TimeUnit.SECONDS)
     }

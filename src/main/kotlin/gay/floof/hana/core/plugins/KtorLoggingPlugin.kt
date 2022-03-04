@@ -33,17 +33,19 @@ import io.ktor.request.*
 import io.ktor.util.*
 import io.ktor.util.pipeline.*
 import io.prometheus.client.Histogram
+import org.apache.commons.lang3.time.StopWatch
+import java.util.concurrent.TimeUnit
 
 class KtorLoggingPlugin {
     private val log by logging<KtorLoggingPlugin>()
     private val startTimePhase = PipelinePhase("StartTimePhase")
     private val logResponsePhase = PipelinePhase("LogResponsePhase")
     private val prometheusObserver = AttributeKey<Histogram.Timer>("PrometheusObserver")
-    private val startTimeKey = AttributeKey<Long>("StartTimeKey")
+    private val startTimeKey = AttributeKey<StopWatch>("StartTimeKey")
 
     private fun install(pipeline: Application) {
         pipeline.environment.monitor.subscribe(ApplicationStarted) {
-            log.info("Started HTTP service in ${System.currentTimeMillis() - Hana.bootTime}ms")
+            log.info("Started HTTP service in ${Hana.bootTime.getTime(TimeUnit.MILLISECONDS)}ms")
         }
 
         pipeline.environment.monitor.subscribe(ApplicationStopped) {
@@ -52,7 +54,7 @@ class KtorLoggingPlugin {
 
         pipeline.addPhase(startTimePhase)
         pipeline.intercept(startTimePhase) {
-            call.attributes.put(startTimeKey, System.currentTimeMillis())
+            call.attributes.put(startTimeKey, StopWatch.createStarted())
         }
 
         pipeline.intercept(ApplicationCallPipeline.Setup) {
@@ -70,12 +72,14 @@ class KtorLoggingPlugin {
     }
 
     private fun logResponse(call: ApplicationCall) {
-        val timeSpent = System.currentTimeMillis() - call.attributes[startTimeKey]
+        val stopwatch = call.attributes[startTimeKey]
         val status = call.response.status() ?: HttpStatusCode.OK
         val timer = call.attributes.getOrNull(prometheusObserver)
 
+        stopwatch.stop()
         timer?.observeDuration()
-        log.info("${status.value} ${status.description} :: ${call.request.httpMethod.value} ${call.request.path()} [${timeSpent}ms]")
+
+        log.info("${status.value} ${status.description} :: ${call.request.httpMethod.value} ${call.request.path()} [${stopwatch.getTime(TimeUnit.MILLISECONDS)}ms]")
     }
 
     companion object: ApplicationFeature<Application, Unit, KtorLoggingPlugin> {

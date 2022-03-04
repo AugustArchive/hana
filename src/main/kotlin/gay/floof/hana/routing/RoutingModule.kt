@@ -30,7 +30,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val routingModule = module {
-    single { MetricsEndpoint() } bind AbstractEndpoint::class
+    single { MetricsEndpoint(get()) } bind AbstractEndpoint::class
     single { HealthEndpoint() } bind AbstractEndpoint::class
     single { MainEndpoint() } bind AbstractEndpoint::class
 }

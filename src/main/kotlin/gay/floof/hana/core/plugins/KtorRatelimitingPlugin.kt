@@ -22,3 +22,59 @@
  */
 
 package gay.floof.hana.core.plugins
+
+import gay.floof.hana.core.plugins.ratelimiter.Ratelimiter
+import io.ktor.application.*
+import io.ktor.features.*
+import io.ktor.http.*
+import io.ktor.response.*
+import io.ktor.util.*
+import kotlinx.datetime.Clock
+import org.koin.core.context.GlobalContext
+
+private data class RatelimitedResponse(
+    val message: String,
+    val success: Boolean
+)
+
+class KtorRatelimitingPlugin(val ratelimiter: Ratelimiter) {
+    companion object: ApplicationFeature<ApplicationCallPipeline, Unit, KtorRatelimitingPlugin> {
+        override val key: AttributeKey<KtorRatelimitingPlugin> = AttributeKey("KtorRatelimitingPlugin")
+        override fun install(pipeline: ApplicationCallPipeline, configure: Unit.() -> Unit): KtorRatelimitingPlugin {
+            val koin = GlobalContext.get()
+            val ratelimiter = Ratelimiter(koin.get(), koin.get(), koin.get())
+
+            pipeline.sendPipeline.intercept(ApplicationSendPipeline.After) {
+                val ip = this.call.request.origin.remoteHost
+                if (ip == "0:0:0:0:0:0:0:1") {
+                    proceed()
+                    return@intercept
+                }
+
+                val record = ratelimiter.get(call)
+                context.response.header("X-RateLimit-Limit", record.limit)
+                context.response.header("X-RateLimit-Remaining", record.remaining)
+                context.response.header("X-RateLimit-Reset", record.resetTime.toEpochMilliseconds())
+                context.response.header("X-RateLimit-Reset-Date", record.resetTime.toString())
+
+                if (record.exceeded) {
+                    val retryAfter = (record.resetTime.epochSeconds - Clock.System.now().epochSeconds).coerceAtLeast(0)
+                    context.response.header(HttpHeaders.RetryAfter, retryAfter)
+                    context.respond(
+                        HttpStatusCode.TooManyRequests,
+                        RatelimitedResponse(
+                            success = false,
+                            message = "You have been ratelimited! ((ヾ(≧皿≦；)ノ＿))Fuuuuuu—-！"
+                        )
+                    )
+
+                    finish()
+                } else {
+                    proceed()
+                }
+            }
+
+            return KtorRatelimitingPlugin(ratelimiter)
+        }
+    }
+}

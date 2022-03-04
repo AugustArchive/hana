@@ -27,6 +27,7 @@ import gay.floof.hana.data.HanaConfig
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.Counter
 import io.prometheus.client.Histogram
+import io.prometheus.client.hotspot.DefaultExports
 
 class MetricsHandler(config: HanaConfig) {
     val requestLatency: Histogram?
@@ -39,6 +40,7 @@ class MetricsHandler(config: HanaConfig) {
         if (enabled) {
             registry = CollectorRegistry()
 
+            DefaultExports.register(registry)
             requestLatency = Histogram.build()
                 .name("hana_request_latency")
                 .help("Returns the average latency on all API requests.")
