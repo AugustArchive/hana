@@ -36,7 +36,6 @@ import gay.floof.hana.core.extensions.inject
 import gay.floof.hana.core.interfaces.SuspendAutoCloseable
 import gay.floof.hana.core.plugins.KtorDocsReverseProxyPlugin
 import gay.floof.hana.core.plugins.KtorLoggingPlugin
-import gay.floof.hana.core.plugins.KtorSentryPlugin
 import gay.floof.hana.core.threading.threadFactory
 import gay.floof.hana.data.Environment
 import gay.floof.hana.data.HanaConfig
@@ -154,7 +153,6 @@ class Hana: SuspendAutoCloseable {
 
                 install(KtorDocsReverseProxyPlugin)
                 install(KtorLoggingPlugin)
-                install(KtorSentryPlugin)
 
                 install(ContentNegotiation) {
                     json(json)
@@ -190,6 +188,10 @@ class Hana: SuspendAutoCloseable {
                                 try {
                                     endpoint.call(call)
                                 } catch (e: Exception) {
+                                    if (Sentry.isEnabled()) {
+                                        Sentry.captureException(e)
+                                    }
+
                                     log.error("Unable to handle request ${call.request.httpMethod.value} ${call.request.path()}:", e)
                                 }
                             }
