@@ -32,10 +32,9 @@ class KtorSentryPlugin {
         override val key: AttributeKey<KtorSentryPlugin> = AttributeKey("KtorSentryPlugin")
         override fun install(pipeline: ApplicationCallPipeline, configure: Unit.() -> Unit): KtorSentryPlugin {
             pipeline.intercept(ApplicationCallPipeline.Call) {
-                call.response
-
                 try {
                     proceed()
+                    return@intercept
                 } catch (e: Exception) {
                     if (Sentry.isEnabled()) Sentry.captureException(e)
 

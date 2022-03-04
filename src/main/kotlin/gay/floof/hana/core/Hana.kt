@@ -34,6 +34,7 @@ import gay.floof.hana.core.discord.executors.RevokeApiKeyCommandExecutor
 import gay.floof.hana.core.extensions.formatSize
 import gay.floof.hana.core.extensions.inject
 import gay.floof.hana.core.interfaces.SuspendAutoCloseable
+import gay.floof.hana.core.plugins.KtorDocsReverseProxyPlugin
 import gay.floof.hana.core.plugins.KtorLoggingPlugin
 import gay.floof.hana.core.plugins.KtorSentryPlugin
 import gay.floof.hana.core.threading.threadFactory
@@ -151,6 +152,7 @@ class Hana: SuspendAutoCloseable {
             module {
                 val json: Json by inject()
 
+                install(KtorDocsReverseProxyPlugin)
                 install(KtorLoggingPlugin)
                 install(KtorSentryPlugin)
 
