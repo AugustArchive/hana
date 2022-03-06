@@ -34,7 +34,7 @@ import gay.floof.hana.core.hanaModule
 import gay.floof.hana.core.managers.RedisManager
 import gay.floof.hana.data.Environment
 import gay.floof.hana.data.HanaConfig
-import gay.floof.hana.routing.routingModule
+import gay.floof.hana.routing.endpoints.routingModule
 import gay.floof.hana.utils.BannerPrinter
 import gay.floof.utils.slf4j.logging
 import kotlinx.coroutines.runBlocking

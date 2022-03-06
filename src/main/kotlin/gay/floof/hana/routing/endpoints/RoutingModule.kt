@@ -21,9 +21,9 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.routing
+package gay.floof.hana.routing.endpoints
 
-import gay.floof.hana.routing.endpoints.*
+import gay.floof.hana.routing.AbstractEndpoint
 import gay.floof.hana.routing.endpoints.api.v2.*
 import org.koin.dsl.bind
 import org.koin.dsl.module
