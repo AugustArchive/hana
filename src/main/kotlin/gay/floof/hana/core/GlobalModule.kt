@@ -27,6 +27,7 @@ import gay.floof.hana.core.interceptors.LoggingInterceptor
 import gay.floof.hana.core.interceptors.SentryInterceptor
 import gay.floof.hana.core.managers.JwtManager
 import gay.floof.hana.core.metrics.MetricsHandler
+import gay.floof.hana.core.s3.S3Service
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.features.*
@@ -77,5 +78,9 @@ val hanaModule = module {
 
     single {
         JwtManager(get())
+    }
+
+    single {
+        S3Service(get())
     }
 }

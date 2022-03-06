@@ -21,38 +21,19 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.data
+package gay.floof.hana.routing.endpoints.api.v2
 
-import kotlinx.serialization.SerialName
+import gay.floof.hana.data.responses.GenericV2Response
+import gay.floof.hana.routing.AbstractEndpoint
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.response.*
 
-@kotlinx.serialization.Serializable
-enum class Environment {
-    @SerialName("production")
-    Production,
-
-    @SerialName("development")
-    Development;
-
-    fun asName(): String = when (this) {
-        Development -> "development"
-        Production -> "production"
+class ApiV2Endpoint: AbstractEndpoint("/api/v2", HttpMethod.Get) {
+    override suspend fun call(call: ApplicationCall) {
+        call.respond(GenericV2Response(
+            "world",
+            "Notice: /api/v2 endpoints are deprecated and will not operate in August 17th, 2022 at 16:30 MST"
+        ))
     }
 }
-
-@kotlinx.serialization.Serializable
-data class HanaConfig(
-    val githubSecret: String,
-    val secretKeyBase: String,
-    val environment: Environment = Environment.Development,
-    val sentryDsn: String? = null,
-    val publicKey: String,
-    val database: PostgresConfig = PostgresConfig(),
-    val instatus: InstatusConfig? = null,
-    val server: KtorConfig = KtorConfig(),
-    val redis: RedisConfig = RedisConfig(),
-    val metrics: Boolean = true,
-    val token: String,
-    val port: Int = 9932,
-    val host: String = "0.0.0.0",
-    val s3: S3Config = S3Config()
-)

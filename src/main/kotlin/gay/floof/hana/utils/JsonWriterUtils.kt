@@ -21,4 +21,27 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.routing.endpoints
+package gay.floof.hana.utils
+
+import gay.floof.hana.core.extensions.inject
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.response.*
+import kotlinx.serialization.json.*
+
+fun List<String>.toJsonArray(): JsonArray = JsonArray(map { it.toJsonPrimitive() })
+fun Boolean.toJsonPrimitive(): JsonPrimitive = JsonPrimitive(this)
+fun String.toJsonPrimitive(): JsonPrimitive = JsonPrimitive(this)
+fun Int.toJsonPrimitive(): JsonPrimitive = JsonPrimitive(this)
+
+/**
+ * Writes JSON from this [ApplicationCall] without writing any other data structures.
+ * @param data The data to write out.
+ */
+suspend fun ApplicationCall.writeJson(
+    status: HttpStatusCode = HttpStatusCode.OK,
+    data: Map<String, JsonElement>
+) = respondText(contentType = ContentType.Application.Json, status) {
+    val json: Json by inject()
+    json.encodeToString(JsonObject.serializer(), JsonObject(data))
+}

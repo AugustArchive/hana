@@ -22,3 +22,27 @@
  */
 
 package gay.floof.hana.routing.endpoints
+
+import gay.floof.hana.data.responses.GenericV1Response
+import gay.floof.hana.routing.AbstractEndpoint
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.response.*
+
+class ApiV1Endpoint: AbstractEndpoint("/api/v1/", HttpMethod.Get) {
+    override suspend fun call(call: ApplicationCall) {
+        call.respond(HttpStatusCode.BadRequest, GenericV1Response(
+            message = "This endpoint and the rest of /api/v1 endpoints are closed and never will come back. :)",
+            statusCode = 400
+        ))
+    }
+}
+
+class ParamApiV1Endpoint: AbstractEndpoint("/api/v1/{params...}", HttpMethod.Get) {
+    override suspend fun call(call: ApplicationCall) {
+        call.respond(HttpStatusCode.BadRequest, GenericV1Response(
+            message = "This endpoint and the rest of /api/v1 endpoints are closed and never will come back. :)",
+            statusCode = 400
+        ))
+    }
+}

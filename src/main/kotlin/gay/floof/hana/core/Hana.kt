@@ -37,6 +37,7 @@ import gay.floof.hana.core.extensions.formatSize
 import gay.floof.hana.core.extensions.inject
 import gay.floof.hana.core.interfaces.SuspendAutoCloseable
 import gay.floof.hana.core.metrics.MetricsHandler
+import gay.floof.hana.core.plugins.KtorBlockNsfwEndpoints
 import gay.floof.hana.core.plugins.KtorDocsReverseProxyPlugin
 import gay.floof.hana.core.plugins.KtorLoggingPlugin
 import gay.floof.hana.core.plugins.KtorRatelimitingPlugin
@@ -162,6 +163,7 @@ class Hana: SuspendAutoCloseable {
                 val json: Json by inject()
 
                 install(KtorDocsReverseProxyPlugin)
+                install(KtorBlockNsfwEndpoints)
                 install(KtorRatelimitingPlugin)
                 install(KtorLoggingPlugin)
 

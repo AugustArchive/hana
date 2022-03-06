@@ -21,38 +21,38 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.data
+package gay.floof.hana.utils
 
-import kotlinx.serialization.SerialName
+import java.io.File
+import java.io.IOException
+import javax.imageio.ImageIO
+import javax.imageio.stream.FileImageInputStream
 
-@kotlinx.serialization.Serializable
-enum class Environment {
-    @SerialName("production")
-    Production,
-
-    @SerialName("development")
-    Development;
-
-    fun asName(): String = when (this) {
-        Development -> "development"
-        Production -> "production"
-    }
-}
-
-@kotlinx.serialization.Serializable
-data class HanaConfig(
-    val githubSecret: String,
-    val secretKeyBase: String,
-    val environment: Environment = Environment.Development,
-    val sentryDsn: String? = null,
-    val publicKey: String,
-    val database: PostgresConfig = PostgresConfig(),
-    val instatus: InstatusConfig? = null,
-    val server: KtorConfig = KtorConfig(),
-    val redis: RedisConfig = RedisConfig(),
-    val metrics: Boolean = true,
-    val token: String,
-    val port: Int = 9932,
-    val host: String = "0.0.0.0",
-    val s3: S3Config = S3Config()
+data class Dimensions(
+    val width: Int = 0,
+    val height: Int = 0
 )
+
+fun dimensions(file: File): Dimensions {
+    val pos = file.name.lastIndexOf('.')
+    if (pos == -1) return Dimensions()
+
+    val suffix = file.name.substring(pos + 1)
+    val iter = ImageIO.getImageReadersBySuffix(suffix)
+
+    while (iter.hasNext()) {
+        val reader = iter.next()
+        try {
+            val stream = FileImageInputStream(file)
+            reader.input = stream
+
+            val width = reader.getWidth(reader.minIndex)
+            val height = reader.getHeight(reader.minIndex)
+            return Dimensions(width, height)
+        } finally {
+            reader.dispose()
+        }
+    }
+
+    throw IOException("Not a known image file: ${file.absolutePath}")
+}

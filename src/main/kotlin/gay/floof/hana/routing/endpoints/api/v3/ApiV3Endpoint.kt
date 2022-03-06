@@ -21,4 +21,4 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.routing.endpoints
+package gay.floof.hana.routing.endpoints.api.v3

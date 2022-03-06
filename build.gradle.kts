@@ -145,7 +145,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core")
     implementation("org.jetbrains.exposed:exposed-jdbc")
     implementation("org.jetbrains.exposed:exposed-dao")
-    implementation("org.postgresql:postgresql:42.3.2")
+    implementation("org.postgresql:postgresql:42.3.3")
     implementation("com.zaxxer:HikariCP:5.0.1")
 
     // YAML (configuration)
@@ -160,6 +160,9 @@ dependencies {
 
     // JWT
     implementation("com.auth0:java-jwt:3.18.3")
+
+    // S3
+    implementation("aws.sdk.kotlin:s3:0.9.4-beta")
 }
 
 spotless {

@@ -21,38 +21,4 @@
  * SOFTWARE.
  */
 
-package gay.floof.hana.data
-
-import kotlinx.serialization.SerialName
-
-@kotlinx.serialization.Serializable
-enum class Environment {
-    @SerialName("production")
-    Production,
-
-    @SerialName("development")
-    Development;
-
-    fun asName(): String = when (this) {
-        Development -> "development"
-        Production -> "production"
-    }
-}
-
-@kotlinx.serialization.Serializable
-data class HanaConfig(
-    val githubSecret: String,
-    val secretKeyBase: String,
-    val environment: Environment = Environment.Development,
-    val sentryDsn: String? = null,
-    val publicKey: String,
-    val database: PostgresConfig = PostgresConfig(),
-    val instatus: InstatusConfig? = null,
-    val server: KtorConfig = KtorConfig(),
-    val redis: RedisConfig = RedisConfig(),
-    val metrics: Boolean = true,
-    val token: String,
-    val port: Int = 9932,
-    val host: String = "0.0.0.0",
-    val s3: S3Config = S3Config()
-)
+package gay.floof.hana.routing.endpoints.api.v3
