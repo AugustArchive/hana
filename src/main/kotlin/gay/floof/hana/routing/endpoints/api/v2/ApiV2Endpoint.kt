@@ -31,9 +31,11 @@ import io.ktor.response.*
 
 class ApiV2Endpoint: AbstractEndpoint("/api/v2", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
-        call.respond(GenericV2Response(
-            "world",
-            "Notice: /api/v2 endpoints are deprecated and will not operate in August 17th, 2022 at 16:30 MST"
-        ))
+        call.respond(
+            GenericV2Response(
+                "world",
+                "Notice: /api/v2 endpoints are deprecated and will not operate in August 17th, 2022 at 16:30 MST"
+            )
+        )
     }
 }

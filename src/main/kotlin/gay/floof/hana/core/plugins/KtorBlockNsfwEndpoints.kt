@@ -1,3 +1,26 @@
+/*
+ * 🥀 hana: API to proxy different APIs like GitHub Sponsors, source code for api.floofy.dev
+ * Copyright (c) 2020-2022 Noel <cutie@floofy.dev>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package gay.floof.hana.core.plugins
 
 import gay.floof.hana.core.database.asyncTransaction
@@ -5,9 +28,6 @@ import gay.floof.hana.core.database.tables.ApiKeyEntity
 import gay.floof.hana.core.database.tables.ApiKeysTable
 import gay.floof.hana.core.extensions.inject
 import gay.floof.hana.core.managers.JwtManager
-import gay.floof.hana.utils.toJsonArray
-import gay.floof.hana.utils.toJsonPrimitive
-import gay.floof.hana.utils.writeJson
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
@@ -52,20 +72,28 @@ class KtorBlockNsfwEndpoints {
                 val authorization = call.request.header("Authorization")
                 if (authorization == null) {
                     call.respondText(contentType = ContentType.parse("application/json"), HttpStatusCode.Forbidden) {
-                        json.encodeToString(JsonObject.serializer(), buildJsonObject {
-                            if (version == 3) {
-                                put("success", false)
-                                put("errors", buildJsonArray {
-                                    add(buildJsonObject {
-                                        put("code", "BLOCKED_ENDPOINT")
-                                        put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                        put("where", "Authorization header is not present")
-                                    })
-                                })
-                            } else {
-                                put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                        json.encodeToString(
+                            JsonObject.serializer(),
+                            buildJsonObject {
+                                if (version == 3) {
+                                    put("success", false)
+                                    put(
+                                        "errors",
+                                        buildJsonArray {
+                                            add(
+                                                buildJsonObject {
+                                                    put("code", "BLOCKED_ENDPOINT")
+                                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                                                    put("where", "Authorization header is not present")
+                                                }
+                                            )
+                                        }
+                                    )
+                                } else {
+                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                                }
                             }
-                        })
+                        )
                     }
 
                     finish()
@@ -78,20 +106,28 @@ class KtorBlockNsfwEndpoints {
 
                 if (params[0] != "Bearer") {
                     call.respondText(contentType = ContentType.parse("application/json"), HttpStatusCode.Forbidden) {
-                        json.encodeToString(JsonObject.serializer(), buildJsonObject {
-                            if (version == 3) {
-                                put("success", false)
-                                put("errors", buildJsonArray {
-                                    add(buildJsonObject {
-                                        put("code", "BLOCKED_ENDPOINT")
-                                        put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                        put("where", "Authorization header prefix was not 'Bearer'")
-                                    })
-                                })
-                            } else {
-                                put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                        json.encodeToString(
+                            JsonObject.serializer(),
+                            buildJsonObject {
+                                if (version == 3) {
+                                    put("success", false)
+                                    put(
+                                        "errors",
+                                        buildJsonArray {
+                                            add(
+                                                buildJsonObject {
+                                                    put("code", "BLOCKED_ENDPOINT")
+                                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                                                    put("where", "Authorization header prefix was not 'Bearer'")
+                                                }
+                                            )
+                                        }
+                                    )
+                                } else {
+                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                                }
                             }
-                        })
+                        )
                     }
 
                     finish()
@@ -100,20 +136,28 @@ class KtorBlockNsfwEndpoints {
 
                 if (!jwt.isValid(params[1])) {
                     call.respondText(contentType = ContentType.parse("application/json"), HttpStatusCode.Forbidden) {
-                        json.encodeToString(JsonObject.serializer(), buildJsonObject {
-                            if (version == 3) {
-                                put("success", false)
-                                put("errors", buildJsonArray {
-                                    add(buildJsonObject {
-                                        put("code", "BLOCKED_ENDPOINT")
-                                        put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                        put("where", "JWT header was not valid")
-                                    })
-                                })
-                            } else {
-                                put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                        json.encodeToString(
+                            JsonObject.serializer(),
+                            buildJsonObject {
+                                if (version == 3) {
+                                    put("success", false)
+                                    put(
+                                        "errors",
+                                        buildJsonArray {
+                                            add(
+                                                buildJsonObject {
+                                                    put("code", "BLOCKED_ENDPOINT")
+                                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                                                    put("where", "JWT header was not valid")
+                                                }
+                                            )
+                                        }
+                                    )
+                                } else {
+                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                                }
                             }
-                        })
+                        )
                     }
 
                     finish()
@@ -129,20 +173,28 @@ class KtorBlockNsfwEndpoints {
 
                 if (apiKey == null) {
                     call.respondText(contentType = ContentType.parse("application/json"), HttpStatusCode.Forbidden) {
-                        json.encodeToString(JsonObject.serializer(), buildJsonObject {
-                            if (version == 3) {
-                                put("success", false)
-                                put("errors", buildJsonArray {
-                                    add(buildJsonObject {
-                                        put("code", "BLOCKED_ENDPOINT")
-                                        put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                        put("where", "API key was not found!")
-                                    })
-                                })
-                            } else {
-                                put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                        json.encodeToString(
+                            JsonObject.serializer(),
+                            buildJsonObject {
+                                if (version == 3) {
+                                    put("success", false)
+                                    put(
+                                        "errors",
+                                        buildJsonArray {
+                                            add(
+                                                buildJsonObject {
+                                                    put("code", "BLOCKED_ENDPOINT")
+                                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                                                    put("where", "API key was not found!")
+                                                }
+                                            )
+                                        }
+                                    )
+                                } else {
+                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                                }
                             }
-                        })
+                        )
                     }
 
                     finish()
@@ -153,20 +205,28 @@ class KtorBlockNsfwEndpoints {
                 val perms = apiKey.permissions?.split("|")
                 if (perms?.contains("nsfw") == false) {
                     call.respondText(contentType = ContentType.parse("application/json"), HttpStatusCode.Forbidden) {
-                        json.encodeToString(JsonObject.serializer(), buildJsonObject {
-                            if (version == 3) {
-                                put("success", false)
-                                put("errors", buildJsonArray {
-                                    add(buildJsonObject {
-                                        put("code", "BLOCKED_ENDPOINT")
-                                        put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                        put("where", "API key does not have permissions to use NSFW endpoints. :<")
-                                    })
-                                })
-                            } else {
-                                put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                        json.encodeToString(
+                            JsonObject.serializer(),
+                            buildJsonObject {
+                                if (version == 3) {
+                                    put("success", false)
+                                    put(
+                                        "errors",
+                                        buildJsonArray {
+                                            add(
+                                                buildJsonObject {
+                                                    put("code", "BLOCKED_ENDPOINT")
+                                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                                                    put("where", "API key does not have permissions to use NSFW endpoints. :<")
+                                                }
+                                            )
+                                        }
+                                    )
+                                } else {
+                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                                }
                             }
-                        })
+                        )
                     }
 
                     finish()

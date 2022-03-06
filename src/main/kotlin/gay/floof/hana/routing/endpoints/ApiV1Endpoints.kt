@@ -31,18 +31,24 @@ import io.ktor.response.*
 
 class ApiV1Endpoint: AbstractEndpoint("/api/v1/", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
-        call.respond(HttpStatusCode.BadRequest, GenericV1Response(
-            message = "This endpoint and the rest of /api/v1 endpoints are closed and never will come back. :)",
-            statusCode = 400
-        ))
+        call.respond(
+            HttpStatusCode.BadRequest,
+            GenericV1Response(
+                message = "This endpoint and the rest of /api/v1 endpoints are closed and never will come back. :)",
+                statusCode = 400
+            )
+        )
     }
 }
 
 class ParamApiV1Endpoint: AbstractEndpoint("/api/v1/{params...}", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
-        call.respond(HttpStatusCode.BadRequest, GenericV1Response(
-            message = "This endpoint and the rest of /api/v1 endpoints are closed and never will come back. :)",
-            statusCode = 400
-        ))
+        call.respond(
+            HttpStatusCode.BadRequest,
+            GenericV1Response(
+                message = "This endpoint and the rest of /api/v1 endpoints are closed and never will come back. :)",
+                statusCode = 400
+            )
+        )
     }
 }

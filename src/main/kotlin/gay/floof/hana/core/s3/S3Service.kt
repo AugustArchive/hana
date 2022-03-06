@@ -28,7 +28,6 @@ import aws.sdk.kotlin.runtime.auth.credentials.DefaultChainCredentialsProvider
 import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
 import aws.sdk.kotlin.runtime.endpoint.AwsEndpoint
 import aws.sdk.kotlin.runtime.endpoint.AwsEndpointResolver
-import aws.sdk.kotlin.runtime.endpoint.CredentialScope
 import aws.sdk.kotlin.services.s3.S3Client
 import aws.sdk.kotlin.services.s3.model.ListObjectsRequest
 import gay.floof.hana.data.HanaConfig
