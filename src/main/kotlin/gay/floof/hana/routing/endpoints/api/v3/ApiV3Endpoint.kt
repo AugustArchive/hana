@@ -22,3 +22,44 @@
  */
 
 package gay.floof.hana.routing.endpoints.api.v3
+
+import gay.floof.hana.routing.AbstractEndpoint
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.response.*
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+
+class ApiV3Endpoint: AbstractEndpoint("/api/v3", HttpMethod.Get) {
+    override suspend fun call(call: ApplicationCall) {
+        call.respond(
+            buildJsonObject {
+                put("success", true)
+                put(
+                    "data",
+                    buildJsonObject {
+                        put("message", "Hello, world!")
+                        put("docsUri", "https://api.floofy.dev/docs/")
+                    }
+                )
+            }
+        )
+    }
+}
+
+class DefaultApiV3Endpoint: AbstractEndpoint("/api", HttpMethod.Get) {
+    override suspend fun call(call: ApplicationCall) {
+        call.respond(
+            buildJsonObject {
+                put("success", true)
+                put(
+                    "data",
+                    buildJsonObject {
+                        put("message", "Hello, world!")
+                        put("docsUri", "https://api.floofy.dev/docs/")
+                    }
+                )
+            }
+        )
+    }
+}

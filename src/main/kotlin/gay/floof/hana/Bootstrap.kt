@@ -43,6 +43,7 @@ import org.jetbrains.exposed.sql.DatabaseConfig
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Slf4jSqlDebugLogger
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import java.io.File
@@ -137,16 +138,17 @@ object Bootstrap: AutoCloseable {
     override fun close() {
         log.info("Shutting down hana...")
 
-        runBlocking {
-            val hana: Hana by inject()
-
-            hana.close()
-        }
+        if (GlobalContext.getOrNull() == null) return
 
         val redis: RedisManager by inject()
         val ds: HikariDataSource by inject()
 
         redis.close()
         ds.close()
+
+        runBlocking {
+            val hana: Hana by inject()
+            hana.close()
+        }
     }
 }

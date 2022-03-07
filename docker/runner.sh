@@ -25,7 +25,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-. /app/noel/hana/liblog.sh
+. /app/noel/hana/scripts/liblog.sh
 
 info "*** starting hana! ***"
 exec "/app/noel/hana/bin/hana"

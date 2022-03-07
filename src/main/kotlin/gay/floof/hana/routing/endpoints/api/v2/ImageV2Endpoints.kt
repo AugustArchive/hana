@@ -161,10 +161,7 @@ class KadiImageV2Endpoint(private val s3: S3Service, private val httpClient: Htt
         val url = s3.getObjects("kadi").random()
         val res = httpClient.get<HttpResponse>(url)
 
-        val content = withContext(Dispatchers.IO) {
-            res.receive<ByteArray>()
-        }
-
+        val content = res.receive<ByteArray>()
         val header = when (url.split('.').last()) {
             "png" -> ContentType.Image.PNG
             "jpg" -> ContentType.Image.JPEG

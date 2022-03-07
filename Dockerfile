@@ -20,7 +20,7 @@
 # SOFTWARE.
 
 # Build stage!
-FROM eclipse-temurin:17.0.2-alpine AS builder
+FROM eclipse-temurin:17.0.2_8-jdk-alpine AS builder
 
 # Install common libraries we will need
 RUN apk update && apk add --no-cache git
@@ -32,13 +32,13 @@ WORKDIR /build
 COPY . .
 
 # Build a copy of hana (we only need the class libraries)
-RUN ./gradlew installDist --stacktrace
+RUN ./gradlew installDist --stacktrace --no-daemon
 
 # Now we're at the container stage.
-FROM eclipse-temurin:17.0.2-alpine
+FROM eclipse-temurin:17.0.2_8-jdk-alpine
 
 # Install common libraries we need
-RUN apk update && apk add --no-cache bash
+RUN apk update && apk add --no-cache bash musl-dev libc-dev gcompat
 
 # Change the working directory to `/app/noel/hana` to add
 # our Docker scripts!
@@ -47,18 +47,20 @@ WORKDIR /app/noel/hana
 # Copy the `docker/` folder to the directory we just changed to
 COPY docker /app/noel/hana/scripts
 
+# Copy the `assets/` folder to the image
+COPY assets /app/noel/hana/assets
+
 # Bring in the classpath!
 COPY --from=builder /build/build/install/hana .
 
 # Remove the `hana.bat` file since we are NOT on windows.
 RUN rm /app/noel/hana/bin/hana.bat
 
+# Give our scripts executable permissions
+RUN chmod +x /app/noel/hana/scripts/docker-entrypoint.sh && chmod +x /app/noel/hana/scripts/runner.sh
+
 # Now, we need to not be root for security reasons.
 USER 1001
-
-# Give our scripts executable permissions
-RUN chmod +x /app/noel/hana/scripts/docker-entrypoint.sh \
-    chmod +x /app/noel/hana/scripts/runner.sh
 
 # Add in the entrypoint (which will be /docker-entrypoint.sh)
 ENTRYPOINT ["/app/noel/hana/scripts/docker-entrypoint.sh"]

@@ -25,11 +25,24 @@ package gay.floof.hana.routing.endpoints
 
 import gay.floof.hana.routing.AbstractEndpoint
 import gay.floof.hana.routing.endpoints.api.v2.*
+import gay.floof.hana.routing.endpoints.api.v3.*
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val routingModule = module {
     // api/v3 (default)
+    single { KadiV3ImageEndpoint() } bind AbstractEndpoint::class
+    single { DefaultApiV3Endpoint() } bind AbstractEndpoint::class
+    single { WahsV3ImageEndpoint() } bind AbstractEndpoint::class
+    single { YiffV3ImageEndpoint() } bind AbstractEndpoint::class
+    single { KadiImageEndpoint() } bind AbstractEndpoint::class
+    single { YiffImageEndpoint() } bind AbstractEndpoint::class
+    single { WahsImageEndpoint() } bind AbstractEndpoint::class
+    single { YiffV3Endpoint() } bind AbstractEndpoint::class
+    single { ApiV3Endpoint() } bind AbstractEndpoint::class
+    single { YiffEndpoint() } bind AbstractEndpoint::class
+    single { WahsEndpoint() } bind AbstractEndpoint::class
+    single { KadiEndpoint() } bind AbstractEndpoint::class
 
     // api/v2
     single { FetchSponsorV2Endpoint(get(), get()) } bind AbstractEndpoint::class
