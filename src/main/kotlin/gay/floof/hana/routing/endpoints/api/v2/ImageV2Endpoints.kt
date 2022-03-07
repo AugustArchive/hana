@@ -36,16 +36,50 @@ import io.ktor.http.*
 import io.ktor.response.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayInputStream
+import javax.imageio.ImageIO
 
-class YiffV2Endpoint(private val s3: S3Service): AbstractEndpoint("/api/v2/yiff", HttpMethod.Get) {
+class YiffV2Endpoint(private val s3: S3Service, private val httpClient: HttpClient): AbstractEndpoint("/api/v2/yiff", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         val url = s3.getObjects("yiff").random()
+
+        // Get the image as a InputStream
+        // TODO: possibly cache this?
+        val res: HttpResponse = httpClient.get(url)
+        val stream = withContext(Dispatchers.IO) {
+            ByteArrayInputStream(res.receive())
+        }
+
+        val streamImage = withContext(Dispatchers.IO) {
+            ImageIO.createImageInputStream(stream)
+        }
+
+        val height: Int
+        val width: Int
+
+        if (streamImage == null) {
+            height = 0
+            width = 0
+        } else {
+            val formatReader = ImageIO.getImageWritersByFormatName(url.split('.').last()).next()
+            val reader = ImageIO.getImageReader(formatReader)
+            reader.setInput(streamImage, true)
+
+            height = withContext(Dispatchers.IO) {
+                reader.getHeight(0)
+            }
+
+            width = withContext(Dispatchers.IO) {
+                reader.getWidth(0)
+            }
+        }
+
         call.writeJson(
             data = mapOf(
                 "artist" to "unknown".toJsonPrimitive(),
                 "source" to "unknown".toJsonPrimitive(),
-                "height" to 0.toJsonPrimitive(),
-                "width" to 0.toJsonPrimitive(),
+                "height" to height.toJsonPrimitive(),
+                "width" to width.toJsonPrimitive(),
                 "url" to url.toJsonPrimitive()
             )
         )
@@ -68,11 +102,75 @@ class YiffImageV2Endpoint(private val s3: S3Service, private val httpClient: Htt
             else -> ContentType.Image.Any
         }
 
-        call.response.header("X-Hana-Image-Url", url)
-        call.response.header("X-Hana-Image-Width", 0)
-        call.response.header("X-Hana-Image-Height", 0)
-        call.response.header("X-Hana-Image-Artist", "unknown")
-        call.response.header("X-Hana-Image-Source", "unknown")
+        call.respondBytes(
+            content,
+            status = HttpStatusCode.OK,
+            contentType = header
+        )
+    }
+}
+
+class KadiV2Endpoint(private val s3: S3Service, private val httpClient: HttpClient): AbstractEndpoint("/api/v2/kadi", HttpMethod.Get) {
+    override suspend fun call(call: ApplicationCall) {
+        val url = s3.getObjects("kadi").random()
+
+        // Get the image as a InputStream
+        // TODO: possibly cache this?
+        val res: HttpResponse = httpClient.get(url)
+        val stream = withContext(Dispatchers.IO) {
+            ByteArrayInputStream(res.receive())
+        }
+
+        val streamImage = withContext(Dispatchers.IO) {
+            ImageIO.createImageInputStream(stream)
+        }
+
+        val height: Int
+        val width: Int
+
+        if (streamImage == null) {
+            height = 0
+            width = 0
+        } else {
+            val formatReader = ImageIO.getImageWritersByFormatName(url.split('.').last()).next()
+            val reader = ImageIO.getImageReader(formatReader)
+            reader.setInput(streamImage, true)
+
+            height = withContext(Dispatchers.IO) {
+                reader.getHeight(0)
+            }
+
+            width = withContext(Dispatchers.IO) {
+                reader.getWidth(0)
+            }
+        }
+
+        call.writeJson(
+            data = mapOf(
+                "source" to "Noel - https://floofy.dev".toJsonPrimitive(),
+                "height" to height.toJsonPrimitive(),
+                "width" to width.toJsonPrimitive(),
+                "url" to url.toJsonPrimitive()
+            )
+        )
+    }
+}
+
+class KadiImageV2Endpoint(private val s3: S3Service, private val httpClient: HttpClient): AbstractEndpoint("/api/v2/kadi/random", HttpMethod.Get) {
+    override suspend fun call(call: ApplicationCall) {
+        val url = s3.getObjects("kadi").random()
+        val res = httpClient.get<HttpResponse>(url)
+
+        val content = withContext(Dispatchers.IO) {
+            res.receive<ByteArray>()
+        }
+
+        val header = when (url.split('.').last()) {
+            "png" -> ContentType.Image.PNG
+            "jpg" -> ContentType.Image.JPEG
+            "gif" -> ContentType.Image.GIF
+            else -> ContentType.Image.Any
+        }
 
         call.respondBytes(
             content,

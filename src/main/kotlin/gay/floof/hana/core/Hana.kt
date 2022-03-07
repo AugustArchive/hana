@@ -48,13 +48,18 @@ import gay.floof.hana.routing.AbstractEndpoint
 import gay.floof.utils.slf4j.logging
 import io.ktor.application.*
 import io.ktor.features.*
+import io.ktor.http.*
 import io.ktor.request.*
+import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.sentry.Sentry
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import net.perfectdreams.discordinteraktions.common.commands.CommandManager
 import net.perfectdreams.discordinteraktions.platforms.kord.commands.KordCommandRegistry
 import net.perfectdreams.discordinteraktions.webserver.DefaultInteractionRequestHandler
@@ -166,6 +171,7 @@ class Hana: SuspendAutoCloseable {
                 install(KtorBlockNsfwEndpoints)
                 install(KtorRatelimitingPlugin)
                 install(KtorLoggingPlugin)
+                install(AutoHeadResponse)
 
                 install(ContentNegotiation) {
                     json(json)
@@ -191,6 +197,60 @@ class Hana: SuspendAutoCloseable {
                     }
                 }
 
+                install(StatusPages) {
+                    status(HttpStatusCode.NotFound) {
+                        call.respond(
+                            HttpStatusCode.NotFound,
+                            buildJsonObject {
+                                put("success", false)
+                                put(
+                                    "errors",
+                                    buildJsonArray {
+                                        add(
+                                            buildJsonObject {
+                                                put("code", "UNKNOWN_ROUTE")
+                                                put("message", "Route ${call.request.httpMethod.value} ${call.request.uri} was not found.")
+                                            }
+                                        )
+                                    }
+                                )
+                            }
+                        )
+                    }
+
+                    exception<Exception> { cause ->
+                        if (Sentry.isEnabled()) {
+                            Sentry.captureException(cause)
+                        }
+
+                        log.error("Unable to handle request ${call.request.httpMethod.value} ${call.request.path()}:", cause)
+                        call.respond(
+                            HttpStatusCode.InternalServerError,
+                            buildJsonObject {
+                                put("success", false)
+                                put(
+                                    "errors",
+                                    buildJsonArray {
+                                        add(
+                                            buildJsonObject {
+                                                put("code", "INTERNAL_SERVER_ERROR")
+                                                put(
+                                                    "message",
+                                                    if (config.environment == Environment.Development) {
+                                                        "Unknown error has occurred: ${cause.message}"
+                                                    } else {
+                                                        "Unknown error has occurred, please report it to Noel -- https://discord.gg/ATmjFH9kMH under #hana-support"
+                                                    }
+                                                )
+                                            }
+                                        )
+                                    }
+                                )
+                            }
+                        )
+                    }
+                }
+
                 var visited = 0
                 routing {
                     val endpoints = koin.getAll<AbstractEndpoint>()
@@ -211,15 +271,7 @@ class Hana: SuspendAutoCloseable {
                                 val metrics: MetricsHandler by inject()
                                 metrics.requestsCount?.labels(endpoint.path, endpoint.method.value)?.inc()
 
-                                try {
-                                    endpoint.call(call)
-                                } catch (e: Exception) {
-                                    if (Sentry.isEnabled()) {
-                                        Sentry.captureException(e)
-                                    }
-
-                                    log.error("Unable to handle request ${call.request.httpMethod.value} ${call.request.path()}:", e)
-                                }
+                                endpoint.call(call)
                             }
                         }
                     }

@@ -163,6 +163,9 @@ dependencies {
 
     // S3
     implementation("aws.sdk.kotlin:s3:0.9.4-beta")
+
+    // Virtual Filesystem in-memory
+    implementation("com.google.jimfs:jimfs:1.2")
 }
 
 spotless {

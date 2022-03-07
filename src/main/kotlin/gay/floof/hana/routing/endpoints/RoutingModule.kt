@@ -32,8 +32,12 @@ val routingModule = module {
     // api/v3 (default)
 
     // api/v2
+    single { FetchSponsorV2Endpoint(get(), get()) } bind AbstractEndpoint::class
+    single { KadiImageV2Endpoint(get(), get()) } bind AbstractEndpoint::class
     single { YiffImageV2Endpoint(get(), get()) } bind AbstractEndpoint::class
-    single { YiffV2Endpoint(get()) } bind AbstractEndpoint::class
+    single { KadiV2Endpoint(get(), get()) } bind AbstractEndpoint::class
+    single { YiffV2Endpoint(get(), get()) } bind AbstractEndpoint::class
+    single { SponsorV2Endpoint() } bind AbstractEndpoint::class
     single { ApiV2Endpoint() } bind AbstractEndpoint::class
 
     // api/v1

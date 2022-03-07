@@ -37,7 +37,7 @@ import kotlinx.serialization.json.*
 
 class KtorBlockNsfwEndpoints {
     companion object: ApplicationFeature<ApplicationCallPipeline, Unit, KtorBlockNsfwEndpoints> {
-        private val ROUTE_REGEX = "\\/api\\/?(\\/v\\d)?\\/(manipulation|yiff)?(\\/(\\w+)*)?".toRegex()
+        private val ROUTE_REGEX = "\\/api\\/?(\\/v\\d)?\\/yiff?(\\/(\\w+)*)?".toRegex()
 
         override val key: AttributeKey<KtorBlockNsfwEndpoints> = AttributeKey("KtorBlockNsfwEndpoints")
         override fun install(pipeline: ApplicationCallPipeline, configure: Unit.() -> Unit): KtorBlockNsfwEndpoints {
