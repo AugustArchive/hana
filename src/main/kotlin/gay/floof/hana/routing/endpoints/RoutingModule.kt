@@ -31,10 +31,14 @@ import org.koin.dsl.module
 
 val routingModule = module {
     // api/v3 (default)
-    single { KadiV3ImageEndpoint() } bind AbstractEndpoint::class
+    single { DefaultFetchSponsorsEndpoint(get(), get()) } bind AbstractEndpoint::class
+    single { FetchSponsorsV3Endpoint(get(), get()) } bind AbstractEndpoint::class
+    single { DefaultSponsorsEndpoint() } bind AbstractEndpoint::class
     single { DefaultApiV3Endpoint() } bind AbstractEndpoint::class
+    single { KadiV3ImageEndpoint() } bind AbstractEndpoint::class
     single { WahsV3ImageEndpoint() } bind AbstractEndpoint::class
     single { YiffV3ImageEndpoint() } bind AbstractEndpoint::class
+    single { SponsorsV3Endpoint() } bind AbstractEndpoint::class
     single { KadiImageEndpoint() } bind AbstractEndpoint::class
     single { YiffImageEndpoint() } bind AbstractEndpoint::class
     single { WahsImageEndpoint() } bind AbstractEndpoint::class
