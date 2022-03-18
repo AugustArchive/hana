@@ -195,8 +195,6 @@ class FetchSponsorV2Endpoint(private val config: HanaConfig, private val httpCli
         val sponsoring = data["data"]!!.jsonObject["user"]!!.jsonObject["sponsorshipsAsSponsor"]!!.jsonObject
         val sponsors = data["data"]!!.jsonObject["user"]!!.jsonObject["sponsorshipsAsMaintainer"]!!.jsonObject
 
-        println(sponsoring)
-
         call.respond(
             HttpStatusCode.OK,
             buildJsonObject {
@@ -296,9 +294,9 @@ class FetchSponsorV2Endpoint(private val config: HanaConfig, private val httpCli
                                                     put(
                                                         "price",
                                                         if (pricing == "Dollars") {
-                                                            tier["monthlyPriceInDollars"]!!
+                                                            tier["monthlyPriceInDollars"] ?: JsonNull
                                                         } else {
-                                                            tier["monthlyPriceInCents"]!!
+                                                            tier["monthlyPriceInCents"] ?: JsonNull
                                                         }
                                                     )
                                                 }
@@ -306,8 +304,8 @@ class FetchSponsorV2Endpoint(private val config: HanaConfig, private val httpCli
 
                                             val sponsorEntity = obj["sponsorEntity"]!!.jsonObject
 
-                                            put("followers", sponsorEntity["following"]!!)
-                                            put("followers", sponsorEntity["followers"]!!)
+                                            put("followers", sponsorEntity["following"]!!.jsonObject["totalCount"]!!.jsonPrimitive.int)
+                                            put("followers", sponsorEntity["followers"]!!.jsonObject["totalCount"]!!.jsonPrimitive.int)
 
                                             val status = try {
                                                 sponsorEntity["status"]?.jsonObject
@@ -319,8 +317,8 @@ class FetchSponsorV2Endpoint(private val config: HanaConfig, private val httpCli
                                                 put(
                                                     "status",
                                                     buildJsonObject {
-                                                        put("emoji", status["emojiHTML"]!!)
-                                                        put("message", status["message"]!!)
+                                                        put("emoji", status["emojiHTML"]?.jsonPrimitive?.contentOrNull)
+                                                        put("message", status["message"]?.jsonPrimitive?.contentOrNull)
                                                         put("expires_at", status["expiresAt"]?.jsonPrimitive?.content)
                                                     }
                                                 )
