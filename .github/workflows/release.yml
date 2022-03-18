@@ -75,4 +75,4 @@ jobs:
           url: 'https://discord.com/api/v10/channels/949128364722102292/messages'
           method: 'POST'
           customHeaders: '{"Authorization":"Bot ${{ secrets.DISCORD_BOT_TOKEN }}"}'
-          data: '{"content":":pencil2: **New Release: v${{ steps.tag.outputs.tag }}** <@&843347187953827841> **~** https://github.com/auguwu/hana/releases/v${{ steps.tag.outputs.tag }}"}'
+          data: '{"content":":pencil2: **New Release: v${{ steps.tag.outputs.tag }}** **~** <https://github.com/auguwu/hana/releases/v${{ steps.tag.outputs.tag }}>"}'
