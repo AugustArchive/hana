@@ -47,7 +47,7 @@ jobs:
         run: kubectl rollout status deployment/hana
 
       - name: Create a Discord announcement
-        uses: fjogletit/http-request-action@master
+        uses: fjogeleit/http-request-action@master
         with:
           url: 'https://discord.com/api/v10/channels/949128364722102292/messages'
           method: 'POST'
