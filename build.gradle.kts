@@ -117,7 +117,7 @@ dependencies {
 
     // Logging with logback
     implementation("net.logstash.logback:logstash-logback-encoder:7.0.1")
-    implementation("ch.qos.logback:logback-classic:1.2.10")
+    implementation("ch.qos.logback:logback-classic:1.2.11")
     implementation("ch.qos.logback:logback-core:1.2.10")
     api("org.slf4j:slf4j-api:1.7.36")
 
