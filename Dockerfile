@@ -35,10 +35,11 @@ COPY . .
 RUN ./gradlew installDist --stacktrace --no-daemon
 
 # Now we're at the container stage.
-FROM azul_zulu-openjdk:17
+FROM eclipse-temurin:17.0.2_8-jdk
 
 # Install common libraries we need
-RUN apk update && apk add --no-cache bash musl-dev libc-dev gcompat
+RUN apt update && apt install bash
+# RUN apk update && apk add --no-cache bash musl-dev libc-dev gcompat
 
 # Change the working directory to `/app/noel/hana` to add
 # our Docker scripts!
