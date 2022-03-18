@@ -25,7 +25,6 @@ package gay.floof.hana.routing.endpoints.api.v3
 
 import gay.floof.hana.data.HanaConfig
 import gay.floof.hana.data.types.GitHubGraphQLResult
-import gay.floof.hana.data.types.GitHubUserSponsorResult
 import gay.floof.hana.routing.AbstractEndpoint
 import io.ktor.application.*
 import io.ktor.client.*
@@ -305,10 +304,12 @@ class DefaultFetchSponsorsEndpoint(private val config: HanaConfig, private val h
         // assumed it errored, so let's not do anything :fleashed:
         if (sponsors.isEmpty()) return
 
-        call.respond(buildJsonObject {
-            put("success", true)
-            put("data", buildJsonArray {})
-        })
+        call.respond(
+            buildJsonObject {
+                put("success", true)
+                put("data", buildJsonArray {})
+            }
+        )
     }
 
     private suspend fun getSponsors(
