@@ -55,7 +55,7 @@ jobs:
       - name: Create ~/.kube/config file
         run: |
           mkdir ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" >> ~/.kube/config
+          echo "${{ secrets.KUBE_CONFIG }}" >> ~/.kube/config
 
       - name: Get the current git tag to use
         id: tag
