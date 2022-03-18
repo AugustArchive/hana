@@ -1,4 +1,4 @@
-# **花** - "hana"
+# 花 - "hana"
 **hana** is an API service made for [Noel](https://floofy.dev)'s projects and proxy services. It contains the following:
 
 - Image Endpoints (red pandas, polar bears, and much more!)
