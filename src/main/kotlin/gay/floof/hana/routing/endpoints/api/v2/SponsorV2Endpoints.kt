@@ -146,7 +146,7 @@ private fun graphQlQuery(login: String, pricing: String = "Dollars"): String = "
 }
 """.trimIndent()
 
-class SponsorV2Endpoint: AbstractEndpoint("/api/v2/sponsors", HttpMethod.Get) {
+class SponsorV2Endpoint: AbstractEndpoint("/v2/sponsors", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         call.respond(
             buildJsonObject {
@@ -156,7 +156,7 @@ class SponsorV2Endpoint: AbstractEndpoint("/api/v2/sponsors", HttpMethod.Get) {
     }
 }
 
-class FetchSponsorV2Endpoint(private val config: HanaConfig, private val httpClient: HttpClient): AbstractEndpoint("/api/v2/sponsors/{login}", HttpMethod.Get) {
+class FetchSponsorV2Endpoint(private val config: HanaConfig, private val httpClient: HttpClient): AbstractEndpoint("/v2/sponsors/{login}", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         val login = call.parameters["login"]!!
 

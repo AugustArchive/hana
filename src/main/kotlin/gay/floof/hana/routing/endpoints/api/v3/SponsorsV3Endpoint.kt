@@ -179,7 +179,7 @@ private fun graphqlQuery(
 }
 """.trimIndent()
 
-class SponsorsV3Endpoint: AbstractEndpoint("/api/v3/sponsors", HttpMethod.Get) {
+class SponsorsV3Endpoint: AbstractEndpoint("/v3/sponsors", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         call.respond(
             buildJsonObject {
@@ -200,7 +200,7 @@ class SponsorsV3Endpoint: AbstractEndpoint("/api/v3/sponsors", HttpMethod.Get) {
     }
 }
 
-class DefaultSponsorsEndpoint: AbstractEndpoint("/api/sponsors", HttpMethod.Get) {
+class DefaultSponsorsEndpoint: AbstractEndpoint("/sponsors", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         call.respond(
             buildJsonObject {
@@ -221,7 +221,7 @@ class DefaultSponsorsEndpoint: AbstractEndpoint("/api/sponsors", HttpMethod.Get)
     }
 }
 
-class FetchSponsorsV3Endpoint(private val config: HanaConfig, private val httpClient: HttpClient): AbstractEndpoint("/api/v3/sponsors/{login}", HttpMethod.Get) {
+class FetchSponsorsV3Endpoint(private val config: HanaConfig, private val httpClient: HttpClient): AbstractEndpoint("/v3/sponsors/{login}", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         val login = call.parameters["login"]!!
 
@@ -279,7 +279,7 @@ class FetchSponsorsV3Endpoint(private val config: HanaConfig, private val httpCl
     }
 }
 
-class DefaultFetchSponsorsEndpoint(private val config: HanaConfig, private val httpClient: HttpClient): AbstractEndpoint("/api/sponsors/{login}", HttpMethod.Get) {
+class DefaultFetchSponsorsEndpoint(private val config: HanaConfig, private val httpClient: HttpClient): AbstractEndpoint("/sponsors/{login}", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         val login = call.parameters["login"]!!
 

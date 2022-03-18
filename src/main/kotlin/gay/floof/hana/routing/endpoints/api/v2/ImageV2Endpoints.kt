@@ -39,7 +39,7 @@ import kotlinx.coroutines.withContext
 import java.io.ByteArrayInputStream
 import javax.imageio.ImageIO
 
-class YiffV2Endpoint(private val s3: S3Service, private val httpClient: HttpClient): AbstractEndpoint("/api/v2/yiff", HttpMethod.Get) {
+class YiffV2Endpoint(private val s3: S3Service, private val httpClient: HttpClient): AbstractEndpoint("/v2/yiff", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         val url = s3.getObjects("yiff").random()
 
@@ -86,7 +86,7 @@ class YiffV2Endpoint(private val s3: S3Service, private val httpClient: HttpClie
     }
 }
 
-class YiffImageV2Endpoint(private val s3: S3Service, private val httpClient: HttpClient): AbstractEndpoint("/api/v2/yiff/random", HttpMethod.Get) {
+class YiffImageV2Endpoint(private val s3: S3Service, private val httpClient: HttpClient): AbstractEndpoint("/v2/yiff/random", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         val url = s3.getObjects("yiff").random()
         val res = httpClient.get<HttpResponse>(url)
@@ -110,7 +110,7 @@ class YiffImageV2Endpoint(private val s3: S3Service, private val httpClient: Htt
     }
 }
 
-class KadiV2Endpoint(private val s3: S3Service, private val httpClient: HttpClient): AbstractEndpoint("/api/v2/kadi", HttpMethod.Get) {
+class KadiV2Endpoint(private val s3: S3Service, private val httpClient: HttpClient): AbstractEndpoint("/v2/kadi", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         val url = s3.getObjects("kadi").random()
 
@@ -156,7 +156,7 @@ class KadiV2Endpoint(private val s3: S3Service, private val httpClient: HttpClie
     }
 }
 
-class KadiImageV2Endpoint(private val s3: S3Service, private val httpClient: HttpClient): AbstractEndpoint("/api/v2/kadi/random", HttpMethod.Get) {
+class KadiImageV2Endpoint(private val s3: S3Service, private val httpClient: HttpClient): AbstractEndpoint("/v2/kadi/random", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         val url = s3.getObjects("kadi").random()
         val res = httpClient.get<HttpResponse>(url)

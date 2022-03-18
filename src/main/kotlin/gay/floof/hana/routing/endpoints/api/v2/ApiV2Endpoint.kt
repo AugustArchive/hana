@@ -29,7 +29,7 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
 
-class ApiV2Endpoint: AbstractEndpoint("/api/v2", HttpMethod.Get) {
+class ApiV2Endpoint: AbstractEndpoint("/v2", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         call.respond(
             GenericV2Response(

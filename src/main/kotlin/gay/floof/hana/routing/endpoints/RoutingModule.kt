@@ -34,7 +34,6 @@ val routingModule = module {
     single { DefaultFetchSponsorsEndpoint(get(), get()) } bind AbstractEndpoint::class
     single { FetchSponsorsV3Endpoint(get(), get()) } bind AbstractEndpoint::class
     single { DefaultSponsorsEndpoint() } bind AbstractEndpoint::class
-    single { DefaultApiV3Endpoint() } bind AbstractEndpoint::class
     single { KadiV3ImageEndpoint() } bind AbstractEndpoint::class
     single { WahsV3ImageEndpoint() } bind AbstractEndpoint::class
     single { YiffV3ImageEndpoint() } bind AbstractEndpoint::class

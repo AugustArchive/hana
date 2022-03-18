@@ -30,24 +30,7 @@ import io.ktor.response.*
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
-class ApiV3Endpoint: AbstractEndpoint("/api/v3", HttpMethod.Get) {
-    override suspend fun call(call: ApplicationCall) {
-        call.respond(
-            buildJsonObject {
-                put("success", true)
-                put(
-                    "data",
-                    buildJsonObject {
-                        put("message", "Hello, world!")
-                        put("docsUri", "https://api.floofy.dev/docs/")
-                    }
-                )
-            }
-        )
-    }
-}
-
-class DefaultApiV3Endpoint: AbstractEndpoint("/api", HttpMethod.Get) {
+class ApiV3Endpoint: AbstractEndpoint("/v3", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         call.respond(
             buildJsonObject {

@@ -146,73 +146,73 @@ object ImageEndpointUtil {
     }
 }
 
-class YiffEndpoint: AbstractEndpoint("/api/yiff", HttpMethod.Get) {
+class YiffEndpoint: AbstractEndpoint("/yiff", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         call.respond(ImageEndpointUtil.getImage("yiff"))
     }
 }
 
-class YiffImageEndpoint: AbstractEndpoint("/api/yiff/random", HttpMethod.Get) {
+class YiffImageEndpoint: AbstractEndpoint("/yiff/random", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         ImageEndpointUtil.sendImageFromBytes(call, "yiff")
     }
 }
 
-class YiffV3Endpoint: AbstractEndpoint("/api/v3/yiff", HttpMethod.Get) {
+class YiffV3Endpoint: AbstractEndpoint("/v3/yiff", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         call.respond(ImageEndpointUtil.getImage("yiff"))
     }
 }
 
-class YiffV3ImageEndpoint: AbstractEndpoint("/api/v3/yiff/random", HttpMethod.Get) {
+class YiffV3ImageEndpoint: AbstractEndpoint("/v3/yiff/random", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         ImageEndpointUtil.sendImageFromBytes(call, "yiff")
     }
 }
 
-class KadiEndpoint: AbstractEndpoint("/api/kadi", HttpMethod.Get) {
+class KadiEndpoint: AbstractEndpoint("/kadi", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         call.respond(ImageEndpointUtil.getImage("kadi"))
     }
 }
 
-class KadiImageEndpoint: AbstractEndpoint("/api/kadi/random", HttpMethod.Get) {
+class KadiImageEndpoint: AbstractEndpoint("/kadi/random", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         ImageEndpointUtil.sendImageFromBytes(call, "kadi")
     }
 }
 
-class KadiV3Endpoint: AbstractEndpoint("/api/v3/kadi", HttpMethod.Get) {
+class KadiV3Endpoint: AbstractEndpoint("/v3/kadi", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         call.respond(ImageEndpointUtil.getImage("kadi"))
     }
 }
 
-class KadiV3ImageEndpoint: AbstractEndpoint("/api/v3/kadi/random", HttpMethod.Get) {
+class KadiV3ImageEndpoint: AbstractEndpoint("/v3/kadi/random", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         ImageEndpointUtil.sendImageFromBytes(call, "kadi")
     }
 }
 
-class WahsEndpoint: AbstractEndpoint("/api/wah", HttpMethod.Get) {
+class WahsEndpoint: AbstractEndpoint("/wah", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         call.respond(ImageEndpointUtil.getImage("wahs"))
     }
 }
 
-class WahsImageEndpoint: AbstractEndpoint("/api/wah/random", HttpMethod.Get) {
+class WahsImageEndpoint: AbstractEndpoint("/wah/random", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         ImageEndpointUtil.sendImageFromBytes(call, "wahs")
     }
 }
 
-class WahsV3Endpoint: AbstractEndpoint("/api/v3/wah", HttpMethod.Get) {
+class WahsV3Endpoint: AbstractEndpoint("/v3/wah", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         call.respond(ImageEndpointUtil.getImage("wahs"))
     }
 }
 
-class WahsV3ImageEndpoint: AbstractEndpoint("/api/v3/wah/random", HttpMethod.Get) {
+class WahsV3ImageEndpoint: AbstractEndpoint("/v3/wah/random", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         ImageEndpointUtil.sendImageFromBytes(call, "wahs")
     }
