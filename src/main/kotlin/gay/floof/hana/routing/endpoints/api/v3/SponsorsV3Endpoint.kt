@@ -24,6 +24,8 @@
 package gay.floof.hana.routing.endpoints.api.v3
 
 import gay.floof.hana.data.HanaConfig
+import gay.floof.hana.data.types.GitHubGraphQLResult
+import gay.floof.hana.data.types.GitHubUserSponsorResult
 import gay.floof.hana.routing.AbstractEndpoint
 import io.ktor.application.*
 import io.ktor.client.*
@@ -45,7 +47,7 @@ private fun graphqlQuery(
             totalCount
 
             pageInfo {
-                hasnextPage
+                hasNextPage
                 endCursor
             }
 
@@ -66,12 +68,6 @@ private fun graphqlQuery(
                 sponsorEntity {
                     ... on Organization {
                         avatarUrl(size: 1024)
-
-                        # It will be not `null` if it has a sponsor listing
-                        sponsorListing {
-                            id
-                        }
-
                         description
                         websiteUrl
                         createdAt
@@ -117,7 +113,7 @@ private fun graphqlQuery(
             totalCount
 
             pageInfo {
-                hasnextPage
+                hasNextPage
                 endCursor
             }
 
@@ -138,11 +134,6 @@ private fun graphqlQuery(
                 sponsorEntity {
                     ... on Organization {
                         avatarUrl(size: 1024)
-
-                        # It will be not `null` if it has a sponsor listing
-                        sponsorListing {
-                            id
-                        }
 
                         description
                         websiteUrl
@@ -309,13 +300,31 @@ class DefaultFetchSponsorsEndpoint(private val config: HanaConfig, private val h
             else -> "Cents"
         }
 
-        val data = mutableListOf<JsonObject>()
+        val sponsors = getSponsors(call, login, pricing)
+
+        // assumed it errored, so let's not do anything :fleashed:
+        if (sponsors.isEmpty()) return
+
+        call.respond(buildJsonObject {
+            put("success", true)
+            put("data", buildJsonArray {})
+        })
+    }
+
+    private suspend fun getSponsors(
+        call: ApplicationCall,
+        login: String,
+        pricing: String,
+        cursor: String? = null,
+        afterCursor: String? = null,
+        data: MutableList<JsonObject> = mutableListOf()
+    ): List<JsonObject> {
         val res: HttpResponse = httpClient.post("https://api.github.com/graphql") {
             header("Content-Type", "application/json")
             header("Authorization", "Bearer ${config.githubSecret}")
 
             body = buildJsonObject {
-                put("query", graphqlQuery(login, pricing))
+                put("query", graphqlQuery(login, pricing, cursor, afterCursor))
             }
         }
 
@@ -329,19 +338,12 @@ class DefaultFetchSponsorsEndpoint(private val config: HanaConfig, private val h
                     put("gql", raw["errors"]!!.jsonArray)
                 }
             )
-            return
+
+            return data
         }
 
-        call.respond(
-            buildJsonObject {
-                put("success", true)
-                put(
-                    "data",
-                    buildJsonObject {
-                        put("message", "This route is a WIP")
-                    }
-                )
-            }
-        )
+        // check if we have a next page
+        val data2 = res.receive<GitHubGraphQLResult>()
+        return data
     }
 }
