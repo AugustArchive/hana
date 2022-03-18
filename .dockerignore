@@ -1,14 +1,4 @@
 .github
-.husky
+.gradle
+.idea
 build
-node_modules
-scripts
-
-.eslintignore
-.gitignore
-config.yml
-LICENSE
-package-lock.json
-yarn.lock
-**.md
-renovate.json
