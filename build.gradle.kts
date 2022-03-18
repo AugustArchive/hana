@@ -54,7 +54,7 @@ plugins {
 apply(plugin = "kotlinx-atomicfu")
 
 val JAVA_VERSION = JavaVersion.VERSION_17
-val VERSION = Version(4, 0, 0, 0, ReleaseType.Snapshot)
+val VERSION = Version(4, 0, 1, 0, ReleaseType.Snapshot)
 
 val commitHash by lazy {
     val cmd = "git rev-parse --short HEAD".split("\\s".toRegex())

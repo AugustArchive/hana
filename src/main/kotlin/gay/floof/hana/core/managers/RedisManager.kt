@@ -53,7 +53,7 @@ class RedisManager(config: HanaConfig): AutoCloseable {
         val redisUri: RedisURI = if (config.redis.sentinels.isNotEmpty()) {
             val builder = RedisURI.builder()
             val sentinelRedisUri = RedisURI.builder()
-                .withSentinelMasterId(config.redis.master!!)
+                .withSentinelMasterId(config.redis.master)
                 .withDatabase(config.redis.index)
 
             for (host in config.redis.sentinels) {
@@ -67,6 +67,7 @@ class RedisManager(config: HanaConfig): AutoCloseable {
 
             builder
                 .withSentinel(sentinelRedisUri.build())
+                .withSentinelMasterId(config.redis.master)
                 .build()
         } else {
             val builder = RedisURI.builder()
