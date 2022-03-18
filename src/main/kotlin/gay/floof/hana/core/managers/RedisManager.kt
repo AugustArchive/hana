@@ -52,23 +52,19 @@ class RedisManager(config: HanaConfig): AutoCloseable {
 
         val redisUri: RedisURI = if (config.redis.sentinels.isNotEmpty()) {
             val builder = RedisURI.builder()
-            val sentinelRedisUri = RedisURI.builder()
                 .withSentinelMasterId(config.redis.master)
                 .withDatabase(config.redis.index)
 
             for (host in config.redis.sentinels) {
                 val (h, port) = host.split(":")
-                sentinelRedisUri.withSentinel(h, Integer.parseInt(port))
+                builder.withSentinel(h, Integer.parseInt(port))
             }
 
             if (config.redis.password != null) {
-                sentinelRedisUri.withPassword(config.redis.password.toCharArray())
+                builder.withPassword(config.redis.password.toCharArray())
             }
 
-            builder
-                .withSentinel(sentinelRedisUri.build())
-                .withSentinelMasterId(config.redis.master)
-                .build()
+            builder.build()
         } else {
             val builder = RedisURI.builder()
                 .withHost(config.redis.host)
