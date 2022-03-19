@@ -96,7 +96,7 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-serialization-core")
 
     // kotlinx.datetime libraries
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
 
     // Noel Utilities
     floof("commons", "commons-slf4j", "1.3.0")
