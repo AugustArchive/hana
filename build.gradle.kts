@@ -113,7 +113,7 @@ dependencies {
     implementation("io.insert-koin:koin-core:3.1.5")
 
     // Redis (for caching api keys and ratelimits)
-    implementation("io.lettuce:lettuce-core:6.1.6.RELEASE")
+    implementation("io.lettuce:lettuce-core:6.1.7.RELEASE")
 
     // Logging with logback
     implementation("net.logstash.logback:logstash-logback-encoder:7.0.1")
@@ -137,7 +137,7 @@ dependencies {
     implementation("net.perfectdreams.discordinteraktions:webserver-ktor-kord:0.0.12-SNAPSHOT")
 
     // Redis (for ratelimiting cache)
-    implementation("io.lettuce:lettuce-core:6.1.6.RELEASE")
+    implementation("io.lettuce:lettuce-core:6.1.7.RELEASE")
 
     // PostgreSQL (for holding API keys)
     api(platform("org.jetbrains.exposed:exposed-bom:0.36.1"))
