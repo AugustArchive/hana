@@ -107,7 +107,7 @@ dependencies {
     // Ktor Server libraries
     implementation("io.ktor:ktor-server-netty")
     implementation("io.ktor:ktor-serialization")
-    api(platform("io.ktor:ktor-bom:1.6.7"))
+    api(platform("io.ktor:ktor-bom:1.6.8"))
 
     // Koin
     implementation("io.insert-koin:koin-core:3.1.5")
