@@ -91,7 +91,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
     // kotlinx.serialization libraries
-    api(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.3.1"))
+    api(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.3.2"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     api("org.jetbrains.kotlinx:kotlinx-serialization-core")
 
