@@ -40,13 +40,13 @@ buildscript {
         classpath(kotlin("serialization", version = "1.6.10"))
         classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.17.1")
         classpath("gay.floof.utils:gradle-utils:1.3.0")
-        classpath("com.diffplug.spotless:spotless-plugin-gradle:6.2.0")
+        classpath("com.diffplug.spotless:spotless-plugin-gradle:6.3.0")
     }
 }
 
 plugins {
     kotlin("plugin.serialization") version "1.6.10"
-    id("com.diffplug.spotless") version "6.2.0"
+    id("com.diffplug.spotless") version "6.3.0"
     kotlin("jvm") version "1.6.10"
     application
 }
@@ -86,17 +86,17 @@ dependencies {
     implementation(kotlin("stdlib"))
 
     // kotlinx.coroutines libraries
-    api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.6.0-native-mt"))
+    api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.6.0"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
     // kotlinx.serialization libraries
-    api(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.3.1"))
+    api(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.3.2"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     api("org.jetbrains.kotlinx:kotlinx-serialization-core")
 
     // kotlinx.datetime libraries
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
 
     // Noel Utilities
     floof("commons", "commons-slf4j", "1.3.0")
@@ -108,26 +108,26 @@ dependencies {
     // Ktor Server libraries
     implementation("io.ktor:ktor-server-netty")
     implementation("io.ktor:ktor-serialization")
-    api(platform("io.ktor:ktor-bom:1.6.7"))
+    api(platform("io.ktor:ktor-bom:1.6.8"))
 
     // Koin
     implementation("io.insert-koin:koin-core:3.1.5")
 
     // Redis (for caching api keys and ratelimits)
-    implementation("io.lettuce:lettuce-core:6.1.6.RELEASE")
+    implementation("io.lettuce:lettuce-core:6.1.8.RELEASE")
 
     // Logging with logback
     implementation("net.logstash.logback:logstash-logback-encoder:7.0.1")
-    implementation("ch.qos.logback:logback-classic:1.2.10")
-    implementation("ch.qos.logback:logback-core:1.2.10")
+    implementation("ch.qos.logback:logback-classic:1.2.11")
+    implementation("ch.qos.logback:logback-core:1.2.11")
     api("org.slf4j:slf4j-api:1.7.36")
 
     // Conditional logic for logback
     implementation("org.codehaus.janino:janino:3.1.6")
 
     // Sentry
-    implementation("io.sentry:sentry:5.6.0")
-    implementation("io.sentry:sentry-logback:5.6.0")
+    implementation("io.sentry:sentry:5.7.0")
+    implementation("io.sentry:sentry-logback:5.7.0")
 
     // Prometheus (for metrics)
     implementation("io.prometheus:simpleclient_hotspot:0.15.0")
@@ -138,10 +138,10 @@ dependencies {
     implementation("net.perfectdreams.discordinteraktions:webserver-ktor-kord:0.0.12-SNAPSHOT")
 
     // Redis (for ratelimiting cache)
-    implementation("io.lettuce:lettuce-core:6.1.6.RELEASE")
+    implementation("io.lettuce:lettuce-core:6.1.8.RELEASE")
 
     // PostgreSQL (for holding API keys)
-    api(platform("org.jetbrains.exposed:exposed-bom:0.36.1"))
+    api(platform("org.jetbrains.exposed:exposed-bom:0.37.3"))
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime")
     implementation("org.jetbrains.exposed:exposed-core")
     implementation("org.jetbrains.exposed:exposed-jdbc")
@@ -150,17 +150,17 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.0.1")
 
     // YAML (configuration)
-    implementation("com.charleskorn.kaml:kaml:0.40.0")
+    implementation("com.charleskorn.kaml:kaml:0.43.0")
 
     // OkHttp (for ktor client)
     implementation("io.ktor:ktor-client-okhttp")
     implementation("io.ktor:ktor-client-core")
 
     // Kord
-    implementation("dev.kord:kord-core:0.8.0-M10")
+    implementation("dev.kord:kord-core:0.8.0-M12")
 
     // JWT
-    implementation("com.auth0:java-jwt:3.18.3")
+    implementation("com.auth0:java-jwt:3.19.0")
 
     // S3
     implementation("aws.sdk.kotlin:s3:0.9.4-beta")
