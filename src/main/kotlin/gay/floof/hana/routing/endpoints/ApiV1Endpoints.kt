@@ -29,7 +29,7 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
 
-class ApiV1Endpoint: AbstractEndpoint("/api/v1/", HttpMethod.Get) {
+class ApiV1Endpoint: AbstractEndpoint("/v1", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         call.respond(
             HttpStatusCode.BadRequest,
