@@ -38,7 +38,6 @@ import gay.floof.hana.core.extensions.inject
 import gay.floof.hana.core.interfaces.SuspendAutoCloseable
 import gay.floof.hana.core.metrics.MetricsHandler
 import gay.floof.hana.core.plugins.KtorBlockNsfwEndpoints
-import gay.floof.hana.core.plugins.KtorDocsReverseProxyPlugin
 import gay.floof.hana.core.plugins.KtorLoggingPlugin
 import gay.floof.hana.core.plugins.KtorRatelimitingPlugin
 import gay.floof.hana.core.threading.threadFactory
@@ -71,6 +70,7 @@ import java.lang.management.ManagementFactory
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import dev.floofy.ktor.plugins.Sentry as KtorSentry
 
 class Hana: SuspendAutoCloseable {
     companion object {
@@ -78,6 +78,7 @@ class Hana: SuspendAutoCloseable {
         val bootTime = StopWatch.createStarted()
     }
 
+    private val routesRegistered = mutableListOf<Pair<String, HttpMethod>>()
     private val log by logging<Hana>()
     lateinit var server: NettyApplicationEngine
 
@@ -167,11 +168,14 @@ class Hana: SuspendAutoCloseable {
             module {
                 val json: Json by inject()
 
-                install(KtorDocsReverseProxyPlugin)
                 install(KtorBlockNsfwEndpoints)
                 install(KtorRatelimitingPlugin)
                 install(KtorLoggingPlugin)
                 install(AutoHeadResponse)
+
+                if (config.sentryDsn != null) {
+                    install(KtorSentry)
+                }
 
                 install(ContentNegotiation) {
                     json(json)
@@ -251,20 +255,16 @@ class Hana: SuspendAutoCloseable {
                     }
                 }
 
-                var visited = 0
                 routing {
                     val endpoints = koin.getAll<AbstractEndpoint>()
                     log.info("Found ${endpoints.size} endpoints to register.")
 
                     for (endpoint in endpoints) {
-                        // Hacky solution since Koin adds the same MainEndpoint instance
-                        if (endpoint.path == "/") {
-                            visited++
-                            if (visited > 1) {
-                                continue
-                            }
-                        }
+                        val pathMethodPair = Pair(endpoint.path, endpoint.method)
+                        if (routesRegistered.contains(pathMethodPair))
+                            continue
 
+                        routesRegistered.add(pathMethodPair)
                         log.info("Registering endpoint ${endpoint.method.value} ${endpoint.path}")
                         route(endpoint.path, endpoint.method) {
                             handle {

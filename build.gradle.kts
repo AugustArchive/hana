@@ -54,7 +54,7 @@ plugins {
 apply(plugin = "kotlinx-atomicfu")
 
 val JAVA_VERSION = JavaVersion.VERSION_17
-val VERSION = Version(4, 0, 4, 0, ReleaseType.None)
+val VERSION = Version(4, 1, 0, 0, ReleaseType.None)
 
 val commitHash by lazy {
     val cmd = "git rev-parse --short HEAD".split("\\s".toRegex())
@@ -100,6 +100,7 @@ dependencies {
 
     // Noel Utilities
     floof("commons", "commons-slf4j", "1.3.0")
+    floofy("ktor", "ktor-sentry", "0.0.1")
 
     // Apache Utilities
     implementation("org.apache.commons:commons-lang3:3.12.0")

@@ -23,7 +23,9 @@
 
 package gay.floof.hana.routing.endpoints.api.v2
 
+import gay.floof.hana.core.extensions.put
 import gay.floof.hana.data.HanaConfig
+import gay.floof.hana.data.types.v2.GitHubGraphQLResult
 import gay.floof.hana.routing.AbstractEndpoint
 import io.ktor.application.*
 import io.ktor.client.*
@@ -33,6 +35,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.response.*
 import kotlinx.serialization.json.*
+
+private val EMOJI_REGEX = "<div><g-emoji class=\\\\\"[\\w-]+\\\\\" alias=\\\\\"(?<alias>[\\w-]+)\\\\\" fallback-src=\\\\\"(?<fallbackSrc>[\\d\\D:\\\\]+)\\\\\">(?<emoji>.+)<\\/g-emoji>".toRegex()
 
 private fun graphQlQuery(login: String, pricing: String = "Dollars"): String = """query {
     user(login: "$login") {
@@ -192,78 +196,105 @@ class FetchSponsorV2Endpoint(private val config: HanaConfig, private val httpCli
             return
         }
 
-        val sponsoring = data["data"]!!.jsonObject["user"]!!.jsonObject["sponsorshipsAsSponsor"]!!.jsonObject
-        val sponsors = data["data"]!!.jsonObject["user"]!!.jsonObject["sponsorshipsAsMaintainer"]!!.jsonObject
-
-        call.respond(
-            HttpStatusCode.OK,
+        val sponsorData = res.receive<GitHubGraphQLResult>()
+        val sponsors = sponsorData.data.user.sponsorshipsAsSponsor.nodes.map {
             buildJsonObject {
                 put(
-                    "sponsorsing",
+                    "tier",
                     buildJsonObject {
-                        put("total_count", sponsoring["totalCount"]!!)
+                        put("joined_at", it.tier.createdAt)
+                        put("tier_selected_at", it.tier.tierSelectedAt)
+                        put(
+                            "tier",
+                            buildJsonObject {
+                                put("custom_amount", it.tier.isCustomAmount)
+                                put("created_at", it.tier.createdAt)
+                                put("price", if (pricing == "Dollars") it.tier.monthlyPriceInDollars!! else it.tier.monthlyPriceInCents ?: 0)
+                            }
+                        )
+                    }
+                )
+
+                if (it.sponsorable.status != null) {
+                    put(
+                        "status",
+                        buildJsonObject {
+                            put("emoji", it.sponsorable.status.emojiHTML)
+                            put("message", it.sponsorable.status.message)
+                            put("expires_at", it.sponsorable.status.expiresAt)
+                        }
+                    )
+                } else {
+                    put("status", JsonNull)
+                }
+
+                put("has_sponsor_listing", it.sponsorable.hasSponsorsListing)
+                put("twitter_handle", it.sponsorable.twitterUsername)
+                put("followers", it.sponsorable.followers.totalCount)
+                put("following", it.sponsorable.following.totalCount)
+                put("website_url", it.sponsorable.websiteUrl)
+                put("avatar_url", it.sponsorable.avatarUrl)
+                put("company", it.sponsorable.company)
+                put("login", it.sponsorable.login)
+                put("name", it.sponsorable.name)
+                put("bio", it.sponsorable.bio)
+            }
+        }
+
+        val sponsoring = sponsorData.data.user.sponsorshipsAsMaintainer.nodes.map {
+            buildJsonObject {
+                put(
+                    "tier",
+                    buildJsonObject {
+                        put("joined_at", it.tier.createdAt)
+                        put("tier_selected_at", it.tier.tierSelectedAt)
+                        put(
+                            "tier",
+                            buildJsonObject {
+                                put("custom_amount", it.tier.isCustomAmount)
+                                put("created_at", it.tier.createdAt)
+                                put("price", if (pricing == "Dollars") it.tier.monthlyPriceInDollars!! else it.tier.monthlyPriceInCents ?: 0)
+                            }
+                        )
+                    }
+                )
+
+                if (it.sponsorEntity.status != null) {
+                    put(
+                        "status",
+                        buildJsonObject {
+                            put("emoji", it.sponsorEntity.status.emojiHTML)
+                            put("message", it.sponsorEntity.status.message)
+                            put("expires_at", it.sponsorEntity.status.expiresAt)
+                        }
+                    )
+                } else {
+                    put("status", JsonNull)
+                }
+
+                put("has_sponsor_listing", it.sponsorEntity.hasSponsorsListing)
+                put("twitter_handle", it.sponsorEntity.twitterUsername)
+                put("followers", it.sponsorEntity.followers.totalCount)
+                put("following", it.sponsorEntity.following.totalCount)
+                put("website_url", it.sponsorEntity.websiteUrl)
+                put("avatar_url", it.sponsorEntity.avatarUrl)
+                put("company", it.sponsorEntity.company)
+                put("login", it.sponsorEntity.login)
+                put("name", it.sponsorEntity.name)
+            }
+        }
+
+        call.respond(
+            buildJsonObject {
+                put(
+                    "sponsors",
+                    buildJsonObject {
+                        put("total_count", sponsorData.data.user.sponsorshipsAsSponsor.totalCount)
                         put(
                             "data",
                             buildJsonArray {
-                                val sponsorData = sponsoring["nodes"]!!.jsonArray.toList().map { it.jsonObject }
-
-                                for (obj in sponsorData) {
-                                    val tier = obj["tier"]!!.jsonObject
-                                    add(
-                                        buildJsonObject {
-                                            put("joined_at", obj["createdAt"]!!)
-                                            put("tier_selected_at", obj["tierSelectedAt"]!!)
-                                            put(
-                                                "tier",
-                                                buildJsonObject {
-                                                    put("custom_amount", tier["isCustomAmount"]!!)
-                                                    put("created_at", tier["createdAt"]!!)
-                                                    put("name", tier["name"]!!)
-                                                    put(
-                                                        "price",
-                                                        if (pricing == "Dollars") {
-                                                            tier["monthlyPriceInDollars"]!!
-                                                        } else {
-                                                            tier["monthlyPriceInCents"]!!
-                                                        }
-                                                    )
-                                                }
-                                            )
-
-                                            val sponsorEntity = obj["sponsorable"]!!.jsonObject
-
-                                            put("followers", sponsorEntity["following"]!!)
-                                            put("followers", sponsorEntity["followers"]!!)
-
-                                            val status = try {
-                                                sponsorEntity["status"]?.jsonObject
-                                            } catch (e: IllegalArgumentException) {
-                                                null
-                                            }
-
-                                            if (status != null) {
-                                                put(
-                                                    "status",
-                                                    buildJsonObject {
-                                                        put("emoji", status["emojiHTML"]!!)
-                                                        put("message", status["message"]!!)
-                                                        put("expires_at", status["expiresAt"]?.jsonPrimitive?.content)
-                                                    }
-                                                )
-                                            } else {
-                                                put("status", null as String?)
-                                            }
-
-                                            put("has_sponsor_listing", sponsorEntity["has_sponsor_listing"]?.jsonPrimitive?.contentOrNull)
-                                            put("twitter_handle", sponsorEntity["twitter_handle"]?.jsonPrimitive?.contentOrNull)
-                                            put("website_url", sponsorEntity["website_url"]?.jsonPrimitive?.contentOrNull)
-                                            put("avatar_url", sponsorEntity["avatar_url"]?.jsonPrimitive?.contentOrNull)
-                                            put("company", sponsorEntity["company"]?.jsonPrimitive?.contentOrNull)
-                                            put("login", sponsorEntity["login"]?.jsonPrimitive?.contentOrNull)
-                                            put("name", sponsorEntity["name"]?.jsonPrimitive?.contentOrNull)
-                                            put("bio", sponsorEntity["bio"]?.jsonPrimitive?.contentOrNull)
-                                        }
-                                    )
+                                for (node in sponsors) {
+                                    add(node)
                                 }
                             }
                         )
@@ -271,71 +302,14 @@ class FetchSponsorV2Endpoint(private val config: HanaConfig, private val httpCli
                 )
 
                 put(
-                    "sponsors",
+                    "sponsoring",
                     buildJsonObject {
-                        put("total_count", sponsors["totalCount"]!!)
+                        put("total_count", sponsorData.data.user.sponsorshipsAsMaintainer.totalCount)
                         put(
                             "data",
                             buildJsonArray {
-                                val sponsorData = sponsors["nodes"]!!.jsonArray.toList().map { it.jsonObject }
-
-                                for (obj in sponsorData) {
-                                    val tier = obj["tier"]!!.jsonObject
-                                    add(
-                                        buildJsonObject {
-                                            put("joined_at", obj["createdAt"]!!)
-                                            put("tier_selected_at", obj["tierSelectedAt"]!!)
-                                            put(
-                                                "tier",
-                                                buildJsonObject {
-                                                    put("custom_amount", tier["isCustomAmount"]!!)
-                                                    put("created_at", tier["createdAt"]!!)
-                                                    put("name", tier["name"]!!)
-                                                    put(
-                                                        "price",
-                                                        if (pricing == "Dollars") {
-                                                            tier["monthlyPriceInDollars"] ?: JsonNull
-                                                        } else {
-                                                            tier["monthlyPriceInCents"] ?: JsonNull
-                                                        }
-                                                    )
-                                                }
-                                            )
-
-                                            val sponsorEntity = obj["sponsorEntity"]!!.jsonObject
-
-                                            put("followers", sponsorEntity["following"]!!.jsonObject["totalCount"]!!.jsonPrimitive.int)
-                                            put("followers", sponsorEntity["followers"]!!.jsonObject["totalCount"]!!.jsonPrimitive.int)
-
-                                            val status = try {
-                                                sponsorEntity["status"]?.jsonObject
-                                            } catch (e: IllegalArgumentException) {
-                                                null
-                                            }
-
-                                            if (status != null) {
-                                                put(
-                                                    "status",
-                                                    buildJsonObject {
-                                                        put("emoji", status["emojiHTML"]?.jsonPrimitive?.contentOrNull)
-                                                        put("message", status["message"]?.jsonPrimitive?.contentOrNull)
-                                                        put("expires_at", status["expiresAt"]?.jsonPrimitive?.content)
-                                                    }
-                                                )
-                                            } else {
-                                                put("status", JsonNull)
-                                            }
-
-                                            put("has_sponsor_listing", sponsorEntity["has_sponsor_listing"]?.jsonPrimitive?.contentOrNull)
-                                            put("twitter_handle", sponsorEntity["twitter_handle"]?.jsonPrimitive?.contentOrNull)
-                                            put("website_url", sponsorEntity["website_url"]?.jsonPrimitive?.contentOrNull)
-                                            put("avatar_url", sponsorEntity["avatar_url"]?.jsonPrimitive?.contentOrNull)
-                                            put("company", sponsorEntity["company"]?.jsonPrimitive?.contentOrNull)
-                                            put("login", sponsorEntity["login"]?.jsonPrimitive?.contentOrNull)
-                                            put("name", sponsorEntity["name"]?.jsonPrimitive?.contentOrNull)
-                                            put("bio", sponsorEntity["bio"]?.jsonPrimitive?.contentOrNull)
-                                        }
-                                    )
+                                for (node in sponsoring) {
+                                    add(node)
                                 }
                             }
                         )
