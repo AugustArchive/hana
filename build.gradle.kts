@@ -111,7 +111,7 @@ dependencies {
     api(platform("io.ktor:ktor-bom:1.6.8"))
 
     // Koin
-    implementation("io.insert-koin:koin-core:3.1.5")
+    implementation("io.insert-koin:koin-core:3.1.6")
 
     // Redis (for caching api keys and ratelimits)
     implementation("io.lettuce:lettuce-core:6.1.8.RELEASE")
