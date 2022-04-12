@@ -141,7 +141,7 @@ dependencies {
     implementation("io.lettuce:lettuce-core:6.1.8.RELEASE")
 
     // PostgreSQL (for holding API keys)
-    api(platform("org.jetbrains.exposed:exposed-bom:0.37.3"))
+    api(platform("org.jetbrains.exposed:exposed-bom:0.38.1"))
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime")
     implementation("org.jetbrains.exposed:exposed-core")
     implementation("org.jetbrains.exposed:exposed-jdbc")
