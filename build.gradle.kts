@@ -135,7 +135,7 @@ dependencies {
     implementation("io.prometheus:simpleclient:0.15.0")
 
     // Discord Interactions
-    implementation("net.perfectdreams.discordinteraktions:webserver-ktor-kord:0.0.12-SNAPSHOT")
+    implementation("net.perfectdreams.discordinteraktions:webserver-ktor-kord:0.0.12")
 
     // Redis (for ratelimiting cache)
     implementation("io.lettuce:lettuce-core:6.1.8.RELEASE")
