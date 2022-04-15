@@ -146,7 +146,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core")
     implementation("org.jetbrains.exposed:exposed-jdbc")
     implementation("org.jetbrains.exposed:exposed-dao")
-    implementation("org.postgresql:postgresql:42.3.3")
+    implementation("org.postgresql:postgresql:42.3.4")
     implementation("com.zaxxer:HikariCP:5.0.1")
 
     // YAML (configuration)
