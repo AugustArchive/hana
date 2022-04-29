@@ -115,7 +115,7 @@ class Ratelimiter(
                     }
                 }
 
-                delay(1.minutes.inWholeMilliseconds)
+                delay(15.minutes.inWholeMilliseconds)
             }
         }
     }
@@ -165,7 +165,7 @@ class Ratelimiter(
 
         if (authorization != null) {
             // Check if the path is any image manipulation endpoints
-            val routeRegex = "\\/api\\/?(\\/v\\d)?\\/(manipulation|yiff|kadi|sponsors)?".toRegex().toPattern().matcher(call.request.uri) as Matcher
+            val routeRegex = "\\/(\\/v\\d)?\\/(manipulation|yiff|kadi|sponsors)?".toRegex().toPattern().matcher(call.request.uri) as Matcher
             if (routeRegex.matches()) {
                 when (routeRegex.group(2)) {
                     "manipulation" -> {

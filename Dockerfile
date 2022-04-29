@@ -38,7 +38,7 @@ RUN ./gradlew installDist --stacktrace --no-daemon
 FROM eclipse-temurin:17.0.2_8-jdk
 
 # Install common libraries we need
-RUN apt update && apt install bash
+RUN apt update && apt install bash tini
 # RUN apk update && apk add --no-cache bash musl-dev libc-dev gcompat
 
 # Change the working directory to `/app/noel/hana` to add

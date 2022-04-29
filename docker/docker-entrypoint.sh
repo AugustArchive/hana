@@ -34,4 +34,4 @@ if ! [[ "${HANA_ENABLE_WELCOME_PROMPT:-yes}" =~ ^(no|false)$ ]]; then
     info ""
 fi
 
-exec "$@"
+tini -s "$@"

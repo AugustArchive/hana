@@ -28,4 +28,23 @@ set -o pipefail
 . /app/noel/hana/scripts/liblog.sh
 
 info "*** starting hana! ***"
-exec "/app/noel/hana/bin/hana"
+debug "   ===> Logback Configuration: ${HANA_LOGBACK_CONFIG_PATH:-unknown}"
+debug "   ===> Dedicated Node:        ${WINTERFOX_DEDI_NODE:-unknown}"
+debug "   ===> JVM Arguments:         ${HANA_JAVA_OPTS:-unknown}"
+
+JAVA_OPTS=("-XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8")
+
+if [[ -n "${HANA_LOGBACK_CONFIG_PATH:-}" && -f "${HANA_LOGBACK_CONFIG_PATH}" ]]; then
+  JAVA_OPTS+=("-Dgay.floof.hana.logback.config=${HANA_LOGBACK_CONFIG_PATH}")
+fi
+
+if [[ -n "${WINTERFOX_DEDI_NODE:-}" ]]; then
+  JAVA_OPTS+=("-Dwinterfox.dediNode=${WINTERFOX_DEDI_NODE}")
+fi
+
+if [[ -n "${HANA_JAVA_OPTS:-}" ]]; then
+  JAVA_OPTS+=("$HANA_JAVA_OPTS")
+fi
+
+debug "Resolved JVM arguments: $JAVA_OPTS"
+/app/noel/hana/bin/hana $@
