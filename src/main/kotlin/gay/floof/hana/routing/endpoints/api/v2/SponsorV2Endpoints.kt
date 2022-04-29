@@ -27,13 +27,13 @@ import gay.floof.hana.core.extensions.put
 import gay.floof.hana.data.HanaConfig
 import gay.floof.hana.data.types.v2.GitHubGraphQLResult
 import gay.floof.hana.routing.AbstractEndpoint
-import io.ktor.application.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import kotlinx.serialization.json.*
 
 private val EMOJI_REGEX = "<div><g-emoji class=\\\\\"[\\w-]+\\\\\" alias=\\\\\"(?<alias>[\\w-]+)\\\\\" fallback-src=\\\\\"(?<fallbackSrc>[\\d\\D:\\\\]+)\\\\\">(?<emoji>.+)<\\/g-emoji>".toRegex()
@@ -185,18 +185,20 @@ class FetchSponsorV2Endpoint(private val config: HanaConfig, private val httpCli
             header("Content-Type", "application/json")
             header("Authorization", "Bearer ${config.githubSecret}")
 
-            body = buildJsonObject {
-                put("query", graphQlQuery(login, pricing))
-            }
+            setBody(
+                buildJsonObject {
+                    put("query", graphQlQuery(login, pricing))
+                }
+            )
         }
 
-        val data = res.receive<JsonObject>()
+        val data = res.body<JsonObject>()
         if (data["errors"]?.jsonArray != null) {
             call.respond(HttpStatusCode.InternalServerError, data["errors"]!!.jsonArray)
             return
         }
 
-        val sponsorData = res.receive<GitHubGraphQLResult>()
+        val sponsorData = res.body<GitHubGraphQLResult>()
         val sponsors = sponsorData.data.user.sponsorshipsAsSponsor.nodes.map {
             buildJsonObject {
                 put(

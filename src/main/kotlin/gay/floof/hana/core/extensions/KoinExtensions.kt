@@ -41,6 +41,11 @@ inline fun <reified T> inject(): ReadOnlyProperty<Any?, T> =
     }
 
 /**
+ * Returns a singleton that match with type [T].
+ */
+inline fun <reified T> GlobalContext.retrieve(): T = get().get()
+
+/**
  * Returns a list of singletons that match with type [T].
  * ```kt
  * val commands: List<AbstractCommand> = GlobalContext.retrieveAll()

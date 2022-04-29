@@ -26,13 +26,13 @@ package gay.floof.hana.routing.endpoints.api.v3
 import gay.floof.hana.data.HanaConfig
 import gay.floof.hana.data.types.GitHubGraphQLResult
 import gay.floof.hana.routing.AbstractEndpoint
-import io.ktor.application.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import kotlinx.serialization.json.*
 
 private fun graphqlQuery(
@@ -246,12 +246,14 @@ class FetchSponsorsV3Endpoint(private val config: HanaConfig, private val httpCl
             header("Content-Type", "application/json")
             header("Authorization", "Bearer ${config.githubSecret}")
 
-            body = buildJsonObject {
-                put("query", graphqlQuery(login, pricing))
-            }
+            setBody(
+                buildJsonObject {
+                    put("query", graphqlQuery(login, pricing))
+                }
+            )
         }
 
-        val raw = res.receive<JsonObject>()
+        val raw = res.body<JsonObject>()
         if (raw["data"]?.jsonObject == null && raw["errors"]?.jsonArray != null) {
             call.respond(
                 HttpStatusCode.InternalServerError,
@@ -324,12 +326,14 @@ class DefaultFetchSponsorsEndpoint(private val config: HanaConfig, private val h
             header("Content-Type", "application/json")
             header("Authorization", "Bearer ${config.githubSecret}")
 
-            body = buildJsonObject {
-                put("query", graphqlQuery(login, pricing, cursor, afterCursor))
-            }
+            setBody(
+                buildJsonObject {
+                    put("query", graphqlQuery(login, pricing, cursor, afterCursor))
+                }
+            )
         }
 
-        val raw = res.receive<JsonObject>()
+        val raw = res.body<JsonObject>()
         if (raw["data"]?.jsonObject == null && raw["errors"]?.jsonArray != null) {
             call.respond(
                 HttpStatusCode.InternalServerError,
@@ -344,7 +348,7 @@ class DefaultFetchSponsorsEndpoint(private val config: HanaConfig, private val h
         }
 
         // check if we have a next page
-        val data2 = res.receive<GitHubGraphQLResult>()
+        val data2 = res.body<GitHubGraphQLResult>()
         return data
     }
 }

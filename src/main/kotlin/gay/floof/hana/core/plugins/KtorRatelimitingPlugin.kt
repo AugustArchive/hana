@@ -23,58 +23,50 @@
 
 package gay.floof.hana.core.plugins
 
+import gay.floof.hana.core.extensions.inject
 import gay.floof.hana.core.plugins.ratelimiter.Ratelimiter
-import io.ktor.application.*
-import io.ktor.features.*
 import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.util.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.*
+import io.ktor.server.response.*
 import kotlinx.datetime.Clock
-import org.koin.core.context.GlobalContext
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 
-private data class RatelimitedResponse(
-    val message: String,
-    val success: Boolean
-)
+val KtorRatelimitingPlugin = createApplicationPlugin("HanaRatelimitingPlugin") {
+    val ratelimiter: Ratelimiter by inject()
 
-class KtorRatelimitingPlugin(val ratelimiter: Ratelimiter) {
-    companion object: ApplicationFeature<ApplicationCallPipeline, Unit, KtorRatelimitingPlugin> {
-        override val key: AttributeKey<KtorRatelimitingPlugin> = AttributeKey("KtorRatelimitingPlugin")
-        override fun install(pipeline: ApplicationCallPipeline, configure: Unit.() -> Unit): KtorRatelimitingPlugin {
-            val koin = GlobalContext.get()
-            val ratelimiter = Ratelimiter(koin.get(), koin.get(), koin.get())
+    onCall { call ->
+        // If it was already handled, let's not continue.
+        if (call.isHandled)
+            return@onCall
 
-            pipeline.sendPipeline.intercept(ApplicationSendPipeline.After) {
-                val ip = this.call.request.origin.remoteHost
-                if (ip == "0:0:0:0:0:0:0:1") {
-                    proceed()
-                    return@intercept
-                }
+        val record = ratelimiter.get(call)
+        call.response.header("X-RateLimit-Limit", record.limit)
+        call.response.header("X-RateLimit-Reset", record.resetTime.toEpochMilliseconds())
+        call.response.header("X-RateLimit-Remaining", record.remaining)
+        call.response.header("X-RateLimit-Reset-Date", record.resetTime.toString())
 
-                val record = ratelimiter.get(call)
-                context.response.header("X-RateLimit-Limit", record.limit)
-                context.response.header("X-RateLimit-Remaining", record.remaining)
-                context.response.header("X-RateLimit-Reset", record.resetTime.toEpochMilliseconds())
-                context.response.header("X-RateLimit-Reset-Date", record.resetTime.toString())
-
-                if (record.exceeded) {
-                    val retryAfter = (record.resetTime.epochSeconds - Clock.System.now().epochSeconds).coerceAtLeast(0)
-                    context.response.header(HttpHeaders.RetryAfter, retryAfter)
-                    context.respond(
-                        HttpStatusCode.TooManyRequests,
-                        RatelimitedResponse(
-                            success = false,
-                            message = "You have been ratelimited! ((ヾ(≧皿≦；)ノ＿))Fuuuuuu—-！"
+        if (record.exceeded) {
+            val retryAfter = (record.resetTime.epochSeconds - Clock.System.now().epochSeconds).coerceAtLeast(0)
+            call.response.header(HttpHeaders.RetryAfter, retryAfter)
+            call.respond(
+                HttpStatusCode.TooManyRequests,
+                buildJsonObject {
+                    put("success", false)
+                    putJsonArray("errors") {
+                        add(
+                            buildJsonObject {
+                                put("code", "RATELIMITED")
+                                put("message", "You have been ratelimited! ((ヾ(≧皿≦；)ノ＿))Fuuuuuu—-！")
+                            }
                         )
-                    )
-
-                    finish()
-                } else {
-                    proceed()
+                    }
                 }
-            }
+            )
 
-            return KtorRatelimitingPlugin(ratelimiter)
+            return@onCall
         }
     }
 }

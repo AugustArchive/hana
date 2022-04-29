@@ -24,9 +24,9 @@
 package gay.floof.hana.routing.endpoints
 
 import gay.floof.hana.routing.AbstractEndpoint
-import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 
 @kotlinx.serialization.Serializable
 private data class MainResponse(

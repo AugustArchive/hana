@@ -28,215 +28,210 @@ import gay.floof.hana.core.database.tables.ApiKeyEntity
 import gay.floof.hana.core.database.tables.ApiKeysTable
 import gay.floof.hana.core.extensions.inject
 import gay.floof.hana.core.managers.JwtManager
-import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.ktor.util.*
 import kotlinx.serialization.json.*
 
-class KtorBlockNsfwEndpoints {
-    companion object: ApplicationFeature<ApplicationCallPipeline, Unit, KtorBlockNsfwEndpoints> {
-        private val ROUTE_REGEX = "\\/api\\/?(\\/v\\d)?\\/yiff?(\\/(\\w+)*)?".toRegex()
+val KtorBlockNsfwEndpoints = createApplicationPlugin("HanaBlockNsfwEndpoints") {
+    val ROUTE_REGEX = "(\\/v\\d)?\\/yiff?(\\/(\\w+)*)?".toRegex()
+    val jwt: JwtManager by inject()
 
-        override val key: AttributeKey<KtorBlockNsfwEndpoints> = AttributeKey("KtorBlockNsfwEndpoints")
-        override fun install(pipeline: ApplicationCallPipeline, configure: Unit.() -> Unit): KtorBlockNsfwEndpoints {
-            pipeline.intercept(ApplicationCallPipeline.Call) {
-                val json: Json by inject()
+    onCall { call ->
+        if (!call.request.uri.matches(ROUTE_REGEX)) {
+            return@onCall
+        }
 
-                if (!call.request.uri.matches(ROUTE_REGEX)) {
-                    proceed()
-                    return@intercept
-                }
+        val matcher = ROUTE_REGEX.toPattern().matcher(call.request.uri)
+        if (!matcher.matches()) {
+            return@onCall
+        }
 
-                val matcher = ROUTE_REGEX.toPattern().matcher(call.request.uri)
-                if (!matcher.matches()) {
-                    proceed()
-                    return@intercept
-                }
+        val groupCount = matcher.groupCount()
 
-                val groupCount = matcher.groupCount()
+        // get all matches
+        val matches = mutableListOf<String>()
+        for (index in 0..groupCount) {
+            val value = matcher.group(index) ?: continue
+            matches.add(value)
+        }
 
-                // get all matches
-                val matches = mutableListOf<String>()
-                for (index in 0..groupCount) {
-                    val value = matcher.group(index) ?: continue
-                    matches.add(value)
-                }
+        val versionMatch = matches.find { it.matches("\\/v\\d".toRegex()) }
+        val version =
+            if (versionMatch != null) Integer.parseInt(versionMatch.substring(2)) else 3
 
-                val versionMatch = matches.find { it.matches("\\/v\\d".toRegex()) }
-                val version =
-                    if (versionMatch != null) Integer.parseInt(versionMatch.substring(2)) else 3
-
-                // Check for any API keys
-                val authorization = call.request.header("Authorization")
-                if (authorization == null) {
-                    call.respondText(contentType = ContentType.parse("application/json"), HttpStatusCode.Forbidden) {
-                        json.encodeToString(
-                            JsonObject.serializer(),
-                            buildJsonObject {
-                                if (version == 3) {
-                                    put("success", false)
-                                    put(
-                                        "errors",
-                                        buildJsonArray {
-                                            add(
-                                                buildJsonObject {
-                                                    put("code", "BLOCKED_ENDPOINT")
-                                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                                    put("where", "Authorization header is not present")
-                                                }
-                                            )
-                                        }
-                                    )
-                                } else {
-                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                }
+        // Do we have any authorization keys?
+        val auth = call.request.header("Authorization")
+        if (auth == null) {
+            call.respond(
+                HttpStatusCode.Forbidden,
+                buildJsonObject {
+                    if (version == 3) {
+                        put("success", false)
+                        put(
+                            "errors",
+                            buildJsonArray {
+                                add(
+                                    buildJsonObject {
+                                        put("code", "FORBIDDEN")
+                                        put("message", "You cannot access blocked endpoints without proper authorization!")
+                                        put("detail", "You are missing the `Authorization` header in your request.")
+                                    }
+                                )
                             }
                         )
+                    } else {
+                        put("message", "You are missing the `Authorization` header in your request, which means you cannot access blocked endpoints.")
                     }
-
-                    finish()
-                    return@intercept
                 }
+            )
 
-                // Check if the API key is valid
-                val jwt: JwtManager by inject()
-                val params = authorization.split(" ")
+            return@onCall
+        }
 
-                if (params[0] != "Bearer") {
-                    call.respondText(contentType = ContentType.parse("application/json"), HttpStatusCode.Forbidden) {
-                        json.encodeToString(
-                            JsonObject.serializer(),
-                            buildJsonObject {
-                                if (version == 3) {
-                                    put("success", false)
-                                    put(
-                                        "errors",
-                                        buildJsonArray {
-                                            add(
-                                                buildJsonObject {
-                                                    put("code", "BLOCKED_ENDPOINT")
-                                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                                    put("where", "Authorization header prefix was not 'Bearer'")
-                                                }
-                                            )
-                                        }
-                                    )
-                                } else {
-                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                }
+        val params = auth.split(" ")
+        if (params.isEmpty() || params.size > 2) {
+            call.respond(
+                HttpStatusCode.Forbidden,
+                buildJsonObject {
+                    if (version == 3) {
+                        put("success", false)
+                        put(
+                            "errors",
+                            buildJsonArray {
+                                add(
+                                    buildJsonObject {
+                                        put("code", "UNKNOWN_AUTH_STRUCTURE")
+                                        put("message", "You are missing the proper authorization structure.")
+                                        put("detail", "Make sure your Authorization header is: \"Bearer <token>\"")
+                                    }
+                                )
                             }
                         )
+                    } else {
+                        put("message", "Authorization structure was not correct, please format it as so: \"Bearer <token>\"")
                     }
-
-                    finish()
-                    return@intercept
                 }
+            )
 
-                if (!jwt.isValid(params[1])) {
-                    call.respondText(contentType = ContentType.parse("application/json"), HttpStatusCode.Forbidden) {
-                        json.encodeToString(
-                            JsonObject.serializer(),
-                            buildJsonObject {
-                                if (version == 3) {
-                                    put("success", false)
-                                    put(
-                                        "errors",
-                                        buildJsonArray {
-                                            add(
-                                                buildJsonObject {
-                                                    put("code", "BLOCKED_ENDPOINT")
-                                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                                    put("where", "JWT header was not valid")
-                                                }
-                                            )
-                                        }
-                                    )
-                                } else {
-                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                }
+            return@onCall
+        }
+
+        if (params[0] != "Bearer") {
+            call.respond(
+                HttpStatusCode.Forbidden,
+                buildJsonObject {
+                    if (version == 3) {
+                        put("success", false)
+                        put(
+                            "errors",
+                            buildJsonArray {
+                                add(
+                                    buildJsonObject {
+                                        put("code", "UNKNOWN_PREFIX")
+                                        put("message", "The prefix of the Authorization value was not \"Bearer\"")
+                                        put("detail", "Make sure your Authorization header is: \"Bearer <token>\"")
+                                    }
+                                )
                             }
                         )
+                    } else {
+                        put("message", "Authorization structure was not correct, please format it as so: \"Bearer <token>\"")
                     }
-
-                    finish()
-                    return@intercept
                 }
+            )
 
-                // Check if it's in the database
-                val apiKey = asyncTransaction {
-                    ApiKeyEntity.find {
-                        ApiKeysTable.token eq params[1]
-                    }.firstOrNull()
-                }
+            return@onCall
+        }
 
-                if (apiKey == null) {
-                    call.respondText(contentType = ContentType.parse("application/json"), HttpStatusCode.Forbidden) {
-                        json.encodeToString(
-                            JsonObject.serializer(),
-                            buildJsonObject {
-                                if (version == 3) {
-                                    put("success", false)
-                                    put(
-                                        "errors",
-                                        buildJsonArray {
-                                            add(
-                                                buildJsonObject {
-                                                    put("code", "BLOCKED_ENDPOINT")
-                                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                                    put("where", "API key was not found!")
-                                                }
-                                            )
-                                        }
-                                    )
-                                } else {
-                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                }
+        if (!jwt.isValid(params[1])) {
+            call.respond(
+                HttpStatusCode.Forbidden,
+                buildJsonObject {
+                    if (version == 3) {
+                        put("success", false)
+                        put(
+                            "errors",
+                            buildJsonArray {
+                                add(
+                                    buildJsonObject {
+                                        put("code", "INVALID_TOKEN")
+                                        put("message", "Token provided was not a valid token")
+                                    }
+                                )
                             }
                         )
+                    } else {
+                        put("message", "Invalid token was provided, please register one in the Noelware Discord server: https://discord.gg/ATmjFH9kMH")
                     }
-
-                    finish()
-                    return@intercept
                 }
+            )
 
-                // Check if the API key has permissions
-                val perms = apiKey.permissions?.split("|")
-                if (perms?.contains("nsfw") == false) {
-                    call.respondText(contentType = ContentType.parse("application/json"), HttpStatusCode.Forbidden) {
-                        json.encodeToString(
-                            JsonObject.serializer(),
-                            buildJsonObject {
-                                if (version == 3) {
-                                    put("success", false)
-                                    put(
-                                        "errors",
-                                        buildJsonArray {
-                                            add(
-                                                buildJsonObject {
-                                                    put("code", "BLOCKED_ENDPOINT")
-                                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                                    put("where", "API key does not have permissions to use NSFW endpoints. :<")
-                                                }
-                                            )
-                                        }
-                                    )
-                                } else {
-                                    put("message", "You are not allowed to preview NSFW endpoints without an API key.")
-                                }
+            return@onCall
+        }
+
+        // Check if it's in the database
+        val apiKey = asyncTransaction {
+            ApiKeyEntity.find {
+                ApiKeysTable.token eq params[1]
+            }.firstOrNull()
+        }
+
+        if (apiKey == null) {
+            call.respond(
+                HttpStatusCode.Forbidden,
+                buildJsonObject {
+                    if (version == 3) {
+                        put("success", false)
+                        put(
+                            "errors",
+                            buildJsonArray {
+                                add(
+                                    buildJsonObject {
+                                        put("code", "BLOCKED_ENDPOINT")
+                                        put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                                        put("where", "API key was not found!")
+                                    }
+                                )
                             }
                         )
+                    } else {
+                        put("message", "You are not allowed to preview NSFW endpoints without an API key.")
                     }
-
-                    finish()
-                    return@intercept
                 }
+            )
 
-                proceed()
-            }
+            return@onCall
+        }
 
-            return KtorBlockNsfwEndpoints()
+        val perms = apiKey.permissions?.split("|")?.contains("nsfw") ?: false
+        if (!perms) {
+            call.respond(
+                HttpStatusCode.Forbidden,
+                buildJsonObject {
+                    if (version == 3) {
+                        put("success", false)
+                        put(
+                            "errors",
+                            buildJsonArray {
+                                add(
+                                    buildJsonObject {
+                                        put("code", "BLOCKED_ENDPOINT")
+                                        put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                                        put("where", "API key does not have permissions to use NSFW endpoints. :<")
+                                    }
+                                )
+                            }
+                        )
+                    } else {
+                        put("message", "You are not allowed to preview NSFW endpoints without an API key.")
+                    }
+                }
+            )
+
+            return@onCall
         }
     }
 }

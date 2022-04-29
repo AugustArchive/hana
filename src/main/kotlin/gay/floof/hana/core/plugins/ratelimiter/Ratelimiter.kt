@@ -26,10 +26,10 @@ package gay.floof.hana.core.plugins.ratelimiter
 import gay.floof.hana.core.managers.JwtManager
 import gay.floof.hana.core.managers.RedisManager
 import gay.floof.utils.slf4j.logging
-import io.ktor.application.*
-import io.ktor.features.*
 import io.ktor.http.*
-import io.ktor.request.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.*
+import io.ktor.server.request.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.sync.Mutex

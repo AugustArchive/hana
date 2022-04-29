@@ -36,11 +36,11 @@ buildscript {
     }
 
     dependencies {
-        classpath(kotlin("gradle-plugin", version = "1.6.10"))
-        classpath(kotlin("serialization", version = "1.6.10"))
         classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.17.2")
-        classpath("gay.floof.utils:gradle-utils:1.3.0")
         classpath("com.diffplug.spotless:spotless-plugin-gradle:6.5.1")
+        classpath("gay.floof.utils:gradle-utils:1.3.0")
+        classpath(kotlin("gradle-plugin", version = "1.6.21"))
+        classpath(kotlin("serialization", version = "1.6.21"))
     }
 }
 
@@ -85,13 +85,17 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation(kotlin("stdlib"))
 
-    // kotlinx.coroutines libraries
+    // BOM
+    api(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.3.2"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.6.1"))
+    api(platform("software.amazon.awssdk:bom:2.17.177"))
+    api(platform("io.ktor:ktor-bom:2.0.0"))
+
+    // kotlinx.coroutines libraries
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
     // kotlinx.serialization libraries
-    api(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.3.2"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
     api("org.jetbrains.kotlinx:kotlinx-serialization-core")
 
@@ -106,9 +110,16 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
 
     // Ktor Server libraries
-    implementation("io.ktor:ktor-server-netty")
+    implementation("io.ktor:ktor-serialization-kotlinx-json")
+    implementation("io.ktor:ktor-server-content-negotiation")
+    implementation("io.ktor:ktor-server-auto-head-response")
+    implementation("io.ktor:ktor-server-default-headers")
+    implementation("io.ktor:ktor-server-double-receive")
+    implementation("io.ktor:ktor-server-call-logging")
+    implementation("io.ktor:ktor-server-status-pages")
     implementation("io.ktor:ktor-serialization")
-    api(platform("io.ktor:ktor-bom:1.6.8"))
+    implementation("io.ktor:ktor-server-netty")
+    implementation("io.ktor:ktor-server-cors")
 
     // Koin
     implementation("io.insert-koin:koin-core:3.1.6")
@@ -135,7 +146,7 @@ dependencies {
     implementation("io.prometheus:simpleclient:0.15.0")
 
     // Discord Interactions
-    implementation("net.perfectdreams.discordinteraktions:webserver-ktor-kord:0.0.12")
+    implementation("net.perfectdreams.discordinteraktions:webserver-ktor-kord:0.0.13-SNAPSHOT")
 
     // Redis (for ratelimiting cache)
     implementation("io.lettuce:lettuce-core:6.1.8.RELEASE")
@@ -153,20 +164,18 @@ dependencies {
     implementation("com.charleskorn.kaml:kaml:0.43.0")
 
     // OkHttp (for ktor client)
+    implementation("io.ktor:ktor-client-content-negotiation")
     implementation("io.ktor:ktor-client-okhttp")
     implementation("io.ktor:ktor-client-core")
 
     // Kord
-    implementation("dev.kord:kord-core:0.8.0-M12")
+    implementation("dev.kord:kord-core:0.8.0-M13")
 
     // JWT
     implementation("com.auth0:java-jwt:3.19.1")
 
     // S3
-    implementation("aws.sdk.kotlin:s3:0.9.4-beta")
-
-    // Virtual Filesystem in-memory
-    implementation("com.google.jimfs:jimfs:1.2")
+    implementation("software.amazon.awssdk:s3")
 }
 
 spotless {

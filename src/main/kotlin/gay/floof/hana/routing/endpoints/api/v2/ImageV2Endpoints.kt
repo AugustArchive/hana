@@ -27,13 +27,13 @@ import gay.floof.hana.core.s3.S3Service
 import gay.floof.hana.routing.AbstractEndpoint
 import gay.floof.hana.utils.toJsonPrimitive
 import gay.floof.hana.utils.writeJson
-import io.ktor.application.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayInputStream
@@ -47,7 +47,7 @@ class YiffV2Endpoint(private val s3: S3Service, private val httpClient: HttpClie
         // TODO: possibly cache this?
         val res: HttpResponse = httpClient.get(url)
         val stream = withContext(Dispatchers.IO) {
-            ByteArrayInputStream(res.receive())
+            ByteArrayInputStream(res.body())
         }
 
         val streamImage = withContext(Dispatchers.IO) {
@@ -89,10 +89,10 @@ class YiffV2Endpoint(private val s3: S3Service, private val httpClient: HttpClie
 class YiffImageV2Endpoint(private val s3: S3Service, private val httpClient: HttpClient): AbstractEndpoint("/v2/yiff/random", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         val url = s3.getObjects("yiff").random()
-        val res = httpClient.get<HttpResponse>(url)
+        val res = httpClient.get(url)
 
         val content = withContext(Dispatchers.IO) {
-            res.receive<ByteArray>()
+            res.body<ByteArray>()
         }
 
         val header = when (url.split('.').last()) {
@@ -118,7 +118,7 @@ class KadiV2Endpoint(private val s3: S3Service, private val httpClient: HttpClie
         // TODO: possibly cache this?
         val res: HttpResponse = httpClient.get(url)
         val stream = withContext(Dispatchers.IO) {
-            ByteArrayInputStream(res.receive())
+            ByteArrayInputStream(res.body())
         }
 
         val streamImage = withContext(Dispatchers.IO) {
@@ -159,9 +159,9 @@ class KadiV2Endpoint(private val s3: S3Service, private val httpClient: HttpClie
 class KadiImageV2Endpoint(private val s3: S3Service, private val httpClient: HttpClient): AbstractEndpoint("/v2/kadi/random", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
         val url = s3.getObjects("kadi").random()
-        val res = httpClient.get<HttpResponse>(url)
+        val res = httpClient.get(url)
 
-        val content = res.receive<ByteArray>()
+        val content = res.body<ByteArray>()
         val header = when (url.split('.').last()) {
             "png" -> ContentType.Image.PNG
             "jpg" -> ContentType.Image.JPEG

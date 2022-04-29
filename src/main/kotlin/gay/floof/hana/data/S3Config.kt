@@ -23,9 +23,17 @@
 
 package gay.floof.hana.data
 
+import kotlinx.serialization.SerialName
+
 @kotlinx.serialization.Serializable
 data class S3Config(
+    @SerialName("enforce_path_style")
+    val enforceNewPathStyle: Boolean = false,
+
+    @SerialName("access_key")
     val accessKey: String? = null,
+
+    @SerialName("secret_key")
     val secretKey: String? = null,
     val bucket: String = "hana",
     val endpoint: String? = null,

@@ -26,65 +26,55 @@ package gay.floof.hana.core.plugins
 import gay.floof.hana.core.Hana
 import gay.floof.hana.core.extensions.inject
 import gay.floof.hana.core.metrics.MetricsHandler
-import gay.floof.utils.slf4j.logging
-import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.request.*
+import io.ktor.server.application.*
+import io.ktor.server.application.hooks.*
+import io.ktor.server.request.*
 import io.ktor.util.*
-import io.ktor.util.pipeline.*
 import io.prometheus.client.Histogram
 import org.apache.commons.lang3.time.StopWatch
+import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import java.util.concurrent.TimeUnit
 
-class KtorLoggingPlugin {
-    private val log by logging<KtorLoggingPlugin>()
-    private val startTimePhase = PipelinePhase("StartTimePhase")
-    private val logResponsePhase = PipelinePhase("LogResponsePhase")
-    private val prometheusObserver = AttributeKey<Histogram.Timer>("PrometheusObserver")
-    private val startTimeKey = AttributeKey<StopWatch>("StartTimeKey")
+val KtorLoggingPlugin = createApplicationPlugin("HanaLogging") {
+    val prometheusObserver = AttributeKey<Histogram.Timer>("PrometheusObserver")
+    val stopwatchKey = AttributeKey<StopWatch>("Stopwatch")
+    val log = LoggerFactory.getLogger("gay.floof.hana.core.plugins.KtorLoggingPluginKt")
+    val metrics by inject<MetricsHandler>()
 
-    private fun install(pipeline: Application) {
-        pipeline.environment.monitor.subscribe(ApplicationStarted) {
-            log.info("Started HTTP service in ${Hana.bootTime.getTime(TimeUnit.MILLISECONDS)}ms")
-        }
+    environment?.monitor?.subscribe(ApplicationStarted) {
+        log.info("Started API in ${Hana.bootTime.getTime(TimeUnit.SECONDS)} seconds!")
+    }
 
-        pipeline.environment.monitor.subscribe(ApplicationStopped) {
-            log.info("HTTP service has completely stopped!")
-        }
+    environment?.monitor?.subscribe(ApplicationStopped) {
+        log.warn("HTTP service has died :(")
+    }
 
-        pipeline.addPhase(startTimePhase)
-        pipeline.intercept(startTimePhase) {
-            call.attributes.put(startTimeKey, StopWatch.createStarted())
-        }
+    on(CallSetup) { call ->
+        MDC.put("user_agent", call.request.userAgent())
 
-        pipeline.intercept(ApplicationCallPipeline.Setup) {
-            val metrics: MetricsHandler by inject()
-            if (metrics.enabled) {
-                val timer = metrics.requestLatency!!.startTimer()
-                call.attributes.put(prometheusObserver, timer)
-            }
-        }
+        call.attributes.put(stopwatchKey, StopWatch.createStarted())
 
-        pipeline.addPhase(logResponsePhase)
-        pipeline.intercept(logResponsePhase) {
-            logResponse(call)
+        if (metrics.enabled) {
+            call.attributes.put(prometheusObserver, metrics.requestLatency!!.startTimer())
         }
     }
 
-    private fun logResponse(call: ApplicationCall) {
-        val stopwatch = call.attributes[startTimeKey]
-        val status = call.response.status() ?: HttpStatusCode.OK
-        val timer = call.attributes.getOrNull(prometheusObserver)
+    on(ResponseSent) { call ->
+        MDC.remove("user_agent")
+
+        val method = call.request.httpMethod
+        val version = call.request.httpVersion
+        val endpoint = call.request.uri
+        val status = call.response.status() ?: HttpStatusCode(-1, "Unknown HTTP Method")
+        val stopwatch = call.attributes[stopwatchKey]
+        val userAgent = call.request.userAgent()
+        val observer = call.attributes.getOrNull(prometheusObserver)
 
         stopwatch.stop()
-        timer?.observeDuration()
+        observer?.observeDuration()
 
-        log.info("${status.value} ${status.description} :: ${call.request.httpMethod.value} ${call.request.path()} [${stopwatch.getTime(TimeUnit.MILLISECONDS)}ms]")
-    }
-
-    companion object: ApplicationFeature<Application, Unit, KtorLoggingPlugin> {
-        override val key: AttributeKey<KtorLoggingPlugin> = AttributeKey("KtorLoggingPlugin")
-        override fun install(pipeline: Application, configure: Unit.() -> Unit): KtorLoggingPlugin =
-            KtorLoggingPlugin().apply { install(pipeline) }
+        log.info("${method.value} $version $endpoint [$userAgent] :: ${status.value} ${status.description} [${stopwatch.getTime(TimeUnit.MILLISECONDS)}ms]")
     }
 }

@@ -35,30 +35,33 @@ import gay.floof.hana.core.discord.executors.InfoOnApiKeyCommandExecutor
 import gay.floof.hana.core.discord.executors.RevokeApiKeyCommandExecutor
 import gay.floof.hana.core.extensions.formatSize
 import gay.floof.hana.core.extensions.inject
+import gay.floof.hana.core.extensions.retrieve
 import gay.floof.hana.core.interfaces.SuspendAutoCloseable
 import gay.floof.hana.core.metrics.MetricsHandler
 import gay.floof.hana.core.plugins.KtorBlockNsfwEndpoints
 import gay.floof.hana.core.plugins.KtorLoggingPlugin
 import gay.floof.hana.core.plugins.KtorRatelimitingPlugin
+import gay.floof.hana.core.plugins.ratelimiter.Ratelimiter
 import gay.floof.hana.core.threading.threadFactory
 import gay.floof.hana.data.Environment
 import gay.floof.hana.data.HanaConfig
 import gay.floof.hana.routing.AbstractEndpoint
 import gay.floof.utils.slf4j.logging
-import io.ktor.application.*
-import io.ktor.features.*
 import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.serialization.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.autohead.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.*
+import io.ktor.server.plugins.defaultheaders.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import io.sentry.Sentry
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.buildJsonArray
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
+import kotlinx.serialization.json.*
 import net.perfectdreams.discordinteraktions.common.commands.CommandManager
 import net.perfectdreams.discordinteraktions.platforms.kord.commands.KordCommandRegistry
 import net.perfectdreams.discordinteraktions.webserver.DefaultInteractionRequestHandler
@@ -70,7 +73,6 @@ import java.lang.management.ManagementFactory
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import dev.floofy.ktor.plugins.Sentry as KtorSentry
 
 class Hana: SuspendAutoCloseable {
     companion object {
@@ -115,10 +117,10 @@ class Hana: SuspendAutoCloseable {
 
             Sentry.configureScope {
                 it.tags += mapOf(
-                    "helm.server.environment" to config.environment.asName(),
-                    "helm.server.commit.sha" to HanaInfo.COMMIT_HASH,
-                    "helm.server.build.date" to HanaInfo.BUILD_DATE,
-                    "helm.server.version" to HanaInfo.VERSION,
+                    "hana.environment" to config.environment.asName(),
+                    "hana.commit.sha" to HanaInfo.COMMIT_HASH,
+                    "hana.build.date" to HanaInfo.BUILD_DATE,
+                    "hana.version" to HanaInfo.VERSION,
                     "system.user" to System.getProperty("user.name"),
                     "system.os" to "${os.name} (${os.arch}; ${os.version})"
                 )
@@ -152,8 +154,8 @@ class Hana: SuspendAutoCloseable {
             InfoOnApiKeyCommand()
         )
 
-        registry.updateAllCommandsInGuild(Snowflake(824066105102303232), true)
-        registry.updateAllCommandsInGuild(Snowflake(743698927039283201), true)
+        registry.updateAllCommandsInGuild(Snowflake(824066105102303232))
+        registry.updateAllCommandsInGuild(Snowflake(743698927039283201))
 
         log.info("* Launching HTTP service...")
         val environment = applicationEngineEnvironment {
@@ -166,43 +168,37 @@ class Hana: SuspendAutoCloseable {
             }
 
             module {
-                val json: Json by inject()
-
                 install(KtorBlockNsfwEndpoints)
                 install(KtorRatelimitingPlugin)
                 install(KtorLoggingPlugin)
                 install(AutoHeadResponse)
 
-                if (config.sentryDsn != null) {
-                    install(KtorSentry)
-                }
-
                 install(ContentNegotiation) {
-                    json(json)
+                    json(GlobalContext.retrieve())
                 }
 
                 install(CORS) {
-                    header("X-Forwarded-Proto")
+                    headers += "X-Forwarded-Proto"
                     anyHost()
                 }
 
-                install(DefaultHeaders) {
-                    header("X-Powered-By", "noel/hana (+https://github.com/auguwu/hana; v${HanaInfo.VERSION})")
-                    header("Cache-Control", "public, max-age=7776000")
-
-                    if (config.server.securityHeaders) {
-                        header("X-Frame-Options", "deny")
-                        header("X-Content-Type-Options", "nosniff")
-                        header("X-XSS-Protection", "1; mode=block")
-                    }
-
-                    for ((key, value) in config.server.extraHeaders) {
-                        header(key, value)
-                    }
-                }
+//                install(DefaultHeaders) {
+//                    header("X-Powered-By", "Noel/Hana (+https://github.com/auguwu/hana; v${HanaInfo.VERSION})")
+//                    header("Cache-Control", "public, max-age=7776000")
+//
+//                    if (config.server.securityHeaders) {
+//                        header("X-Frame-Options", "deny")
+//                        header("X-Content-Type-Options", "nosniff")
+//                        header("X-XSS-Protection", "1; mode=block")
+//                    }
+//
+//                    for ((key, value) in config.server.extraHeaders) {
+//                        header(key, value)
+//                    }
+//                }
 
                 install(StatusPages) {
-                    status(HttpStatusCode.NotFound) {
+                    status(HttpStatusCode.NotFound) { call, _ ->
                         call.respond(
                             HttpStatusCode.NotFound,
                             buildJsonObject {
@@ -222,12 +218,16 @@ class Hana: SuspendAutoCloseable {
                         )
                     }
 
-                    exception<Exception> { cause ->
+                    exception<Exception> { call, cause ->
                         if (Sentry.isEnabled()) {
                             Sentry.captureException(cause)
                         }
 
-                        log.error("Unable to handle request ${call.request.httpMethod.value} ${call.request.path()}:", cause)
+                        this@Hana.log.error("Unable to handle request ${call.request.httpMethod.value} ${call.request.path()}:", cause)
+
+                        // If a response was already sent, let's not send a new one.
+                        if (call.isHandled) return@exception
+
                         call.respond(
                             HttpStatusCode.InternalServerError,
                             buildJsonObject {
@@ -257,7 +257,7 @@ class Hana: SuspendAutoCloseable {
 
                 routing {
                     val endpoints = koin.getAll<AbstractEndpoint>()
-                    log.info("Found ${endpoints.size} endpoints to register.")
+                    this@Hana.log.info("Found ${endpoints.size} endpoints to register.")
 
                     for (endpoint in endpoints) {
                         val pathMethodPair = Pair(endpoint.path, endpoint.method)
@@ -265,7 +265,7 @@ class Hana: SuspendAutoCloseable {
                             continue
 
                         routesRegistered.add(pathMethodPair)
-                        log.info("Registering endpoint ${endpoint.method.value} ${endpoint.path}")
+                        this@Hana.log.info("Registering endpoint ${endpoint.method.value} ${endpoint.path}")
                         route(endpoint.path, endpoint.method) {
                             handle {
                                 val metrics: MetricsHandler by inject()
@@ -276,7 +276,7 @@ class Hana: SuspendAutoCloseable {
                         }
                     }
 
-                    log.info("Registered all endpoints! Now registering Discord Interactions...")
+                    this@Hana.log.info("Installing Discord interactions handler...")
                     installDiscordInteractions(
                         config.publicKey,
                         "/api/interactions",
@@ -313,8 +313,12 @@ class Hana: SuspendAutoCloseable {
             return
         }
 
-        val ratelimiting = server.application.featureOrNull(KtorRatelimitingPlugin)
-        ratelimiting?.ratelimiter?.close()
+        val ratelimiter: Ratelimiter by inject()
+        try {
+            ratelimiter.close()
+        } catch (e: Throwable) {
+            // don't do anything
+        }
 
         server.stop(1, 5, TimeUnit.SECONDS)
     }

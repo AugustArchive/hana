@@ -26,13 +26,13 @@ package gay.floof.hana.routing.endpoints.api.v3
 import gay.floof.hana.core.extensions.inject
 import gay.floof.hana.core.s3.S3Service
 import gay.floof.hana.routing.AbstractEndpoint
-import io.ktor.application.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
@@ -50,9 +50,9 @@ object ImageEndpointUtil {
 
         // Get the image as a InputStream
         // TODO: possibly cache this?
-        val res: HttpResponse = httpClient.get(url)
+        val res = httpClient.get(url)
         val stream = withContext(Dispatchers.IO) {
-            ByteArrayInputStream(res.receive())
+            ByteArrayInputStream(res.body())
         }
 
         val streamImage = withContext(Dispatchers.IO) {
@@ -99,8 +99,8 @@ object ImageEndpointUtil {
 
         // Get the image as a InputStream
         // TODO: possibly cache this?
-        val res: HttpResponse = httpClient.get(url)
-        val content = res.receive<ByteArray>()
+        val res = httpClient.get(url)
+        val content = res.body<ByteArray>()
         val stream = ByteArrayInputStream(content)
 
         val streamImage = withContext(Dispatchers.IO) {
@@ -158,17 +158,17 @@ class YiffImageEndpoint: AbstractEndpoint("/yiff/random", HttpMethod.Get) {
     }
 }
 
-class YiffV3Endpoint: AbstractEndpoint("/v3/yiff", HttpMethod.Get) {
-    override suspend fun call(call: ApplicationCall) {
-        call.respond(ImageEndpointUtil.getImage("yiff"))
-    }
-}
-
-class YiffV3ImageEndpoint: AbstractEndpoint("/v3/yiff/random", HttpMethod.Get) {
-    override suspend fun call(call: ApplicationCall) {
-        ImageEndpointUtil.sendImageFromBytes(call, "yiff")
-    }
-}
+// class YiffV3Endpoint: AbstractEndpoint("/v3/yiff", HttpMethod.Get) {
+//    override suspend fun call(call: ApplicationCall) {
+//        call.respond(ImageEndpointUtil.getImage("yiff"))
+//    }
+// }
+//
+// class YiffV3ImageEndpoint: AbstractEndpoint("/v3/yiff/random", HttpMethod.Get) {
+//    override suspend fun call(call: ApplicationCall) {
+//        ImageEndpointUtil.sendImageFromBytes(call, "yiff")
+//    }
+// }
 
 class KadiEndpoint: AbstractEndpoint("/kadi", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
@@ -182,17 +182,17 @@ class KadiImageEndpoint: AbstractEndpoint("/kadi/random", HttpMethod.Get) {
     }
 }
 
-class KadiV3Endpoint: AbstractEndpoint("/v3/kadi", HttpMethod.Get) {
-    override suspend fun call(call: ApplicationCall) {
-        call.respond(ImageEndpointUtil.getImage("kadi"))
-    }
-}
-
-class KadiV3ImageEndpoint: AbstractEndpoint("/v3/kadi/random", HttpMethod.Get) {
-    override suspend fun call(call: ApplicationCall) {
-        ImageEndpointUtil.sendImageFromBytes(call, "kadi")
-    }
-}
+// class KadiV3Endpoint: AbstractEndpoint("/v3/kadi", HttpMethod.Get) {
+//    override suspend fun call(call: ApplicationCall) {
+//        call.respond(ImageEndpointUtil.getImage("kadi"))
+//    }
+// }
+//
+// class KadiV3ImageEndpoint: AbstractEndpoint("/v3/kadi/random", HttpMethod.Get) {
+//    override suspend fun call(call: ApplicationCall) {
+//        ImageEndpointUtil.sendImageFromBytes(call, "kadi")
+//    }
+// }
 
 class WahsEndpoint: AbstractEndpoint("/wah", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
@@ -206,14 +206,14 @@ class WahsImageEndpoint: AbstractEndpoint("/wah/random", HttpMethod.Get) {
     }
 }
 
-class WahsV3Endpoint: AbstractEndpoint("/v3/wah", HttpMethod.Get) {
-    override suspend fun call(call: ApplicationCall) {
-        call.respond(ImageEndpointUtil.getImage("wahs"))
-    }
-}
-
-class WahsV3ImageEndpoint: AbstractEndpoint("/v3/wah/random", HttpMethod.Get) {
-    override suspend fun call(call: ApplicationCall) {
-        ImageEndpointUtil.sendImageFromBytes(call, "wahs")
-    }
-}
+// class WahsV3Endpoint: AbstractEndpoint("/v3/wah", HttpMethod.Get) {
+//    override suspend fun call(call: ApplicationCall) {
+//        call.respond(ImageEndpointUtil.getImage("wahs"))
+//    }
+// }
+//
+// class WahsV3ImageEndpoint: AbstractEndpoint("/v3/wah/random", HttpMethod.Get) {
+//    override suspend fun call(call: ApplicationCall) {
+//        ImageEndpointUtil.sendImageFromBytes(call, "wahs")
+//    }
+// }

@@ -26,7 +26,6 @@ package gay.floof.hana
 import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import com.zaxxer.hikari.util.IsolationLevel
 import gay.floof.hana.core.Hana
 import gay.floof.hana.core.database.tables.ApiKeysTable
 import gay.floof.hana.core.extensions.inject
@@ -83,7 +82,6 @@ object Bootstrap: AutoCloseable {
                 schema = config.database.schema
                 driverClassName = "org.postgresql.Driver"
                 isAutoCommit = false
-                transactionIsolation = IsolationLevel.TRANSACTION_REPEATABLE_READ.name
                 leakDetectionThreshold = 30 * 1000
                 poolName = "Hana-HikariPool"
             }
@@ -93,7 +91,6 @@ object Bootstrap: AutoCloseable {
             dataSource,
             databaseConfig = DatabaseConfig.invoke {
                 defaultRepetitionAttempts = 5
-                defaultIsolationLevel = IsolationLevel.TRANSACTION_REPEATABLE_READ.levelId
                 sqlLogger = if (config.environment == Environment.Development) {
                     Slf4jSqlDebugLogger
                 } else {

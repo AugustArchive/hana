@@ -23,68 +23,93 @@
 
 package gay.floof.hana.core.s3
 
-import aws.sdk.kotlin.runtime.auth.credentials.Credentials
-import aws.sdk.kotlin.runtime.auth.credentials.DefaultChainCredentialsProvider
-import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
-import aws.sdk.kotlin.runtime.endpoint.AwsEndpoint
-import aws.sdk.kotlin.runtime.endpoint.AwsEndpointResolver
-import aws.sdk.kotlin.services.s3.S3Client
-import aws.sdk.kotlin.services.s3.model.ListObjectsRequest
 import gay.floof.hana.data.HanaConfig
 import gay.floof.utils.slf4j.logging
-import kotlinx.coroutines.runBlocking
+import software.amazon.awssdk.auth.credentials.AwsCredentials
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
+import java.net.URI
 
 class S3Service(config: HanaConfig) {
-    private val images = mutableMapOf<String, List<String>>()
+    private val images = mutableMapOf<String, MutableList<String>>()
 
     private val log by logging<S3Service>()
-    private val client: S3Client = S3Client.invoke {
-        credentialsProvider = if (config.s3.accessKey == null && config.s3.secretKey == null) {
-            DefaultChainCredentialsProvider()
-        } else {
-            StaticCredentialsProvider(
-                Credentials(
-                    accessKeyId = config.s3.accessKey!!,
-                    secretAccessKey = config.s3.secretKey!!
-                )
+    private val client: S3Client
+
+    init {
+        log.info("Configuring S3 client...")
+
+        val builder = S3Client.builder()
+            .region(Region.of(config.s3.region))
+
+        if (config.s3.enforceNewPathStyle)
+            builder.serviceConfiguration {
+                it.pathStyleAccessEnabled(true)
+            }
+
+        if (config.s3.secretKey != null || config.s3.accessKey != null) {
+            builder.credentialsProvider(
+                StaticCredentialsProvider.create(object: AwsCredentials {
+                    override fun accessKeyId(): String = config.s3.accessKey!!
+                    override fun secretAccessKey(): String = config.s3.secretKey!!
+                })
             )
         }
 
-        region = config.s3.region
-        endpointResolver = if (config.s3.endpoint != null) {
-            AwsEndpointResolver { _, _ ->
-                AwsEndpoint(config.s3.endpoint)
-            }
-        } else {
-            null
+        if (config.s3.endpoint != null) {
+            builder.endpointOverride(URI.create(config.s3.endpoint))
         }
-    }
 
-    init {
-        log.info("* Initializing image cache...")
+        client = builder.build()
 
-        runBlocking {
-            val request = ListObjectsRequest {
-                bucket = config.s3.bucket
+        log.info("Constructed S3 client, now initializing image cache...")
+        var request = ListObjectsV2Request.builder()
+            .bucket(config.s3.bucket)
+            .build()
+
+        while (true) {
+            val objects = client.listObjectsV2(request)
+            for (content in objects.contents()) {
+                val isDir = content.key().split("").last() == "/"
+                if (isDir) continue
+
+                val key = content.key()
+                when (key.split("/").first()) {
+                    "yiff" -> {
+                        if (!images.containsKey("yiff"))
+                            images["yiff"] = mutableListOf()
+
+                        images["yiff"]!!.add("https://cdn.floofy.dev/$key")
+                    }
+
+                    "polarbois" -> {
+                        if (!images.containsKey("polarbois"))
+                            images["polarbois"] = mutableListOf()
+
+                        images["polarbois"]!!.add("https://cdn.floofy.dev/$key")
+                    }
+
+                    "wahs" -> {
+                        if (!images.containsKey("wahs"))
+                            images["wahs"] = mutableListOf()
+
+                        images["wahs"]!!.add("https://cdn.floofy.dev/$key")
+                    }
+                }
             }
 
-            val response = client.listObjects(request)
-            if (response.contents == null)
-                throw IllegalStateException("Unable to retrieve objects from S3!")
+            if (objects.nextContinuationToken() == null) {
+                break
+            }
 
-            // Retrieve all polar bois
-            val polarbois = response.contents!!.filter { it.key!!.contains("polarbois/") }
-            val yiff = response.contents!!.filter { it.key!!.contains("yiff/") }
-            val wahs = response.contents!!.filter { it.key!!.contains("wahs/") }
-            val kadi = response.contents!!.filter { it.key!!.contains("kadi/") }
-
-            images["polarbois"] = polarbois.map { "https://cdn.floofy.dev/${it.key}" }
-            images["yiff"] = yiff.map { "https://cdn.floofy.dev/${it.key}" }
-            images["wahs"] = wahs.map { "https://cdn.floofy.dev/${it.key}" }
-            images["kadi"] = kadi.map { "https://cdn.floofy.dev/${it.key}" }
-
-            log.info("Done!")
+            request = request.toBuilder()
+                .continuationToken(objects.nextContinuationToken())
+                .build()
         }
+
+        log.info("Finished image cache. :D")
     }
 
     fun getObjects(parent: String): List<String> = images[parent] ?: listOf()

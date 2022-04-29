@@ -24,9 +24,9 @@
 package gay.floof.hana.routing.endpoints.api.v3
 
 import gay.floof.hana.routing.AbstractEndpoint
-import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 

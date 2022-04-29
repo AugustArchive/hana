@@ -5,13 +5,8 @@
     <!-- Add the properties from the "src/main/resources/config/logging.example.properties" file -->
     <property resource="config/logging.properties" />
 
-    <!-- Add the properties from /app/noel/hana/logback.properties -->
-    <property resource="/app/noel/hana/logback.properties" />
-
-    <!-- Add the `HANA_LOGBACK_PROPERTIES` environment variable -->
-    <if condition="isDefined('HANA_LOGBACK_PROPERTIES')">
-        <property resource="${HANA_LOGBACK_PROPERTIES}" />
-    </if>
+    <!-- Add it from the Java property `gay.floof.hana.logback.config` -->
+    <property resource="${gay.floof.hana.logback.config:-}" />
 
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -54,15 +49,46 @@
 
     <!--
     This allows you to embed Logstash with Logback to visualize logging with Kibana, which
-    will be outputted in ElasticSearch.
+    will be outputted in Elasticsearch.
     -->
     <if condition='property("hana.logging.appenders").contains("logstash")'>
         <then>
             <appender name="Logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-                <destination>${hana.logging.logstash.urls}</destination>
-                <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+                <destination>${hana.logging.logstash.url}</destination>
+                <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                    <providers>
+                        <timestamp />
+                        <message />
+                        <loggerName />
+                        <threadName />
+                        <logLevel />
+                        <callerData />
+                        <stackTrace />
+                        <contextName />
+                        <mdc />
+                        <tags />
+                        <logstashMarkers />
+                        <throwableClassName />
+                        <throwableMessage />
+                        <throwableRootCauseClassName />
+                        <throwableRootCauseMessage />
+                        <includeMdcKeyName>user_agent</includeMdcKeyName>
+                    </providers>
+
+                    <customFields>{"product":"hana","vendor":"Noel"}</customFields>
+                </encoder>
+
                 <keepAliveDuration>5 minutes</keepAliveDuration>
+                <writeVersionAsInteger>true</writeVersionAsInteger>
             </appender>
+        </then>
+    </if>
+
+    <if condition='property("hana.logging.appenders").contains("sentry")'>
+        <then>
+            <root level="ERROR">
+                <appender-ref ref="Sentry" />
+            </root>
         </then>
     </if>
 
@@ -73,12 +99,6 @@
                 <if condition='property("hana.logging.appenders").contains("file")'>
                     <then>
                         <appender-ref ref="File" />
-                    </then>
-                </if>
-
-                <if condition='property("hana.logging.appenders").contains("sentry")'>
-                    <then>
-                        <appender-ref ref="Sentry" />
                     </then>
                 </if>
 
@@ -94,12 +114,6 @@
                 <if condition='property("hana.logging.appenders").contains("file")'>
                     <then>
                         <appender-ref ref="File" />
-                    </then>
-                </if>
-
-                <if condition='property("hana.logging.appenders").contains("sentry")'>
-                    <then>
-                        <appender-ref ref="Sentry" />
                     </then>
                 </if>
 
@@ -119,12 +133,6 @@
                     </then>
                 </if>
 
-                <if condition='property("hana.logging.appenders").contains("sentry")'>
-                    <then>
-                        <appender-ref ref="Sentry" />
-                    </then>
-                </if>
-
                 <if condition='property("hana.logging.appenders").contains("logstash")'>
                     <then>
                         <appender-ref ref="Logstash" />
@@ -137,12 +145,6 @@
                 <if condition='property("hana.logging.appenders").contains("file")'>
                     <then>
                         <appender-ref ref="File" />
-                    </then>
-                </if>
-
-                <if condition='property("hana.logging.appenders").contains("sentry")'>
-                    <then>
-                        <appender-ref ref="Sentry" />
                     </then>
                 </if>
 

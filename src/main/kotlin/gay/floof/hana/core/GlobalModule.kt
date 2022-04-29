@@ -27,12 +27,13 @@ import gay.floof.hana.core.interceptors.LoggingInterceptor
 import gay.floof.hana.core.interceptors.SentryInterceptor
 import gay.floof.hana.core.managers.JwtManager
 import gay.floof.hana.core.metrics.MetricsHandler
+import gay.floof.hana.core.plugins.ratelimiter.Ratelimiter
 import gay.floof.hana.core.s3.S3Service
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
 import io.sentry.Sentry
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
@@ -62,8 +63,8 @@ val hanaModule = module {
                 }
             }
 
-            install(JsonFeature) {
-                serializer = KotlinxSerializer(get())
+            install(ContentNegotiation) {
+                json(get())
             }
 
             install(UserAgent) {
@@ -82,5 +83,9 @@ val hanaModule = module {
 
     single {
         S3Service(get())
+    }
+
+    single {
+        Ratelimiter(get(), get(), get())
     }
 }

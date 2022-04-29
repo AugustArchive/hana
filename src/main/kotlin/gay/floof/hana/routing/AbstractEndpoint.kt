@@ -23,8 +23,8 @@
 
 package gay.floof.hana.routing
 
-import io.ktor.application.*
 import io.ktor.http.*
+import io.ktor.server.application.*
 
 /**
  * Represents an abstracted class to use as the endpoint module class.

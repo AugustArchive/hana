@@ -25,9 +25,9 @@ package gay.floof.hana.routing.endpoints
 
 import gay.floof.hana.core.metrics.MetricsHandler
 import gay.floof.hana.routing.AbstractEndpoint
-import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import io.prometheus.client.exporter.common.TextFormat
 
 class MetricsEndpoint(private val metrics: MetricsHandler): AbstractEndpoint("/metrics", HttpMethod.Get) {

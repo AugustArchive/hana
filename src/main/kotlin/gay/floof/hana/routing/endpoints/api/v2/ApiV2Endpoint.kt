@@ -25,9 +25,9 @@ package gay.floof.hana.routing.endpoints.api.v2
 
 import gay.floof.hana.data.responses.GenericV2Response
 import gay.floof.hana.routing.AbstractEndpoint
-import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 
 class ApiV2Endpoint: AbstractEndpoint("/v2", HttpMethod.Get) {
     override suspend fun call(call: ApplicationCall) {
