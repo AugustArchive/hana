@@ -161,7 +161,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.0.1")
 
     // YAML (configuration)
-    implementation("com.charleskorn.kaml:kaml:0.43.0")
+    implementation("com.charleskorn.kaml:kaml:0.44.0")
 
     // OkHttp (for ktor client)
     implementation("io.ktor:ktor-client-content-negotiation")
