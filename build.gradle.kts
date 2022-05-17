@@ -169,7 +169,7 @@ dependencies {
     implementation("io.ktor:ktor-client-core")
 
     // Kord
-    implementation("dev.kord:kord-core:0.8.0-M13")
+    implementation("dev.kord:kord-core:0.8.0-M14")
 
     // JWT
     implementation("com.auth0:java-jwt:3.19.2")
