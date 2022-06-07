@@ -137,7 +137,7 @@ dependencies {
     implementation("org.codehaus.janino:janino:3.1.7")
 
     // Sentry
-    implementation("io.sentry:sentry:5.7.4")
+    implementation("io.sentry:sentry:6.0.0")
     implementation("io.sentry:sentry-logback:5.7.4")
 
     // Prometheus (for metrics)
