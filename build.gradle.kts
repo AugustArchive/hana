@@ -37,7 +37,7 @@ buildscript {
 
     dependencies {
         classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.17.3")
-        classpath("com.diffplug.spotless:spotless-plugin-gradle:6.7.1")
+        classpath("com.diffplug.spotless:spotless-plugin-gradle:6.7.2")
         classpath("gay.floof.utils:gradle-utils:1.3.0")
         classpath(kotlin("gradle-plugin", version = "1.6.21"))
         classpath(kotlin("serialization", version = "1.6.21"))
