@@ -172,7 +172,7 @@ dependencies {
     implementation("dev.kord:kord-core:0.8.0-M14")
 
     // JWT
-    implementation("com.auth0:java-jwt:3.19.2")
+    implementation("com.auth0:java-jwt:4.0.0")
 
     // S3
     implementation("software.amazon.awssdk:s3")
