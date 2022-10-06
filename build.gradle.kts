@@ -138,7 +138,7 @@ dependencies {
 
     // Sentry
     implementation("io.sentry:sentry:6.4.3")
-    implementation("io.sentry:sentry-logback:6.4.2")
+    implementation("io.sentry:sentry-logback:6.4.3")
 
     // Prometheus (for metrics)
     implementation("io.prometheus:simpleclient_hotspot:0.16.0")
