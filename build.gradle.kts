@@ -88,7 +88,7 @@ dependencies {
     // BOM
     api(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.4.1"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.6.4"))
-    api(platform("software.amazon.awssdk:bom:2.17.295"))
+    api(platform("software.amazon.awssdk:bom:2.18.0"))
     api(platform("io.ktor:ktor-bom:2.1.2"))
 
     // kotlinx.coroutines libraries
