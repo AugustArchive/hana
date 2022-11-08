@@ -20,7 +20,7 @@
 # SOFTWARE.
 
 # Build stage!
-FROM eclipse-temurin:17.0.4_8-jdk-alpine AS builder
+FROM eclipse-temurin:17.0.5_8-jdk-alpine AS builder
 
 # Install common libraries we will need
 RUN apk update && apk add --no-cache git
@@ -35,7 +35,7 @@ COPY . .
 RUN ./gradlew installDist --stacktrace --no-daemon
 
 # Now we're at the container stage.
-FROM eclipse-temurin:17.0.4_8-jdk
+FROM eclipse-temurin:17.0.5_8-jdk
 
 # Install common libraries we need
 RUN apt update && apt install bash tini
