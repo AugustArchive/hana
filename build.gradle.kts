@@ -122,7 +122,7 @@ dependencies {
     implementation("io.ktor:ktor-server-cors")
 
     // Koin
-    implementation("io.insert-koin:koin-core:3.2.2")
+    implementation("io.insert-koin:koin-core:3.3.0")
 
     // Redis (for caching api keys and ratelimits)
     implementation("io.lettuce:lettuce-core:6.2.2.RELEASE")
