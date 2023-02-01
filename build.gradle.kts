@@ -39,8 +39,8 @@ buildscript {
         classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.18.4")
         classpath("com.diffplug.spotless:spotless-plugin-gradle:6.13.0")
         classpath("gay.floof.utils:gradle-utils:1.3.0")
-        classpath(kotlin("gradle-plugin", version = "1.6.21"))
-        classpath(kotlin("serialization", version = "1.6.21"))
+        classpath(kotlin("gradle-plugin", version = "1.8.0"))
+        classpath(kotlin("serialization", version = "1.8.0"))
     }
 }
 
